@@ -68,9 +68,9 @@ To exit Shusha-DM, you can use the File -> Exit menu or press Alt+F4. You will b
 Shusha-DM is licensed under the GNU GENERAL PUBLIC LICENSE. See the [LICENSE](https://github.com/FourtyThree43/shusha/edit/main/LICENSE) file for more details.
 
 
-# About Shusha-DM
+# About Shusha
 
-Shusha-DM is more than just a download manager. It is also a tribute to the rich and diverse culture of East Africa, where the project originated. The name Shusha-DM comes from the Swahili word "shusha", which means "download". Swahili is a language spoken by millions of people in eastern Africa, especially along the coast. It is influenced by Arabic, Indian, and European languages, making it truly multicultural.
+Shusha is more than just a download manager. It is also a tribute to the rich and diverse culture of East Africa, where the project originated. The name Shusha comes from the Swahili word "shusha", which means "download". Swahili is a language spoken by millions of people in eastern Africa, especially along the coast. It is influenced by Arabic, Indian, and European languages, making it truly multicultural.
 
 The developers of Shusha-DM are based in Kenya, a country in East Africa famed for its scenic landscapes and vast wildlife preserves. Kenya is home to Mount Kenya, the second tallest peak in Africa, and Lake Victoria, the second largest freshwater lake in the world. Kenya is also known for its diverse ethnic groups, vibrant music, and delicious cuisine.
 
