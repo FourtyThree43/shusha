@@ -1,8 +1,14 @@
 import xmlrpc.client
+import subprocess
+import os
+from pathlib import Path
+import platform
+import time
+
 
 class Aria2Client:
     def __init__(self, host, port, aria2_path, secret=None):
-        self.aria2_path = aria2_path
+        self.aria2_path = Path(aria2_path)
         self.host = host
         self.port = port
         self.server_uri = f'http://{host}:{port}/rpc'
@@ -10,15 +16,32 @@ class Aria2Client:
         self.secret = secret
 
     def check_aria_path(self):
-        return os.path.exists(self.aria2_path) and os.path.isfile(self.aria2_path)
+        return self.aria2_path.exists() and self.aria2_path.is_file()
+
+    def initialize_aria2d(self, aria2_path):
+        if not self.check_aria_path():
+            # If aria2_path is not provided or is not a valid file, use a default path
+            cwd = Path(sys.argv[0]).parent
+            aria2d = cwd / "aria2c.exe"  # Default aria2c.exe path
+        else:
+            aria2d = self.aria2_path
+
+        return aria2d
 
     def start_aria(self):
-        if not self.check_aria_path():
-            raise ValueError("Aria2 path is not valid or does not exist.")
+        # if not self.check_aria_path():
+        #     raise ValueError("Aria2 path is not valid or does not exist.")
+        aria2d = self.initialize_aria2d(aria2_path)
 
         if platform.system() == "Windows":
-            # Assuming Windows, adjust the command accordingly for other platforms
-            subprocess.Popen([self.aria2_path, "--enable-rpc", "--rpc-listen-all"])
+            NO_WINDOW = 0x08000000
+            subprocess.Popen([str(aria2d), '--no-conf', '--enable-rpc', '--rpc-listen-port=' + str(self.port),
+                              '--rpc-max-request-size=2M', '--rpc-listen-all', '--quiet=true'],
+                             stderr=subprocess.PIPE,
+                             stdout=subprocess.PIPE,
+                             stdin=subprocess.PIPE,
+                             shell=False,
+                             creationflags=NO_WINDOW)
         else:
             raise NotImplementedError("Starting Aria2 is not implemented for this platform.")
 
@@ -166,12 +189,21 @@ if __name__ == "__main__":
   aria2_client.start_aria()
   print("Aria2 started.")
 
-  url = "https://codeload.github.com/FourtyThree43/shusha/zip/refs/heads/dev"
-  dl_path = "/download/"
-  # Example method call
-  result = aria2_client.add_uri([f'{url}'], {'dir': '{dl_path}'})
-  print(f'New download GID: {result}')
+  time.sleep(2)
 
-  # Shutdown Aria2
-  aria2_client.shutdown_aria()
-  print("Aria2 shut down.")
+  try:
+    verison = aria2_client.get_version()
+    print(version)
+  except:
+    print("Aria2 didn't respond!", "ERROR")
+
+  # url = "https://codeload.github.com/FourtyThree43/shusha/zip/refs/heads/dev"
+  # dl_path = "/download/"
+
+  # # # Example method call
+  # result = aria2_client.add_uri([f'{url}'], {'dir': '{dl_path}'})
+  # print(f'New download GID: {result}')
+
+  # # Shutdown Aria2
+  # aria2_client.shutdown_aria()
+  # print("Aria2 shut down.")
