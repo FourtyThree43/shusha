@@ -1,9 +1,9 @@
-import xmlrpc.client
-import subprocess
-import os
 from pathlib import Path
+import os
 import platform
+import subprocess
 import time
+import xmlrpc.client
 
 
 class Aria2Client:
@@ -35,7 +35,7 @@ class Aria2Client:
 
         if platform.system() == "Windows":
             NO_WINDOW = 0x08000000
-            subprocess.Popen([str(aria2d), '--no-conf', '--enable-rpc', '--rpc-listen-port=' + str(self.port),
+            subprocess.Popen([aria2d, '--no-conf', '--enable-rpc', '--rpc-listen-port=' + str(self.port),
                               '--rpc-max-request-size=2M', '--rpc-listen-all', '--quiet=true'],
                              stderr=subprocess.PIPE,
                              stdout=subprocess.PIPE,
@@ -44,13 +44,6 @@ class Aria2Client:
                              creationflags=NO_WINDOW)
         else:
             raise NotImplementedError("Starting Aria2 is not implemented for this platform.")
-
-
-    def shutdown_aria(self):
-        if not self.check_aria_path():
-            raise ValueError("Aria2 path is not valid or does not exist.")
-
-        subprocess.run([self.aria2_path, "--shutdown"])
 
 
     def _build_request_params(self, method, params=None):
@@ -188,12 +181,10 @@ if __name__ == "__main__":
 
   # Start Aria2
   aria2_client.start_aria()
-  print("Aria2 started.")
-
-  time.sleep(2)
-
+  time.sleep(3)
   try:
-    verison = aria2_client.get_version()
+    version = aria2_client.get_version()
+    print("Aria2 started.")
     print(version)
   except:
     print("Aria2 didn't respond!", "ERROR")
@@ -205,6 +196,14 @@ if __name__ == "__main__":
   # result = aria2_client.add_uri([f'{url}'], {'dir': '{dl_path}'})
   # print(f'New download GID: {result}')
 
-  # # Shutdown Aria2
-  # aria2_client.shutdown_aria()
-  # print("Aria2 shut down.")
+  # Shutdown Aria2
+  aria2_client.shutdown()
+
+  time.sleep(3)
+  try:
+    version = aria2_client.get_version()
+    print("Aria2 still running.")
+    print(version)
+  except:
+    print("Aria2 shut down.")
+    print("Aria2 didn't respond!", "STOPED")
