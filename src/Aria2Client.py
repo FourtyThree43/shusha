@@ -45,6 +45,7 @@ class Aria2Client:
         else:
             raise NotImplementedError("Starting Aria2 is not implemented for this platform.")
 
+
     def shutdown_aria(self):
         if not self.check_aria_path():
             raise ValueError("Aria2 path is not valid or does not exist.")
