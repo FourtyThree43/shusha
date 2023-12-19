@@ -169,7 +169,7 @@ class MainWindow:
 
 
 if __name__ == "__main__":
-    from Aria2Client import Aria2Client
+    from aria2_client import Aria2Client
 
     ariaC = Aria2Client(host="localhost", port=6800, aria2_path="aria2c.exe")
     ariaC.start_aria()
