@@ -200,9 +200,8 @@ if __name__ == "__main__":
     url = "https://docs.python.org/3/_images/pathlib-inheritance.png"
     dl_path = Path("~/Downloads/msic").expanduser()
 
-    # # # Example method call
-    result = aria2_client.add_uri([url], {"dir": str(dl_path)})
-    print(f"New download GID: {result}")
+    gid = aria2_client.add_uri([url], {"dir": str(dl_path)})
+    print(f"New download GID: {gid}")
 
-    # Shutdown Aria2
+    time.sleep(10)
     aria2_client.shutdown()
