@@ -18,7 +18,7 @@ class Aria2Client:
     ]
 
     def __init__(self, host, port, aria2_path="", secret=None):
-        self.aria2_path = Path(aria2_path) if aria2_path else None
+        self.aria2_path = Path(aria2_path)
         self.host = host
         self.port = port
         self.server_uri = f"http://{host}:{port}/rpc"
