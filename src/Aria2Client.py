@@ -186,6 +186,14 @@ class Aria2Client:
     def tell_status(self, gid, keys=None):
         return self._call_method("tellStatus", [gid, keys])
 
+    def get_all_downloads(self):
+        active_downloads = self.tell_active()
+        waiting_downloads = self.tell_waiting(0, 1000)
+        stopped_downloads = self.tell_stopped(0, 1000)
+
+        return active_downloads + waiting_downloads + stopped_downloads
+    
+
 
 if __name__ == "__main__":
     aria2_path = "aria2c"

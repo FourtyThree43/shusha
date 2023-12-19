@@ -61,6 +61,26 @@ class MainWindow:
         self.status_label.grid(row=2, column=0, padx=10, pady=10, columnspan=3)
         self.status_button.grid(row=3, column=1, columnspan=3, pady=10)
 
+        # Treeview widget to display download list
+        columns = ("GID", "Status", "Progress", "Action")
+        self.download_tree = ttk.Treeview(mainframe, columns=columns, show="headings")
+
+        # Define column headings
+        for col in columns:
+            self.download_tree.heading(col, text=col)
+
+        # Populate the treeview with initial download data
+        self.update_download_list()
+
+        # Add a vertical scrollbar
+        scrollbar = ttk.Scrollbar(mainframe, orient="vertical", command=self.download_tree.yview)
+        self.download_tree.configure(yscrollcommand=scrollbar.set)
+
+        # Layout for the Treeview and scrollbar
+        self.download_tree.grid(row=4, column=0, columnspan=3, pady=10, sticky=(tk.W, tk.E))
+        scrollbar.grid(row=4, column=3, sticky=(tk.N, tk.S))
+
+
         # Padding for all child widgets of mainframe
         for child in mainframe.winfo_children():
             child.grid_configure(padx=5, pady=5)
@@ -120,6 +140,26 @@ class MainWindow:
 
         # Schedule the next update after 1 second
         self.master.after(1000, self.status_update)
+
+    def open_downloads_list(self):
+        # Open Downloads List Window
+        downloads_list_window = tk.Toplevel(self.master)
+        DownloadsListWindow(master=downloads_list_window, aria2_client=self.downloader)
+
+    def update_download_list(self):
+        # Update the download list in the Treeview widget
+        downloads = self.downloader.get_all_downloads()
+        for download in downloads:
+            gid = download.get("gid", "")
+            status = download.get("status", "")
+            progress = download.get("completedLength", 0) / download.get("totalLength", 1) * 100  # Calculate progress percentage
+            action_button = ttk.Button(self.download_tree, text="Action", command=lambda g=gid: self.perform_action(g))
+            self.download_tree.insert("", tk.END, values=(gid, status, f"{progress:.2f}%", action_button))
+
+    def perform_action(self, gid):
+        # Handle the action button click for a specific download
+        # You may implement pausing, resuming, or canceling the download based on GID
+        pass
 
     def run(self):
         # Start the Tkinter main loop
