@@ -1,8 +1,12 @@
 import time
+import logging
 import threading
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
+from status_window import StatusWindow
+
+logging.basicConfig(level=logging.INFO)
 
 
 class MainWindow:
@@ -10,7 +14,7 @@ class MainWindow:
     def __init__(self, master, aria2_client):
         self.master = master
         self.master.title("Download Manager")
-        self.aria2_client = aria2_client
+        self.downloader = aria2_client
 
         # Mainframe a frame widge that will contain all the widgets
         mainframe = ttk.Frame(self.master, padding="3 3 12 12")
@@ -45,7 +49,7 @@ class MainWindow:
                                           command=self.start_download)
         self.status_button = ttk.Button(mainframe,
                                         text="Status",
-                                        command=self.status_thread)
+                                        command=self.show_status)
 
         # Layout
         self.url_label.grid(row=0, column=0, sticky=tk.W, pady=5)
@@ -64,42 +68,63 @@ class MainWindow:
         self.url_entry.focus()
         self.master.bind("<Return>", self.start_download)
 
+        # Close event handler
+        self.master.protocol("WM_DELETE_WINDOW", self.on_close)
+
+    def on_close(self):
+        self.downloader.shutdown()
+        self.master.destroy()
+
     def browse_output_path(self):
         output_path = filedialog.askdirectory()
         if output_path:
-            self.aria2_client.change_global_option({"dir": str(output_path)})
+            self.downloader.change_global_option({"dir": str(output_path)})
             self.status_label.config(
                 text=f"Download directory set to: {output_path}")
             self.output_entry.delete(0, tk.END)
             self.output_entry.insert(0, output_path)
 
     def start_download(self):
-        url = self.url_entry.get()
+        url = self.url.get()
         if url:
             threading.Thread(target=self.download_thread,
                              args=(url, ),
                              daemon=True).start()
 
     def download_thread(self, url):
-        gid = self.aria2_client.add_uri([url])
-        self.status_label.config(text=f"Download started with GID: {gid}")
+        try:
+            gid = self.downloader.add_uri([url])
+            self.status_label.config(text=f"Download started with GID: {gid}")
+        except Exception as e:
+            logging.error(f"Error starting download: {e}")
 
-    def status_thread(self):
-        threading.Thread(target=self.status_update_thread, daemon=True).start()
+    def show_status(self):
+        status = self.downloader.tell_active()
+        if status:
+            status_window = tk.Toplevel(self.master)
+            StatusWindow(master=status_window,
+                         aria2_client=self.downloader,
+                         gid=f"{status[0]['gid']}")
 
-    def status_update_thread(self):
-        while True:
-            status = self.aria2_client.tell_active()
+    def status_update(self):
+        try:
+            status = self.downloader.tell_active()
             if status:
                 self.status_label.config(text=f"Active: {status}",
                                          wraplength=200,
                                          justify=tk.LEFT)
             else:
                 self.status_label.config(text="No active downloads")
-            time.sleep(1)
+        except Exception as e:
+            logging.error(f"Error in status_update: {e}")
+
+        # Schedule the next update after 1 second
+        self.master.after(1000, self.status_update)
 
     def run(self):
         # Start the Tkinter main loop
+        #  Schedule the first status update
+        self.master.after(1000, self.status_update)
         self.master.mainloop()
 
 
@@ -114,4 +139,3 @@ if __name__ == "__main__":
 
     # Start the Tkinter event loop
     app.run()
-    ariaC.shutdown()
