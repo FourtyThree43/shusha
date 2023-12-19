@@ -49,3 +49,9 @@ class MainWindow:
 
     def show_status(self):
         status_window = StatusWindow(self.master, self.downloader, 'your_gid')  # Replace 'your_gid' with the actual GID
+
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    main_window = MainWindow(root)
+    root.mainloop()
