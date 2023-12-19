@@ -12,28 +12,38 @@ class MainWindow:
         self.master.title("Download Manager")
         self.aria2_client = aria2_client
 
+        # Mainframe a frame widge that will contain all the widgets
+        mainframe = ttk.Frame(self.master, padding="3 3 12 12")
+        mainframe.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
+        self.master.columnconfigure(0, weight=1)
+        self.master.rowconfigure(0, weight=1)
+
         # GUI Elements
         # URL Entry
-        self.url_label = ttk.Label(master, text="URL:")
-        self.url_entry = ttk.Entry(self.master, width=50)
+        self.url = tk.StringVar()
+        self.url_label = ttk.Label(mainframe, text="URL:")
+        self.url_entry = ttk.Entry(mainframe, width=50, textvariable=self.url)
         self.url_entry.insert(0, "https://proof.ovh.net/files/10Mb.dat")
 
         # Output Entry
-        self.output_label = ttk.Label(master, text="Output Path:")
-        self.output_entry = ttk.Entry(master, width=50)
-        self.output_entry.insert(0, "")
+        self.output_path = tk.StringVar()
+        self.output_label = ttk.Label(mainframe, text="Output Path:")
+        self.output_entry = ttk.Entry(mainframe,
+                                      width=50,
+                                      textvariable=self.output_path)
+        self.output_entry.insert(0, "C:/Users/username/Downloads")
 
         # Status
-        self.status_label = ttk.Label(self.master, text="")
+        self.status_label = ttk.Label(mainframe, text="")
 
         # Buttons
-        self.output_button = ttk.Button(self.master,
+        self.output_button = ttk.Button(mainframe,
                                         text="Browse",
                                         command=self.browse_output_path)
-        self.download_button = ttk.Button(self.master,
+        self.download_button = ttk.Button(mainframe,
                                           text="Download",
                                           command=self.start_download)
-        self.status_button = ttk.Button(self.master,
+        self.status_button = ttk.Button(mainframe,
                                         text="Status",
                                         command=self.status_thread)
 
@@ -46,6 +56,13 @@ class MainWindow:
         self.download_button.grid(row=3, column=0, columnspan=2, pady=10)
         self.status_label.grid(row=2, column=0, padx=10, pady=10, columnspan=3)
         self.status_button.grid(row=3, column=1, columnspan=3, pady=10)
+
+        # Padding for all child widgets of mainframe
+        for child in mainframe.winfo_children():
+            child.grid_configure(padx=5, pady=5)
+
+        self.url_entry.focus()
+        self.master.bind("<Return>", self.start_download)
 
     def browse_output_path(self):
         output_path = filedialog.askdirectory()
@@ -89,14 +106,12 @@ class MainWindow:
 if __name__ == "__main__":
     from Aria2Client import Aria2Client
 
-    aria2_client = Aria2Client(host="localhost",
-                               port=6800,
-                               aria2_path="aria2c.exe")
-    aria2_client.start_aria()
+    ariaC = Aria2Client(host="localhost", port=6800, aria2_path="aria2c.exe")
+    ariaC.start_aria()
 
     root = tk.Tk()
-    app = MainWindow(root, aria2_client)
+    app = MainWindow(master=root, aria2_client=ariaC)
 
     # Start the Tkinter event loop
     app.run()
-    aria2_client.shutdown()
+    ariaC.shutdown()
