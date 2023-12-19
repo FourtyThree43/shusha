@@ -1,9 +1,11 @@
 import tkinter as tk
 from tkinter import ttk
 from gui.status_window import StatusWindow
-from src import Aria2Client
+from Aria2Client import Aria2Client
+
 
 class MainWindow:
+
     def __init__(self, master):
         self.master = master
         self.master.title("Shusha")

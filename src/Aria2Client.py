@@ -22,7 +22,8 @@ class Aria2Client:
         self.host = host
         self.port = port
         self.server_uri = f"http://{host}:{port}/rpc"
-        self.server = xmlrpc.client.ServerProxy(self.server_uri, allow_none=True)
+        self.server = xmlrpc.client.ServerProxy(self.server_uri,
+                                                allow_none=True)
         self.secret = secret
 
     def check_aria_path(self):
@@ -31,7 +32,7 @@ class Aria2Client:
     def initialize_aria2d(self):
         if not self.check_aria_path():
             cwd = Path(__file__).parent
-            aria2d = PurePath.joinpath(cwd, "aria2c.exe")  # Default aria2c.exe path
+            aria2d = PurePath.joinpath(cwd, "aria2c.exe")
         else:
             aria2d = self.aria2_path
 
@@ -61,8 +62,7 @@ class Aria2Client:
                 logging.error(f"Error starting Aria2: {e}")
         else:
             raise NotImplementedError(
-                "Starting Aria2 is not implemented for this platform."
-            )
+                "Starting Aria2 is not implemented for this platform.")
 
     def _build_request_params(self, method, params=None):
         request_params = [self.secret] if self.secret else []
@@ -82,7 +82,8 @@ class Aria2Client:
         return self._call_method("addUri", [uris, options, position])
 
     def add_torrent(self, torrent, uris=None, options=None, position=None):
-        return self._call_method("addTorrent", [torrent, uris, options, position])
+        return self._call_method("addTorrent",
+                                 [torrent, uris, options, position])
 
     def add_metalink(self, metalink, options=None, position=None):
         return self._call_method("addMetalink", [metalink, options, position])
@@ -131,8 +132,7 @@ class Aria2Client:
 
     def change_uri(self, gid, file_index, del_uris, add_uris, position=None):
         return self._call_method(
-            "changeUri", [gid, file_index, del_uris, add_uris, position]
-        )
+            "changeUri", [gid, file_index, del_uris, add_uris, position])
 
     def get_option(self, gid):
         return self._call_method("getOption", [gid])
@@ -162,6 +162,7 @@ class Aria2Client:
         return self._call_method("getSessionInfo")
 
     def shutdown(self):
+        logging.info("Shutting down Aria2.")
         return self._call_method("shutdown")
 
     def force_shutdown(self):
@@ -196,7 +197,7 @@ if __name__ == "__main__":
     aria2_client.start_aria()
     time.sleep(5)
 
-    url = "https://codeload.github.com/FourtyThree43/shusha/zip/refs/heads/dev"
+    url = "https://docs.python.org/3/_images/pathlib-inheritance.png"
     dl_path = Path("~/Downloads/msic").expanduser()
 
     # # # Example method call
