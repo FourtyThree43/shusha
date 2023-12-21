@@ -1,0 +1,24 @@
+{
+  "name": "Motrix",
+  "version": "1.8.19",
+  "description": "A full-featured download manager",
+  "homepage": "https://motrix.app",
+  "author": {
+    "name": "Dr_rOot",
+    "email": "agalwood.net@gmail.com"
+  },
+  "copyright": "Copyright© Dr_rOot",
+  "license": "MIT",
+  "main": "./dist/electron/main.js",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:agalwood/Motrix.git"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.1",
+    "ws": "^8.13.0"
+  }
+}
