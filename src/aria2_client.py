@@ -8,6 +8,27 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 
+class XMLRPCClientException(Exception):
+    """An exception specific to XML-RPC errors."""
+
+    def __init__(self, faultCode: int, faultString: str) -> None:
+        """Initialize the exception.
+
+        Parameters:
+            faultCode: The fault code.
+            faultString: The fault string describing the error.
+        """
+        super().__init__()
+        self.faultCode = faultCode
+        self.faultString = faultString
+
+    def __str__(self):
+        return f"XML-RPC Error - Code: {self.faultCode}, Message: {self.faultString}"
+
+    def __bool__(self):
+        return False
+
+
 class Aria2Client:
     ARIA2_OPTIONS = [
         "--no-conf",
@@ -75,8 +96,13 @@ class Aria2Client:
         try:
             return getattr(self.server.aria2, method)(*request_params)
         except xmlrpc.client.Fault as e:
-            print(f"XML-RPC Error: {e.faultString}")
+            self._handle_xmlrpc_error(e)
             return None
+
+    def _handle_xmlrpc_error(self, xmlrpc_fault):
+        faultCode = xmlrpc_fault.faultCode
+        faultString = xmlrpc_fault.faultString
+        raise XMLRPCClientException(faultCode, faultString)
 
     def add_uri(self, uris, options=None, position=None):
         return self._call_method("addUri", [uris, options, position])
@@ -192,7 +218,6 @@ class Aria2Client:
         stopped_downloads = self.tell_stopped(0, 1000)
 
         return active_downloads + waiting_downloads + stopped_downloads
-    
 
 
 if __name__ == "__main__":
@@ -203,13 +228,17 @@ if __name__ == "__main__":
 
     # Start Aria2
     aria2_client.start_aria()
-    time.sleep(5)
+    time.sleep(3)
 
-    url = "https://docs.python.org/3/_images/pathlib-inheritance.png"
-    dl_path = Path("~/Downloads/msic").expanduser()
+    url = "https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4"
+    dl_path = Path(__file__).parent
 
     gid = aria2_client.add_uri([url], {"dir": str(dl_path)})
-    print(f"New download GID: {gid}")
+    time.sleep(5)
+    print(gid)
 
-    time.sleep(10)
+    # listofdl = aria2_client.get_all_downloads()
+    # print(listofdl)
+
+    time.sleep(5)
     aria2_client.shutdown()

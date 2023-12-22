@@ -15,9 +15,9 @@ class App:
 
     def __init__(self, root):
         self.master = root
-        self.master.geometry("540x540+664+580")
-        self.master.minsize(1050, 480)
-        self.master.maxsize(1920, 1080)
+        self.master.geometry("540x540+664+580")  # “wm geometry... wxh+x+y”)
+        self.master.minsize(1050, 320)
+        self.master.maxsize(1050, 320)
         self.master.resizable(1, 1)
         self.master.configure(background="wheat")
         self.master.configure(highlightbackground="wheat")
@@ -68,19 +68,25 @@ class App:
     def create_task_actions_bar(self):
         # task_actions_bar = ttk.Frame(self.mainframe)
         task_actions_bar = tk.PanedWindow(self.mainframe, orient=tk.HORIZONTAL)
-        task_actions_bar.grid(column=1, row=1, sticky=(tk.W, tk.E))
+        task_actions_bar.grid(column=0,
+                              row=1,
+                              sticky=(tk.W, tk.E),
+                              columnspan=3)
 
         # Load images
-        add_url_icon = tk.PhotoImage(file=relative_to_assets("button_2.png"))
+        add_url_icon = tk.PhotoImage(
+            file=relative_to_assets("add-url-icon.png"))
         add_torrent_icon = tk.PhotoImage(
-            file=relative_to_assets("button_2.png"))
-        refresh_icon = tk.PhotoImage(file=relative_to_assets("button_2.png"))
+            file=relative_to_assets("magnetic-icon.png"))
+        refresh_icon = tk.PhotoImage(
+            file=relative_to_assets("task-sync-icon.png"))
         start_all_icon = tk.PhotoImage(file=relative_to_assets("button_2.png"))
         resume_all_icon = tk.PhotoImage(
-            file=relative_to_assets("button_2.png"))
-        pause_all_icon = tk.PhotoImage(file=relative_to_assets("button_2.png"))
+            file=relative_to_assets("play-pause-icon.png"))
+        pause_all_icon = tk.PhotoImage(
+            file=relative_to_assets("pause-icon.png"))
         purge_completed_icon = tk.PhotoImage(
-            file=relative_to_assets("button_3.png"))
+            file=relative_to_assets("remove-files-icon.png"))
 
         # Create buttons with images
         add_url_button = ttk.Button(task_actions_bar,
@@ -125,13 +131,32 @@ class App:
 
     def create_left_panel(self):
         left_pane = ttk.Panedwindow(self.mainframe, orient=tk.VERTICAL)
-        left_pane.grid(column=0, row=2, sticky=(tk.W, tk.E), padx=0, pady=0)
+        left_pane.grid(column=0,
+                       row=2,
+                       sticky=(tk.W, tk.E),
+                       padx=0,
+                       pady=0,
+                       columnspan=1)
 
         # Treeview for Categories
         categories_tree = ttk.Treeview(left_pane,
-                                       columns=("Categories", ),
+                                       columns=("Categories"),
                                        show="headings")
         categories_tree.heading("Categories", text="Categories")
+        categories_tree.insert("", "end", text="All", values=["All"])
+        categories_tree.insert("", "end", text="Active", values=["Active"])
+        categories_tree.insert("", "end", text="Inactive", values=["Inactive"])
+        categories_tree.insert("",
+                               "end",
+                               text="Completed",
+                               values=["Completed"])
+        categories_tree.insert("",
+                               "end",
+                               text="Downloading",
+                               values=["Downloading"])
+        categories_tree.insert("", "end", text="Paused", values=["Paused"])
+        categories_tree.insert("", "end", text="Queued", values=["Queued"])
+        categories_tree.insert("", "end", text="Seeding", values=["Seeding"])
 
         # Add left_pane widget with a specific size
         left_pane.add(categories_tree)
@@ -142,7 +167,8 @@ class App:
                          row=2,
                          sticky=(tk.W, tk.E, tk.N, tk.S),
                          padx=5,
-                         pady=5)
+                         pady=5,
+                         columnspan=2)
 
         # Treeview for Download List
         _columns = ("GID", "Status", "Progress", "Action")
@@ -160,15 +186,60 @@ class App:
                                   orient="vertical",
                                   command=download_list_tree.yview)
         download_list_tree.configure(yscrollcommand=scrollbar.set)
-        scrollbar.grid(column=2, row=2, sticky=(tk.N, tk.S))
+        scrollbar.grid(column=5, row=2, sticky=(tk.N, tk.S))
 
     def create_right_panel(self):
         # ... (implement your right panel here)
         pass
 
     def create_bottom_status_bar(self):
-        # ... (implement your bottom status bar here)
-        pass
+        satus_bar = ttk.Panedwindow(self.mainframe)
+        satus_bar.grid(column=0, row=3, sticky=(tk.W, tk.E), columnspan=5)
+
+        # Create a label
+        status_label = ttk.Label(satus_bar, text="Status: ")
+        status_label.grid(column=0, row=0, sticky=(tk.W, tk.E))
+
+        # Create a progress bar
+        # progress_bar = ttk.Progressbar(satus_bar, orient=tk.HORIZONTAL)
+        # progress_bar.grid(column=1, row=0, sticky=(tk.W, tk.E))
+
+        # Create a label
+        download_speed_label = ttk.Label(satus_bar, text="Download Speed: ")
+        download_speed_label.grid(column=2, row=0, sticky=(tk.W, tk.E))
+
+        # Create a label
+        upload_speed_label = ttk.Label(satus_bar, text="Upload Speed: ")
+        upload_speed_label.grid(column=3, row=0, sticky=(tk.W, tk.E))
+
+        # Create a label
+        time_elapsed_label = ttk.Label(satus_bar, text="Time Elapsed: ")
+        time_elapsed_label.grid(column=4, row=0, sticky=(tk.W, tk.E))
+
+        # Create a label
+        time_remaining_label = ttk.Label(satus_bar, text="Time Remaining: ")
+        time_remaining_label.grid(column=5, row=0, sticky=(tk.W, tk.E))
+
+        # Create a label
+        num_of_active_downloads_label = ttk.Label(
+            satus_bar, text="Number of Active Downloads: ")
+        num_of_active_downloads_label.grid(column=6,
+                                           row=0,
+                                           sticky=(tk.W, tk.E))
+
+        # Create a label
+        num_of_waiting_downloads_label = ttk.Label(
+            satus_bar, text="Number of Waiting Downloads: ")
+        num_of_waiting_downloads_label.grid(column=7,
+                                            row=0,
+                                            sticky=(tk.W, tk.E))
+
+        # Create a label
+        num_of_stopped_downloads_label = ttk.Label(
+            satus_bar, text="Number of Stopped Downloads: ")
+        num_of_stopped_downloads_label.grid(column=8,
+                                            row=0,
+                                            sticky=(tk.W, tk.E))
 
     def open_file(self):
         # Implement the open file functionality

@@ -13,7 +13,15 @@ class MainWindow:
 
     def __init__(self, master, aria2_client):
         self.master = master
+        self.master.geometry("840x420+664+580")  # “wm geometry... wxh+x+y”)
+        self.master.minsize(840, 420)
+        self.master.maxsize(1000, 1000)
+        self.master.resizable(1, 1)
+        self.master.configure(background="wheat")
+        self.master.configure(highlightbackground="wheat")
+        self.master.configure(highlightcolor="black")
         self.master.title("Download Manager")
+
         self.downloader = aria2_client
 
         # Mainframe a frame widge that will contain all the widgets
@@ -52,6 +60,8 @@ class MainWindow:
                                         command=self.show_status)
 
         # Layout
+        self.menu()
+        # self.task_actions_bar(mainframe=mainframe)
         self.url_label.grid(row=0, column=0, sticky=tk.W, pady=5)
         self.url_entry.grid(row=0, column=1, columnspan=1, pady=5)
         self.output_label.grid(row=1, column=0, sticky=tk.W, pady=5)
@@ -63,7 +73,9 @@ class MainWindow:
 
         # Treeview widget to display download list
         columns = ("GID", "Status", "Progress", "Action")
-        self.download_tree = ttk.Treeview(mainframe, columns=columns, show="headings")
+        self.download_tree = ttk.Treeview(mainframe,
+                                          columns=columns,
+                                          show="headings")
 
         # Define column headings
         for col in columns:
@@ -73,13 +85,18 @@ class MainWindow:
         self.update_download_list()
 
         # Add a vertical scrollbar
-        scrollbar = ttk.Scrollbar(mainframe, orient="vertical", command=self.download_tree.yview)
+        scrollbar = ttk.Scrollbar(mainframe,
+                                  orient="vertical",
+                                  command=self.download_tree.yview)
         self.download_tree.configure(yscrollcommand=scrollbar.set)
 
         # Layout for the Treeview and scrollbar
-        self.download_tree.grid(row=4, column=0, columnspan=3, pady=10, sticky=(tk.W, tk.E))
+        self.download_tree.grid(row=4,
+                                column=0,
+                                columnspan=3,
+                                pady=10,
+                                sticky=(tk.W, tk.E))
         scrollbar.grid(row=4, column=3, sticky=(tk.N, tk.S))
-
 
         # Padding for all child widgets of mainframe
         for child in mainframe.winfo_children():
@@ -94,6 +111,55 @@ class MainWindow:
     def on_close(self):
         self.downloader.shutdown()
         self.master.destroy()
+
+    def menu(self):
+        # Create a menu bar
+        menu_bar = tk.Menu(self.master)
+
+        # Create a pull-down menu for File
+        file_menu = tk.Menu(menu_bar, tearoff=0)
+        file_menu.add_command(label="Start All")
+        file_menu.add_command(label="Pause All")
+        file_menu.add_command(label="Resume All")
+        file_menu.add_command(label="Purge Completed")
+        file_menu.add_command(label="Exit", command=self.on_close)
+        menu_bar.add_cascade(label="File", menu=file_menu)
+
+        # Create a pull-down menu for Edit
+        edit_menu = tk.Menu(menu_bar, tearoff=0)
+        edit_menu.add_command(label="Downloads List",
+                              command=self.open_downloads_list)
+        menu_bar.add_cascade(label="Edit", menu=edit_menu)
+
+        # Create a pull-down menu for Help
+        help_menu = tk.Menu(menu_bar, tearoff=0)
+        help_menu.add_command(label="About")
+        menu_bar.add_cascade(label="Help", menu=help_menu)
+
+        # Display the menu bar
+        self.master.config(menu=menu_bar)
+
+    def task_actions_bar(self, mainframe):
+        # Create a frame widget to hold the task action buttons
+        task_actions_bar = ttk.Frame(mainframe)
+        task_actions_bar.grid(row=3, column=0, columnspan=3, pady=10)
+
+        # Create task action buttons
+        start_all_button = ttk.Button(task_actions_bar, text="Start All")
+        pause_all_button = ttk.Button(task_actions_bar, text="Pause All")
+        resume_all_button = ttk.Button(task_actions_bar, text="Resume All")
+        purge_completed_button = ttk.Button(task_actions_bar,
+                                            text="Purge Completed")
+
+        # Layout for task action buttons
+        start_all_button.grid(row=0, column=0, padx=10, pady=5)
+        pause_all_button.grid(row=0, column=1, padx=10, pady=5)
+        resume_all_button.grid(row=0, column=2, padx=10, pady=5)
+        purge_completed_button.grid(row=0, column=3, padx=10, pady=5)
+
+    def about(self):
+        # Open About Window
+        pass
 
     def browse_output_path(self):
         output_path = filedialog.askdirectory()
@@ -144,7 +210,8 @@ class MainWindow:
     def open_downloads_list(self):
         # Open Downloads List Window
         downloads_list_window = tk.Toplevel(self.master)
-        DownloadsListWindow(master=downloads_list_window, aria2_client=self.downloader)
+        DownloadsListWindow(master=downloads_list_window,
+                            aria2_client=self.downloader)
 
     def update_download_list(self):
         # Update the download list in the Treeview widget
@@ -152,9 +219,22 @@ class MainWindow:
         for download in downloads:
             gid = download.get("gid", "")
             status = download.get("status", "")
-            progress = download.get("completedLength", 0) / download.get("totalLength", 1) * 100  # Calculate progress percentage
-            action_button = ttk.Button(self.download_tree, text="Action", command=lambda g=gid: self.perform_action(g))
-            self.download_tree.insert("", tk.END, values=(gid, status, f"{progress:.2f}%", action_button))
+            completedLength = int(download.get("completedLength", 0))
+            totalLength = int(download.get("totalLength", 1))
+            # progress = completedLength / totalLength * 100
+            print(
+                f"gid: {gid}, status: {status}, completedLength: {completedLength}, totalLength: {totalLength}"
+            )
+
+            # action_button = ttk.Button(
+            #     self.download_tree,
+            #     text="Action",
+            #     command=lambda g=gid: self.perform_action(g))
+        #     self.download_tree.insert("",
+        #                               tk.END,
+        #                               values=(gid, status, f"{progress:.2f}%",
+        #                                       action_button))
+        self.master.after(1000, self.update_download_list)
 
     def perform_action(self, gid):
         # Handle the action button click for a specific download
