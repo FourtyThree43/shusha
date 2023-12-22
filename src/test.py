@@ -60,7 +60,53 @@ class App:
 
         # Add sub-items to File menu
         file_menu.add_command(label="Open", command=self.open_file)
+        file_menu.add_command(label="Save")
         file_menu.add_command(label="Exit", command=self.master.quit)
+
+        # Add sub-items to Edit menu
+        edit_menu.add_command(label="Add URL", command=self.add_url)
+        edit_menu.add_command(label="Add Torrent", command=self.add_torrent)
+        edit_menu.add_command(label="Refresh", command=self.refresh_task_list)
+        edit_menu.add_separator()
+        edit_menu.add_command(label="Start All", command=self.start_all)
+        edit_menu.add_command(label="Resume All", command=self.resume_all)
+        edit_menu.add_command(label="Pause All", command=self.pause_all)
+        edit_menu.add_command(label="Purge Completed",
+                              command=self.purge_completed)
+
+        # Add sub-items to View menu
+        view_menu.add_checkbutton(label="Category")
+        view_menu.add_checkbutton(label="Name")
+        view_menu.add_checkbutton(label="Size")
+        view_menu.add_checkbutton(label="Progress")
+        view_menu.add_checkbutton(label="Download Speed")
+        view_menu.add_checkbutton(label="Upload Speed")
+        view_menu.add_checkbutton(label="ETA")
+        view_menu.add_checkbutton(label="Status")
+        view_menu.add_checkbutton(label="Note")
+
+        # Add sub-items to Queue menu
+        queue_menu.add_command(label="Move To Top")
+        queue_menu.add_command(label="Move To Bottom")
+        queue_menu.add_command(label="Move Up")
+        queue_menu.add_command(label="Move Down")
+        queue_menu.add_command(label="Remove")
+
+        # Add sub-items to Options menu
+        options_menu.add_command(label="Settings")
+        options_menu.add_command(label="Scheduler")
+        options_menu.add_command(label="Speed Limit")
+        options_menu.add_command(label="Connection")
+        options_menu.add_command(label="Proxy")
+        options_menu.add_command(label="Plugin")
+
+        # Add sub-items to Help menu
+        help_menu.add_command(label="About")
+        help_menu.add_command(label="Online Help")
+        help_menu.add_command(label="Forum")
+        help_menu.add_command(label="Discord")
+        help_menu.add_command(label="Report Bug")
+        help_menu.add_command(label="Donate")
 
         # Display the menu
         self.master.config(menu=menu)
