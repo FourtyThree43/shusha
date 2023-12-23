@@ -17,7 +17,7 @@ class App:
         self.master = root
         self.master.geometry("540x540+664+580")  # “wm geometry... wxh+x+y”)
         self.master.minsize(1050, 320)
-        self.master.maxsize(1050, 320)
+        self.master.maxsize(1050, 350)
         self.master.resizable(1, 1)
         self.master.configure(background="wheat")
         self.master.configure(highlightbackground="wheat")
@@ -26,7 +26,7 @@ class App:
 
         # Mainframe a frame widge that will contain all the widgets
         self.mainframe = ttk.Frame(self.master, padding="3 3 12 12")
-        self.mainframe.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
+        self.mainframe.grid(column=0, row=0, sticky=tk.NSEW)
         self.master.columnconfigure(0, weight=1)
         self.master.rowconfigure(0, weight=1)
 
@@ -39,7 +39,7 @@ class App:
 
     def create_menu_bar(self):
         menu_bar = ttk.Frame(self.mainframe)
-        menu_bar.grid(column=0, row=0, sticky=(tk.W, tk.E))
+        menu_bar.grid(column=0, row=0, sticky=tk.EW)
 
         # Create the menu
         menu = tk.Menu(menu_bar)
@@ -114,10 +114,7 @@ class App:
     def create_task_actions_bar(self):
         # task_actions_bar = ttk.Frame(self.mainframe)
         task_actions_bar = tk.PanedWindow(self.mainframe, orient=tk.HORIZONTAL)
-        task_actions_bar.grid(column=0,
-                              row=1,
-                              sticky=(tk.W, tk.E),
-                              columnspan=3)
+        task_actions_bar.grid(column=0, row=1, sticky=tk.EW, columnspan=3)
 
         # Load images
         add_url_icon = tk.PhotoImage(
@@ -179,7 +176,7 @@ class App:
         left_pane = ttk.Panedwindow(self.mainframe, orient=tk.VERTICAL)
         left_pane.grid(column=0,
                        row=2,
-                       sticky=(tk.W, tk.E),
+                       sticky=tk.EW,
                        padx=0,
                        pady=0,
                        columnspan=1)
@@ -211,7 +208,7 @@ class App:
         center_pane = ttk.Panedwindow(self.mainframe, orient=tk.VERTICAL)
         center_pane.grid(column=1,
                          row=2,
-                         sticky=(tk.W, tk.E, tk.N, tk.S),
+                         sticky=tk.NSEW,
                          padx=5,
                          pady=5,
                          columnspan=2)
@@ -232,7 +229,24 @@ class App:
                                   orient="vertical",
                                   command=download_list_tree.yview)
         download_list_tree.configure(yscrollcommand=scrollbar.set)
-        scrollbar.grid(column=5, row=2, sticky=(tk.N, tk.S))
+        scrollbar.grid(column=5, row=2, sticky=tk.NS)
+
+        # Add a horizontal scrollbar
+        scrollbar = ttk.Scrollbar(self.mainframe,
+                                  orient="horizontal",
+                                  command=download_list_tree.xview)
+        download_list_tree.configure(xscrollcommand=scrollbar.set)
+        scrollbar.grid(column=1, row=3, sticky=tk.EW, columnspan=4)
+
+        # add sample values to the center_panel
+        for i in range(21):
+            download_list_tree.insert("",
+                                      "end",
+                                      text="Sample",
+                                      values=[
+                                          f"Lorem_a{i}", f"Lorem_b{i}",
+                                          f"Lorem_c{i}", f"Lorem_d{i}"
+                                      ])
 
     def create_right_panel(self):
         # ... (implement your right panel here)
@@ -240,52 +254,95 @@ class App:
 
     def create_bottom_status_bar(self):
         satus_bar = ttk.Panedwindow(self.mainframe)
-        satus_bar.grid(column=0, row=3, sticky=(tk.W, tk.E), columnspan=5)
+        satus_bar.grid(column=0, row=3, sticky=tk.EW, columnspan=5)
 
         # Create a label
         status_label = ttk.Label(satus_bar, text="Status: ")
-        status_label.grid(column=0, row=0, sticky=(tk.W, tk.E))
+        status_label.grid(column=0, row=1, sticky=tk.EW)
 
         # Create a progress bar
-        # progress_bar = ttk.Progressbar(satus_bar, orient=tk.HORIZONTAL)
-        # progress_bar.grid(column=1, row=0, sticky=(tk.W, tk.E))
+        progress_bar = ttk.Progressbar(satus_bar, orient=tk.HORIZONTAL)
+        progress_bar.grid(column=0, row=0, sticky=tk.EW)
 
         # Create a label
         download_speed_label = ttk.Label(satus_bar, text="Download Speed: ")
-        download_speed_label.grid(column=2, row=0, sticky=(tk.W, tk.E))
+        download_speed_label.grid(column=2, row=1, sticky=tk.EW, padx=10)
+
+        # sample dl_speed
+        dl_speed = ttk.Label(satus_bar, text="0.00 KiB/s" + " ↓")
+        dl_speed.grid(column=2, row=0, sticky=tk.S, padx=5)
 
         # Create a label
         upload_speed_label = ttk.Label(satus_bar, text="Upload Speed: ")
-        upload_speed_label.grid(column=3, row=0, sticky=(tk.W, tk.E))
+        upload_speed_label.grid(column=3, row=1, sticky=tk.EW, padx=10)
+
+        # sample ul_speed
+        ul_speed = ttk.Label(satus_bar, text="0.00 KiB/s" + " ↑")
+        ul_speed.grid(column=3, row=0, sticky=tk.S, padx=5)
 
         # Create a label
         time_elapsed_label = ttk.Label(satus_bar, text="Time Elapsed: ")
-        time_elapsed_label.grid(column=4, row=0, sticky=(tk.W, tk.E))
+        time_elapsed_label.grid(column=4, row=1, sticky=tk.EW, padx=10)
+
+        # sample time_elapsed
+        time_elapsed = ttk.Label(satus_bar, text="00:00:00")
+        time_elapsed.grid(column=4, row=0, sticky=tk.S, padx=5)
 
         # Create a label
         time_remaining_label = ttk.Label(satus_bar, text="Time Remaining: ")
-        time_remaining_label.grid(column=5, row=0, sticky=(tk.W, tk.E))
+        time_remaining_label.grid(column=5, row=1, sticky=tk.EW, padx=10)
+
+        # sample time_remaining
+        time_remaining = ttk.Label(satus_bar, text="00:00:00")
+        time_remaining.grid(column=5, row=0, sticky=tk.S, padx=5)
 
         # Create a label
-        num_of_active_downloads_label = ttk.Label(
-            satus_bar, text="Number of Active Downloads: ")
-        num_of_active_downloads_label.grid(column=6,
-                                           row=0,
-                                           sticky=(tk.W, tk.E))
+        active_downloads_label = ttk.Label(satus_bar, text="Active: ")
+        active_downloads_label.grid(column=6, row=1, sticky=tk.EW, padx=10)
+
+        # sample num_of_active_downloads
+        active_downloads = ttk.Label(satus_bar, text="0/21")
+        active_downloads.grid(column=6, row=0, sticky=tk.S, padx=5)
 
         # Create a label
-        num_of_waiting_downloads_label = ttk.Label(
-            satus_bar, text="Number of Waiting Downloads: ")
-        num_of_waiting_downloads_label.grid(column=7,
-                                            row=0,
-                                            sticky=(tk.W, tk.E))
+        waiting_downloads_label = ttk.Label(satus_bar, text="Waiting: ")
+        waiting_downloads_label.grid(column=7, row=1, sticky=tk.EW, padx=10)
+
+        # sample num_of_waiting_downloads
+        waiting_downloads = ttk.Label(satus_bar, text="0/21")
+        waiting_downloads.grid(column=7, row=0, sticky=tk.S, padx=5)
 
         # Create a label
-        num_of_stopped_downloads_label = ttk.Label(
-            satus_bar, text="Number of Stopped Downloads: ")
-        num_of_stopped_downloads_label.grid(column=8,
-                                            row=0,
-                                            sticky=(tk.W, tk.E))
+        stopped_downloads_label = ttk.Label(satus_bar, text="Stopped: ")
+        stopped_downloads_label.grid(column=8, row=1, sticky=tk.EW, padx=10)
+
+        # sample num_of_stopped_downloads
+        stopped_downloads = ttk.Label(satus_bar, text="21/21")
+        stopped_downloads.grid(column=8, row=0, sticky=tk.S, padx=5)
+
+        # Create a label
+        speed_limit_label = ttk.Label(satus_bar, text="Speed Limiter ")
+        speed_limit_label.grid(column=9, row=1, sticky=tk.EW, padx=10)
+
+        # load speed_limit_icons (Low, Medium, High)
+        self.low_speed_limit_icon = tk.PhotoImage(
+            file=relative_to_assets("sp_low-icon.png"))
+        self.medium_speed_limit_icon = tk.PhotoImage(
+            file=relative_to_assets("sp_mid-icon.png"))
+        self.high_speed_limit_icon = tk.PhotoImage(
+            file=relative_to_assets("sp_high-icon.png"))
+
+        # Initialize speed limit state
+        self.speed_limit_state = 1
+
+        # sample speed_limit button with icon changes to Low/Medium/High on press
+        self.speed_limit_button = ttk.Button(
+            satus_bar,
+            image=self.medium_speed_limit_icon,
+            command=self.change_speed_limit)
+
+        self.speed_limit_button.image = self.medium_speed_limit_icon
+        self.speed_limit_button.grid(column=9, row=0, sticky=tk.NS, padx=5)
 
     def open_file(self):
         # Implement the open file functionality
@@ -319,6 +376,20 @@ class App:
         # Implement the purge completed functionality
 
         pass
+
+    def change_speed_limit(self):
+        # changes the speed limit icon to Low/Medium/High
+        # depending on the number of clicks
+        self.speed_limit_state = (self.speed_limit_state + 1) % 3
+        if self.speed_limit_state == 0:
+            self.speed_limit_button.config(image=self.low_speed_limit_icon)
+            self.speed_limit_button.image = self.low_speed_limit_icon
+        elif self.speed_limit_state == 1:
+            self.speed_limit_button.config(image=self.medium_speed_limit_icon)
+            self.speed_limit_button.image = self.medium_speed_limit_icon
+        elif self.speed_limit_state == 2:
+            self.speed_limit_button.config(image=self.high_speed_limit_icon)
+            self.speed_limit_button.image = self.high_speed_limit_icon
 
 
 # Create and run the app
