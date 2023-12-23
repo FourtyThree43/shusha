@@ -5,7 +5,7 @@ from tkinter import ttk
 
 # root window
 root = tk.Tk()
-root.geometry('300x120')`
+root.geometry('300x120')
 root.title('Progressbar Demo')
 
 root.grid()

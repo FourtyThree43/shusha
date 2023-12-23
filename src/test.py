@@ -17,7 +17,7 @@ class App:
         self.master = root
         self.master.geometry("540x540+664+580")  # “wm geometry... wxh+x+y”)
         self.master.minsize(1050, 320)
-        self.master.maxsize(1050, 350)
+        self.master.maxsize(1050, 390)
         self.master.resizable(1, 1)
         self.master.configure(background="wheat")
         self.master.configure(highlightbackground="wheat")
@@ -66,13 +66,13 @@ class App:
         # Add sub-items to Edit menu
         edit_menu.add_command(label="Add URL", command=self.add_url)
         edit_menu.add_command(label="Add Torrent", command=self.add_torrent)
-        edit_menu.add_command(label="Refresh", command=self.refresh_task_list)
+        edit_menu.add_command(label="Refresh Task List",
+                              command=self.refresh_task_list)
         edit_menu.add_separator()
-        edit_menu.add_command(label="Start All", command=self.start_all)
-        edit_menu.add_command(label="Resume All", command=self.resume_all)
-        edit_menu.add_command(label="Pause All", command=self.pause_all)
-        edit_menu.add_command(label="Purge Completed",
-                              command=self.purge_completed)
+        edit_menu.add_command(label="Resume All Task", command=self.resume_all)
+        edit_menu.add_command(label="Pause All Task", command=self.pause_all)
+        edit_menu.add_command(label="Purge Task Record",
+                              command=self.purge_task_records)
 
         # Add sub-items to View menu
         view_menu.add_checkbutton(label="Category")
@@ -118,18 +118,22 @@ class App:
 
         # Load images
         add_url_icon = tk.PhotoImage(
-            file=relative_to_assets("add-url-icon.png"))
+            file=relative_to_assets("add-url-icon.png")).subsample(15, 15)
         add_torrent_icon = tk.PhotoImage(
-            file=relative_to_assets("magnetic-icon.png"))
+            file=relative_to_assets("magnetic-icon.png")).subsample(15, 15)
         refresh_icon = tk.PhotoImage(
-            file=relative_to_assets("task-sync-icon.png"))
-        start_all_icon = tk.PhotoImage(file=relative_to_assets("button_2.png"))
+            file=relative_to_assets("task-sync-icon.png")).subsample(15, 15)
         resume_all_icon = tk.PhotoImage(
-            file=relative_to_assets("play-pause-icon.png"))
+            file=relative_to_assets("bt-DL4.png")).subsample(15, 15)
         pause_all_icon = tk.PhotoImage(
-            file=relative_to_assets("pause-icon.png"))
-        purge_completed_icon = tk.PhotoImage(
-            file=relative_to_assets("remove-files-icon.png"))
+            file=relative_to_assets("bt-DL5.png")).subsample(15, 15)
+        purge_records_icon = tk.PhotoImage(
+            file=relative_to_assets("remove-files-icon.png")).subsample(
+                15, 15)
+        self.start_all_icon = tk.PhotoImage(
+            file=relative_to_assets("bt-tON.png")).subsample(15, 15)
+        self.stop_all_icon = tk.PhotoImage(
+            file=relative_to_assets("bt-tOFF.png")).subsample(15, 15)
 
         # Create buttons with images
         add_url_button = ttk.Button(task_actions_bar,
@@ -141,36 +145,67 @@ class App:
         refresh_button = ttk.Button(task_actions_bar,
                                     image=refresh_icon,
                                     command=self.refresh_task_list)
-        start_all_button = ttk.Button(task_actions_bar,
-                                      image=start_all_icon,
-                                      command=self.start_all)
         resume_all_button = ttk.Button(task_actions_bar,
                                        image=resume_all_icon,
                                        command=self.resume_all)
         pause_all_button = ttk.Button(task_actions_bar,
                                       image=pause_all_icon,
                                       command=self.pause_all)
-        purge_completed_button = ttk.Button(task_actions_bar,
-                                            image=purge_completed_icon,
-                                            command=self.purge_completed)
+        purge_records_button = ttk.Button(task_actions_bar,
+                                          image=purge_records_icon,
+                                          command=self.purge_task_records)
+
+        self.start_all_button = ttk.Button(task_actions_bar,
+                                           image=self.start_all_icon,
+                                           command=self.start_all)
 
         # Attach icons to buttons
         add_url_button.image = add_url_icon
         add_torrent_button.image = add_torrent_icon
         refresh_button.image = refresh_icon
-        start_all_button.image = start_all_icon
         resume_all_button.image = resume_all_icon
         pause_all_button.image = pause_all_icon
-        purge_completed_button.image = purge_completed_icon
+        purge_records_button.image = purge_records_icon
+        self.start_all_button.image = self.start_all_icon
+
+        # initialize the buttons state
+        self.start_all_state = 1
+
+        # Add tooltips
+        add_url_button.tooltip = "Add URL"
+        add_torrent_button.tooltip = "Add Torrent"
+        refresh_button.tooltip = "Refresh Task List"
+        resume_all_button.tooltip = "Resume All"
+        pause_all_button.tooltip = "Pause All"
+        purge_records_button.tooltip = "Purge Records"
+        self.start_all_button.tooltip = "Start/Stop"
 
         # Arrange buttons
         add_url_button.grid(column=0, row=0, padx=5)
         add_torrent_button.grid(column=1, row=0, padx=5)
         refresh_button.grid(column=2, row=0, padx=5)
-        start_all_button.grid(column=3, row=0, padx=5)
         resume_all_button.grid(column=4, row=0, padx=5)
         pause_all_button.grid(column=5, row=0, padx=5)
-        purge_completed_button.grid(column=6, row=0, padx=5)
+        purge_records_button.grid(column=6, row=0, padx=5)
+        self.start_all_button.grid(column=7, row=0, padx=5)
+
+        # Create a labels
+        add_url_label = ttk.Label(task_actions_bar, text="Add URL")
+        add_torrent_label = ttk.Label(task_actions_bar, text="Add Torrent")
+        refresh_label = ttk.Label(task_actions_bar, text="Refresh")
+        resume_all_label = ttk.Label(task_actions_bar, text="Resume")
+        pause_all_label = ttk.Label(task_actions_bar, text="Pause")
+        purge_records_label = ttk.Label(task_actions_bar, text="Purge Records")
+        start_all_label = ttk.Label(task_actions_bar, text="Start")
+
+        # Arrange labels
+        add_url_label.grid(column=0, row=1, padx=5)
+        add_torrent_label.grid(column=1, row=1, padx=5)
+        refresh_label.grid(column=2, row=1, padx=5)
+        resume_all_label.grid(column=4, row=1, padx=5)
+        pause_all_label.grid(column=5, row=1, padx=5)
+        purge_records_label.grid(column=6, row=1, padx=5)
+        start_all_label.grid(column=7, row=1, padx=5)
 
     def create_left_panel(self):
         left_pane = ttk.Panedwindow(self.mainframe, orient=tk.VERTICAL)
@@ -256,93 +291,90 @@ class App:
         satus_bar = ttk.Panedwindow(self.mainframe)
         satus_bar.grid(column=0, row=3, sticky=tk.EW, columnspan=5)
 
-        # Create a label
-        status_label = ttk.Label(satus_bar, text="Status: ")
-        status_label.grid(column=0, row=1, sticky=tk.EW)
-
-        # Create a progress bar
-        progress_bar = ttk.Progressbar(satus_bar, orient=tk.HORIZONTAL)
-        progress_bar.grid(column=0, row=0, sticky=tk.EW)
-
-        # Create a label
-        download_speed_label = ttk.Label(satus_bar, text="Download Speed: ")
-        download_speed_label.grid(column=2, row=1, sticky=tk.EW, padx=10)
-
-        # sample dl_speed
-        dl_speed = ttk.Label(satus_bar, text="0.00 KiB/s" + " ↓")
-        dl_speed.grid(column=2, row=0, sticky=tk.S, padx=5)
-
-        # Create a label
-        upload_speed_label = ttk.Label(satus_bar, text="Upload Speed: ")
-        upload_speed_label.grid(column=3, row=1, sticky=tk.EW, padx=10)
-
-        # sample ul_speed
-        ul_speed = ttk.Label(satus_bar, text="0.00 KiB/s" + " ↑")
-        ul_speed.grid(column=3, row=0, sticky=tk.S, padx=5)
-
-        # Create a label
-        time_elapsed_label = ttk.Label(satus_bar, text="Time Elapsed: ")
-        time_elapsed_label.grid(column=4, row=1, sticky=tk.EW, padx=10)
-
-        # sample time_elapsed
-        time_elapsed = ttk.Label(satus_bar, text="00:00:00")
-        time_elapsed.grid(column=4, row=0, sticky=tk.S, padx=5)
-
-        # Create a label
-        time_remaining_label = ttk.Label(satus_bar, text="Time Remaining: ")
-        time_remaining_label.grid(column=5, row=1, sticky=tk.EW, padx=10)
-
-        # sample time_remaining
-        time_remaining = ttk.Label(satus_bar, text="00:00:00")
-        time_remaining.grid(column=5, row=0, sticky=tk.S, padx=5)
-
-        # Create a label
-        active_downloads_label = ttk.Label(satus_bar, text="Active: ")
-        active_downloads_label.grid(column=6, row=1, sticky=tk.EW, padx=10)
-
-        # sample num_of_active_downloads
-        active_downloads = ttk.Label(satus_bar, text="0/21")
-        active_downloads.grid(column=6, row=0, sticky=tk.S, padx=5)
-
-        # Create a label
-        waiting_downloads_label = ttk.Label(satus_bar, text="Waiting: ")
-        waiting_downloads_label.grid(column=7, row=1, sticky=tk.EW, padx=10)
-
-        # sample num_of_waiting_downloads
-        waiting_downloads = ttk.Label(satus_bar, text="0/21")
-        waiting_downloads.grid(column=7, row=0, sticky=tk.S, padx=5)
-
-        # Create a label
-        stopped_downloads_label = ttk.Label(satus_bar, text="Stopped: ")
-        stopped_downloads_label.grid(column=8, row=1, sticky=tk.EW, padx=10)
-
-        # sample num_of_stopped_downloads
-        stopped_downloads = ttk.Label(satus_bar, text="21/21")
-        stopped_downloads.grid(column=8, row=0, sticky=tk.S, padx=5)
-
-        # Create a label
-        speed_limit_label = ttk.Label(satus_bar, text="Speed Limiter ")
-        speed_limit_label.grid(column=9, row=1, sticky=tk.EW, padx=10)
-
-        # load speed_limit_icons (Low, Medium, High)
+        #  Load images & Resize the image
+        #  speed_limit button icons
         self.low_speed_limit_icon = tk.PhotoImage(
-            file=relative_to_assets("sp_low-icon.png"))
+            file=relative_to_assets("bt-sp1.png")).subsample(15, 15)
         self.medium_speed_limit_icon = tk.PhotoImage(
-            file=relative_to_assets("sp_mid-icon.png"))
+            file=relative_to_assets("bt-sp2.png")).subsample(15, 15)
         self.high_speed_limit_icon = tk.PhotoImage(
-            file=relative_to_assets("sp_high-icon.png"))
+            file=relative_to_assets("bt-sp3.png")).subsample(15, 15)
+        # sample status_info button icons
+        self.status_info1_icon = tk.PhotoImage(
+            file=relative_to_assets("bt-1.png")).subsample(15, 15)
+        self.status_info2_icon = tk.PhotoImage(
+            file=relative_to_assets("bt-2.png")).subsample(15, 15)
+        self.status_info3_icon = tk.PhotoImage(
+            file=relative_to_assets("bt-3.png")).subsample(15, 15)
+        self.status_info4_icon = tk.PhotoImage(
+            file=relative_to_assets("bt-4.png")).subsample(15, 15)
+        self.status_info5_icon = tk.PhotoImage(
+            file=relative_to_assets("bt-5.png")).subsample(15, 15)
 
-        # Initialize speed limit state
-        self.speed_limit_state = 1
-
-        # sample speed_limit button with icon changes to Low/Medium/High on press
+        # sample status elements Row 0
+        progress_bar = ttk.Progressbar(satus_bar,
+                                       orient=tk.HORIZONTAL,
+                                       mode='indeterminate',
+                                       length=100)
+        dl_speed = ttk.Label(satus_bar, text="0.00 KiB/s" + " ↓")
+        ul_speed = ttk.Label(satus_bar, text="0.00 KiB/s" + " ↑")
+        time_remaining = ttk.Label(satus_bar, text="00:00:00")
+        time_elapsed = ttk.Label(satus_bar, text="00:00:00")
+        active_downloads = ttk.Label(satus_bar, text="0/21")
+        waiting_downloads = ttk.Label(satus_bar, text="0/21")
+        stopped_downloads = ttk.Label(satus_bar, text="21/21")
         self.speed_limit_button = ttk.Button(
             satus_bar,
             image=self.medium_speed_limit_icon,
             command=self.change_speed_limit)
+        self.status_info_button = ttk.Button(satus_bar,
+                                             image=self.status_info1_icon,
+                                             command=self.change_status_info)
 
+        # sample status labels Row 1
+        status_label = ttk.Label(satus_bar, text="Status: ")
+        download_speed_label = ttk.Label(satus_bar, text="Download Speed: ")
+        upload_speed_label = ttk.Label(satus_bar, text="Upload Speed: ")
+        time_elapsed_label = ttk.Label(satus_bar, text="Time Elapsed: ")
+        time_remaining_label = ttk.Label(satus_bar, text="Time Remaining: ")
+        active_downloads_label = ttk.Label(satus_bar, text="Active: ")
+        waiting_downloads_label = ttk.Label(satus_bar, text="Waiting: ")
+        stopped_downloads_label = ttk.Label(satus_bar, text="Stopped: ")
+        speed_limit_label = ttk.Label(satus_bar, text="Speed Limiter ")
+        status_info_label = ttk.Label(satus_bar, text="Status Info: ")
+
+        # Initialize the progress bar & buttons
+        progress_bar.start(10)
+        self.speed_limit_state = 1
+        self.status_info_state = 1
+
+        # Attach icons to buttons
+        self.status_info_button.image = self.status_info1_icon
         self.speed_limit_button.image = self.medium_speed_limit_icon
+
+        # Arrange layout
+        # Row 0
+        progress_bar.grid(column=0, row=0, sticky=tk.EW)
+        dl_speed.grid(column=2, row=0, sticky=tk.S, padx=5)
+        ul_speed.grid(column=3, row=0, sticky=tk.S, padx=5)
+        time_elapsed.grid(column=4, row=0, sticky=tk.S, padx=5)
+        time_remaining.grid(column=5, row=0, sticky=tk.S, padx=5)
+        active_downloads.grid(column=6, row=0, sticky=tk.S, padx=5)
+        waiting_downloads.grid(column=7, row=0, sticky=tk.S, padx=5)
+        stopped_downloads.grid(column=8, row=0, sticky=tk.S, padx=5)
         self.speed_limit_button.grid(column=9, row=0, sticky=tk.NS, padx=5)
+        self.status_info_button.grid(column=10, row=0, sticky=tk.NS, padx=5)
+        # Row 1
+        status_label.grid(column=0, row=1, sticky=tk.EW)
+        download_speed_label.grid(column=2, row=1, sticky=tk.EW, padx=10)
+        upload_speed_label.grid(column=3, row=1, sticky=tk.EW, padx=10)
+        time_elapsed_label.grid(column=4, row=1, sticky=tk.EW, padx=10)
+        time_remaining_label.grid(column=5, row=1, sticky=tk.EW, padx=10)
+        active_downloads_label.grid(column=6, row=1, sticky=tk.EW, padx=10)
+        waiting_downloads_label.grid(column=7, row=1, sticky=tk.EW, padx=10)
+        stopped_downloads_label.grid(column=8, row=1, sticky=tk.EW, padx=10)
+        speed_limit_label.grid(column=9, row=1, sticky=tk.EW, padx=10)
+        status_info_label.grid(column=10, row=1, sticky=tk.EW, padx=10)
 
     def open_file(self):
         # Implement the open file functionality
@@ -362,7 +394,13 @@ class App:
 
     def start_all(self):
         # Implement the start all functionality
-        pass
+        self.start_all_state = (self.start_all_state + 1) % 2
+        if self.start_all_state == 1:
+            self.start_all_button.config(image=self.stop_all_icon)
+            self.start_all_button.image = self.stop_all_icon
+        else:
+            self.start_all_button.config(image=self.start_all_icon)
+            self.start_all_button.image = self.start_all_icon
 
     def resume_all(self):
         # Implement the resume all functionality
@@ -372,9 +410,8 @@ class App:
         # Implement the pause all functionality
         pass
 
-    def purge_completed(self):
+    def purge_task_records(self):
         # Implement the purge completed functionality
-
         pass
 
     def change_speed_limit(self):
@@ -390,6 +427,26 @@ class App:
         elif self.speed_limit_state == 2:
             self.speed_limit_button.config(image=self.high_speed_limit_icon)
             self.speed_limit_button.image = self.high_speed_limit_icon
+
+    def change_status_info(self):
+        # changes the status_info button icon on click
+        # depending on the number of clicks
+        self.status_info_state = (self.status_info_state + 1) % 5
+        if self.status_info_state == 0:
+            self.status_info_button.config(image=self.status_info1_icon)
+            self.status_info_button.image = self.status_info1_icon
+        elif self.status_info_state == 1:
+            self.status_info_button.config(image=self.status_info2_icon)
+            self.status_info_button.image = self.status_info2_icon
+        elif self.status_info_state == 2:
+            self.status_info_button.config(image=self.status_info3_icon)
+            self.status_info_button.image = self.status_info3_icon
+        elif self.status_info_state == 3:
+            self.status_info_button.config(image=self.status_info4_icon)
+            self.status_info_button.image = self.status_info4_icon
+        elif self.status_info_state == 4:
+            self.status_info_button.config(image=self.status_info5_icon)
+            self.status_info_button.image = self.status_info5_icon
 
 
 # Create and run the app
