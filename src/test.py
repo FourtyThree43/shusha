@@ -169,7 +169,7 @@ class App:
         self.start_all_button.image = self.start_all_icon
 
         # initialize the buttons state
-        self.start_all_state = 1
+        self.start_all_state = 0
 
         # Add tooltips
         add_url_button.tooltip = "Add URL"
@@ -191,11 +191,11 @@ class App:
 
         # Create a labels
         add_url_label = ttk.Label(task_actions_bar, text="Add URL")
-        add_torrent_label = ttk.Label(task_actions_bar, text="Add Torrent")
+        add_torrent_label = ttk.Label(task_actions_bar, text="Torrent")
         refresh_label = ttk.Label(task_actions_bar, text="Refresh")
         resume_all_label = ttk.Label(task_actions_bar, text="Resume")
         pause_all_label = ttk.Label(task_actions_bar, text="Pause")
-        purge_records_label = ttk.Label(task_actions_bar, text="Purge Records")
+        purge_records_label = ttk.Label(task_actions_bar, text="Clear")
         start_all_label = ttk.Label(task_actions_bar, text="Start")
 
         # Arrange labels
