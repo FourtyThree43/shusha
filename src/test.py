@@ -6,7 +6,6 @@ from tkinter import filedialog
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path("gui/assets/")
 
-
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
@@ -19,6 +18,7 @@ class App:
         self.master.minsize(1050, 320)
         self.master.maxsize(1050, 390)
         self.master.resizable(1, 1)
+        self.master.iconbitmap("gui/assets/internet_download_symbol.ico")
         self.master.configure(background="wheat")
         self.master.configure(highlightbackground="wheat")
         self.master.configure(highlightcolor="black")
