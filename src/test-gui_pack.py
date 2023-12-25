@@ -241,8 +241,51 @@ class App:
                                  ])
 
     def create_bottom_frame(self) -> None:
-        bt_frame = tk.Frame(self.master, bg="wheat3", height=10)
+        bt_frame = tk.Frame(self.master, height=10)
         bt_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+
+        # Sample download statistics
+        speed_up_label = ttk.Label(bt_frame, text="↑ 666.33 KB/s")
+        speed_up_label.pack(fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5)
+
+        speed_dn_label = ttk.Label(bt_frame, text="↓ 2.45 MB/s")
+        speed_dn_label.pack(fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5)
+
+        # Number of active and inactive downloads
+        active_dl_label = ttk.Label(bt_frame, text="Active Downloads: 5")
+        active_dl_label.pack(fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5)
+
+        inactive_dl_label = ttk.Label(bt_frame, text="Inactive Downloads: 3")
+        inactive_dl_label.pack(fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5)
+
+        # Sample status icons
+        status_icon_ok = tk.PhotoImage(
+            file=relative_to_assets("bt-1.png")).subsample(10, 10)
+        # status_icon_online = tk.PhotoImage(
+        #     file=relative_to_assets("bt-2.png")).subsample(10, 10)
+        # status_icon_offline = tk.PhotoImage(
+        #     file=relative_to_assets("bt-3.png")).subsample(10, 10)
+        # status_icon_warning = tk.PhotoImage(
+        #     file=relative_to_assets("bt-4.png")).subsample(10, 10)
+        # status_icon_danger = tk.PhotoImage(
+        #     file=relative_to_assets("bt-5.png")).subsample(10, 10)
+
+        status_info = ttk.Label(bt_frame, image=status_icon_ok)
+        status_info.image = status_icon_ok
+        status_info.pack(fill=tk.BOTH, side=tk.RIGHT, padx=5, pady=5)
+
+        # Speed limiter button
+        speed_limiter_button = ttk.Button(
+            bt_frame,
+            text="Speed Limiter: OFF",
+            command=self.toggle_speed_limiter,
+        )
+
+        speed_limiter_button.pack(fill=tk.BOTH, side=tk.RIGHT, padx=5, pady=5)
+
+    def toggle_speed_limiter(self) -> None:
+        # Implement speed limiter toggle logic here
+        print("Toggle Speed Limiter")
 
     def add_download(self) -> None:
         add_dl_window = tk.Toplevel(self.master)
