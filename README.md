@@ -63,6 +63,55 @@ To save or load a session, you can use the File -> Save Session or File -> Load 
 
 To exit Shusha-DM, you can use the File -> Exit menu or press Alt+F4. You will be asked if you want to save the current session before exiting.
 
+## Project Structure
+
+* The Project Structure as per the Model-View-Controller (MVC) pattern of software architectural pattern:  
+
+```
+shusha
+├── src
+│   └── shusha
+│       ├── __about__.py
+│       ├── __init__.py
+│       ├── frontend
+│       │   ├── __init__.py
+│       │   ├── model
+│       │   │   ├── __init__.py
+│       │   │   └── gui_model.py
+│       │   ├── view
+│       │   │   ├── __init__.py
+│       │   │   └── main_view.py
+│       │   └── controller
+│       │       ├── __init__.py
+│       │       └── gui_controller.py
+│       ├── backend
+│       │   ├── __init__.py
+│       │   ├── model
+│       │   │   ├── __init__.py
+│       │   │   └── aria2c_connector.py
+│       │   ├── middleware
+│       │   │   ├── __init__.py
+│       │   │   └── download_manager_middleware.py
+│       │   └── controller
+│       │       ├── __init__.py
+│       │       └── download_manager_controller.py
+│       ├── resources
+│       │   ├── __init__.py
+│       │   ├── aria2c
+│       │   │   └── (aria2c-related resources)
+│       │   └── assets
+│       │       └── (icons, images, canvas, etc.)
+│       └── main.py
+├── tests
+│   └── __init__.py
+├── docs
+│   └── index.html
+├── LICENSE.txt
+├── README.md
+└── pyproject.toml
+
+```
+
 ## License
 
 Shusha-DM is licensed under the GNU GENERAL PUBLIC LICENSE. See the [LICENSE](https://github.com/FourtyThree43/shusha/edit/main/LICENSE) file for more details.
