@@ -268,48 +268,105 @@ class App:
         add_dl_notebook.add(schedule_page, text="Schedule")
 
         # URL Page
-        url_label = ttk.Label(master=url_page, text="URL:")
-        url_label.pack(fill=tk.BOTH, side=tk.TOP, padx=5, pady=5)
+        u_frame0 = tk.Frame(master=url_page)
+        u_frame1 = tk.Frame(master=url_page)
+        u_frame2 = tk.Frame(master=url_page)
+        u_frame3 = tk.Frame(master=url_page)
+        u_frame0.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        u_frame1.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        u_frame2.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        u_frame3.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
-        url_entry = ttk.Entry(master=url_page)
-        url_entry.pack(fill=tk.BOTH, side=tk.TOP, padx=5, pady=5, ipady=20)
+        url_entry = ttk.Entry(master=u_frame0)
+        url_entry.pack(fill=tk.BOTH, side=tk.TOP, padx=5, pady=5, ipady=15)
 
-        url_add_button = ttk.Button(master=url_page, text="Add")
+        rename_label = ttk.Label(master=u_frame1, text="Rename:")
+        rename_entry = ttk.Entry(master=u_frame1, width=30)
+        rename_entry.insert(0, "Filename")
+        rename_label.pack(fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5)
+        rename_entry.pack(fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5)
+
+        split_label = ttk.Label(master=u_frame1, text="Split:")
+        split_entry = ttk.Entry(master=u_frame1, width=10)
+        split_entry.insert(0, "0-64")
+        split_label.pack(fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5)
+        split_entry.pack(fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5)
+
+        save_to_label = ttk.Label(master=u_frame2, text="Save To:")
+        save_to_entry = ttk.Entry(master=u_frame2, width=50)
+        save_to_entry.insert(0, "C:/Users/username/Downloads")
+        save_to_label.pack(fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5)
+        save_to_entry.pack(fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5)
+
+        save_to_button = ttk.Button(master=u_frame2, text="Browse")
+        save_to_button.pack(fill=tk.BOTH,
+                            side=tk.LEFT,
+                            padx=5,
+                            pady=5,
+                            ipady=5)
+
+        url_add_button = ttk.Button(master=u_frame3, text="Add")
         url_add_button.pack(fill=tk.BOTH, side=tk.TOP, padx=5, pady=5, ipady=5)
 
         # Torrent Page
-        torrent_label = ttk.Label(master=torrent_page, text="Torrent:")
-        torrent_label.pack(fill=tk.BOTH, side=tk.TOP, padx=5, pady=5)
+        t_frame0 = tk.Frame(master=torrent_page)
+        t_frame1 = tk.Frame(master=torrent_page)
+        t_frame2 = tk.Frame(master=torrent_page)
+        t_frame3 = tk.Frame(master=torrent_page)
+        t_frame0.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        t_frame1.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        t_frame2.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        t_frame3.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
-        torrent_entry = ttk.Entry(master=torrent_page)
-        torrent_entry.pack(fill=tk.BOTH, side=tk.TOP, padx=5, pady=5, ipady=20)
+        torrent_entry = ttk.Entry(master=t_frame0, width=65)
+        torrent_entry.insert(0, "Drag and drop torrent file here")
+        torrent_entry.configure(state="readonly", justify="center")
+        tor_open_button = ttk.Button(master=t_frame0, text="Open")
+        torrent_entry.pack(fill=tk.BOTH,
+                           side=tk.LEFT,
+                           padx=5,
+                           pady=5,
+                           ipady=20)
+        tor_open_button.pack(fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5)
 
-        tor_add_button = ttk.Button(master=torrent_page, text="Add")
+        magnet_label = ttk.Label(master=t_frame1, text="Magnet:")
+        magnet_entry = ttk.Entry(master=t_frame1, width=80)
+        magnet_label.pack(fill=tk.BOTH, side=tk.TOP, padx=5, pady=5)
+        magnet_entry.pack(fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5, ipady=20)
+
+        tor_add_button = ttk.Button(master=t_frame3, text="Add")
         tor_add_button.pack(fill=tk.BOTH, side=tk.TOP, padx=5, pady=5, ipady=5)
 
         # Schedule Page
-        schedule_checkbox = ttk.Checkbutton(master=schedule_page,
-                                            text="Enable Schedule")
-        schedule_checkbox.pack(padx=5, pady=5)
+        s_frame1 = tk.Frame(master=schedule_page, height=10, bg="wheat4")
+        s_frame1.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
-        schedule_m = ttk.Checkbutton(master=schedule_page, text="Monday")
-        schedule_t = ttk.Checkbutton(master=schedule_page, text="Tuesday")
-        schedule_w = ttk.Checkbutton(master=schedule_page, text="Wednesday")
-        schedule_th = ttk.Checkbutton(master=schedule_page, text="Thursday")
-        schedule_f = ttk.Checkbutton(master=schedule_page, text="Friday")
-        schedule_s = ttk.Checkbutton(master=schedule_page, text="Saturday")
-        schedule_su = ttk.Checkbutton(master=schedule_page, text="Sunday")
+        sched_checkbox = ttk.Checkbutton(master=s_frame1,
+                                         text="Enable Schedule")
+        sched_checkbox.pack(fill=tk.BOTH, side=tk.TOP, padx=5, pady=5)
 
-        schedule_m.pack(fill=tk.X)
-        schedule_t.pack(fill=tk.X)
-        schedule_w.pack(fill=tk.X)
-        schedule_th.pack(fill=tk.X)
-        schedule_f.pack(fill=tk.X)
-        schedule_s.pack(fill=tk.X)
-        schedule_su.pack(fill=tk.X)
+        sched_m = ttk.Checkbutton(master=s_frame1, text="Monday")
+        sched_t = ttk.Checkbutton(master=s_frame1, text="Tuesday")
+        sched_w = ttk.Checkbutton(master=s_frame1, text="Wednesday")
+        sched_th = ttk.Checkbutton(master=s_frame1, text="Thursday")
+        sched_f = ttk.Checkbutton(master=s_frame1, text="Friday")
+        sched_s = ttk.Checkbutton(master=s_frame1, text="Saturday")
+        sched_su = ttk.Checkbutton(master=s_frame1, text="Sunday")
 
-        schedule_add_button = ttk.Button(master=schedule_page, text="Add")
-        schedule_add_button.pack(fill=tk.BOTH, side=tk.BOTTOM, padx=5, pady=5)
+        sched_m.pack(fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5)
+        sched_t.pack(fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5)
+        sched_w.pack(fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5)
+        sched_th.pack(fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5)
+        sched_f.pack(fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5)
+        sched_s.pack(fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5)
+        sched_su.pack(fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5)
+
+        sched_button = ttk.Button(master=schedule_page, text="Add")
+        sched_button.pack(fill=tk.BOTH,
+                          side=tk.BOTTOM,
+                          padx=5,
+                          pady=5,
+                          ipady=5)
 
 
 if __name__ == "__main__":
