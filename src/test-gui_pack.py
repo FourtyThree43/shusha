@@ -106,8 +106,8 @@ class App:
         help_menu.add_command(label="Donate")
 
     def create_top_frame(self) -> None:
-        tp_frame = tk.Frame(self.master, bg="wheat4", height=2)
-        tp_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        tp_frame = tk.Frame(self.master)
+        tp_frame.pack(fill=tk.X, expand=False)
 
         #  load Images
         add_dl_icon = tk.PhotoImage(
@@ -120,7 +120,7 @@ class App:
             file=relative_to_assets("bt-schedule.png")).subsample(10, 10)
         queue_top_icon = tk.PhotoImage(
             file=relative_to_assets("bt-top.png")).subsample(10, 10)
-        queue_botom_icon = tk.PhotoImage(
+        queue_btm_icon = tk.PhotoImage(
             file=relative_to_assets("bt-bottom.png")).subsample(10, 10)
         remove_dl_icon = tk.PhotoImage(
             file=relative_to_assets("bt-remove.png")).subsample(10, 10)
@@ -148,9 +148,9 @@ class App:
         queue_top_button = ttk.Button(master=tp_frame,
                                       text="Up",
                                       image=queue_top_icon)
-        queue_botom_button = ttk.Button(master=tp_frame,
-                                        text="Down",
-                                        image=queue_botom_icon)
+        queue_btm_button = ttk.Button(master=tp_frame,
+                                      text="Down",
+                                      image=queue_btm_icon)
         remove_dl_button = ttk.Button(master=tp_frame,
                                       text="Remove",
                                       image=remove_dl_icon)
@@ -165,32 +165,32 @@ class App:
                                     image=setting_icon)
 
         # Attach icons to buttons
-        add_dl_button.image = add_dl_icon
-        resume_dl_button.image = resume_dl_icon
-        pause_dl_button.image = pause_dl_icon
-        scheduler_button.image = scheduler_icon
-        queue_top_button.image = queue_top_icon
-        queue_botom_button.image = queue_botom_icon
-        remove_dl_button.image = remove_dl_icon
-        purge_list_button.image = purge_list_icon
-        refresh_button.image = refresh_icon
-        setting_button.image = setting_icon
+        add_dl_button.image = add_dl_icon  # type: ignore[attr-defined]
+        resume_dl_button.image = resume_dl_icon  # type: ignore[attr-defined]
+        pause_dl_button.image = pause_dl_icon  # type: ignore[attr-defined]
+        scheduler_button.image = scheduler_icon  # type: ignore[attr-defined]
+        queue_top_button.image = queue_top_icon  # type: ignore[attr-defined]
+        queue_btm_button.image = queue_btm_icon  # type: ignore[attr-defined]
+        remove_dl_button.image = remove_dl_icon  # type: ignore[attr-defined]
+        purge_list_button.image = purge_list_icon  # type: ignore[attr-defined]
+        refresh_button.image = refresh_icon  # type: ignore[attr-defined]
+        setting_button.image = setting_icon  # type: ignore[attr-defined]
 
         # Button layout
-        add_dl_button.pack(fill=tk.BOTH, side=tk.LEFT, ipadx=20)
-        resume_dl_button.pack(fill=tk.BOTH, side=tk.LEFT, ipadx=20)
-        pause_dl_button.pack(fill=tk.BOTH, side=tk.LEFT, ipadx=20)
-        scheduler_button.pack(fill=tk.BOTH, side=tk.LEFT, ipadx=20)
-        queue_top_button.pack(fill=tk.BOTH, side=tk.LEFT, ipadx=20)
-        queue_botom_button.pack(fill=tk.BOTH, side=tk.LEFT, ipadx=20)
-        remove_dl_button.pack(fill=tk.BOTH, side=tk.LEFT, ipadx=20)
-        purge_list_button.pack(fill=tk.BOTH, side=tk.LEFT, ipadx=20)
-        refresh_button.pack(fill=tk.BOTH, side=tk.LEFT, ipadx=20)
-        setting_button.pack(fill=tk.BOTH, side=tk.RIGHT, ipadx=20)
+        add_dl_button.pack(fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5)
+        resume_dl_button.pack(fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5)
+        pause_dl_button.pack(fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5)
+        scheduler_button.pack(fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5)
+        queue_top_button.pack(fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5)
+        queue_btm_button.pack(fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5)
+        remove_dl_button.pack(fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5)
+        purge_list_button.pack(fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5)
+        refresh_button.pack(fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5)
+        setting_button.pack(fill=tk.BOTH, side=tk.RIGHT, padx=5, pady=5)
 
     def create_center_frame(self) -> None:
         ct_frame = ttk.PanedWindow(self.master, orient=tk.HORIZONTAL)
-        ct_frame.pack(fill=tk.BOTH, expand=True, padx=5)
+        ct_frame.pack(fill=tk.BOTH, expand=True)
 
         category_list = ttk.Treeview(master=ct_frame,
                                      columns="Categories",
@@ -230,7 +230,7 @@ class App:
             category_list.insert(parent="", index=tk.END, values=[c])
 
         # add items to download_list
-        for i in range(1, 5):
+        for i in range(1, 15):
             download_list.insert(parent="",
                                  index=tk.END,
                                  values=[
@@ -240,9 +240,16 @@ class App:
                                      f"Dec 24 08:36:59 2023"
                                  ])
 
+        # Scrollbars
+        download_scrollbar = ttk.Scrollbar(master=ct_frame,
+                                           orient=tk.VERTICAL,
+                                           command=download_list.yview)
+        download_list.configure(yscrollcommand=download_scrollbar.set)
+        download_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
     def create_bottom_frame(self) -> None:
         bt_frame = tk.Frame(self.master, height=10)
-        bt_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        bt_frame.pack(fill=tk.X, expand=False)
 
         # Sample download statistics
         speed_up_label = ttk.Label(bt_frame, text="↑ 666.33 KB/s")
@@ -259,6 +266,8 @@ class App:
         inactive_dl_label.pack(fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5)
 
         # Sample status icons
+        sp_limit_icon = tk.PhotoImage(
+            file=relative_to_assets("bt-speed2.png")).subsample(10, 10)
         status_icon_ok = tk.PhotoImage(
             file=relative_to_assets("bt-1.png")).subsample(10, 10)
         # status_icon_online = tk.PhotoImage(
@@ -271,17 +280,18 @@ class App:
         #     file=relative_to_assets("bt-5.png")).subsample(10, 10)
 
         status_info = ttk.Label(bt_frame, image=status_icon_ok)
-        status_info.image = status_icon_ok
+        status_info.image = status_icon_ok  # type: ignore[attr-defined]
         status_info.pack(fill=tk.BOTH, side=tk.RIGHT, padx=5, pady=5)
 
         # Speed limiter button
         speed_limiter_button = ttk.Button(
             bt_frame,
-            text="Speed Limiter: OFF",
+            text="Speed Limiter:",
+            image=sp_limit_icon,
             command=self.toggle_speed_limiter,
         )
-
-        speed_limiter_button.pack(fill=tk.BOTH, side=tk.RIGHT, padx=5, pady=5)
+        speed_limiter_button.image = sp_limit_icon  # type: ignore[attr-defined]
+        speed_limiter_button.pack(fill=tk.X, side=tk.RIGHT, padx=5, pady=5)
 
     def toggle_speed_limiter(self) -> None:
         # Implement speed limiter toggle logic here

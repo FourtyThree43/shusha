@@ -161,3 +161,6 @@ cython_debug/
 
 # Junk
 *.dat
+
+# SublimeText
+*.sublime*
