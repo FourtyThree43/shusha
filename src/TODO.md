@@ -1,4 +1,16 @@
-In a download manager application like `myDL`, there are several features and functionalities you might want to consider adding. Below are some additional windows/methods that you might find useful:
+Here are several features and functionalities you might want to consider adding. 
+
+## Backend
+
+- `Aria2Server`: Deals with server operations related to aria2c, such as starting/stopping the server.
+- `Aria2Client`: Provides a high-level interface to interact with a remote aria2c process using XML-RPC calls.
+- `DownloadAPI`: Offers an API for managing downloads, including adding downloads, manipulating the download queue, and retrieving download information.
+- `HelperUtilities`: Provides utility functions for common tasks like retrieving file paths, platform information
+- `LoggingUtilities`: A service for handling logging, allowing for better management of log messages.
+
+## Frontend
+
+Below are some additional windows/methods that you might find useful:
 
 1. **Settings Window:**
    - Allow users to configure settings such as Aria2 RPC details, download directory, etc.
