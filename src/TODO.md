@@ -2,11 +2,19 @@ Here are several features and functionalities you might want to consider adding.
 
 ## Backend
 
-- `Aria2Server`: Deals with server operations related to aria2c, such as starting/stopping the server.
-- `Aria2Client`: Provides a high-level interface to interact with a remote aria2c process using XML-RPC calls.
-- `DownloadAPI`: Offers an API for managing downloads, including adding downloads, manipulating the download queue, and retrieving download information.
+- `DownloadManager`: Provides an interface for interacting with the `DaemonServer`, `StorageDB` and `XMLRPCClient` to perform common download operations, including starting/stopping downloads, updating download status, etc.
+- `DaemonServer`: Deals with server operations related to aria2c, such as starting/stopping the server.
+- `XMLRPCClient`: Provides a high-level interface to interact with a remote aria2c process using XML-RPC calls.
+- `StorageDB`: Stores information about downloads in a database, including download status, file size, etc. from the aria2c process.
+- `ModelsStruct`: Contains models for the struct received from the aria2c process, including:
+    - `DownloadStruct`: Stores information about a single download, including download status, file size, etc.
+    - `FilesStruct`: Stores information about downloaded files, including file name, file size, etc.
+    - `BittorrentStruct`: Stores information about BitTorrent downloads, including tracker, peers, etc.
+    - `StatsStruct`: Stores information about download statistics, including download speed, upload speed, etc.
+    - `OptionsStruct`: Stores information about download options, including max connections, max upload speed, etc.
+    - `ServerStruct`: Stores information about the aria2c server, including version, RPC version, etc.
 - `HelperUtilities`: Provides utility functions for common tasks like retrieving file paths, platform information
-- `LoggingUtilities`: A service for handling logging, allowing for better management of log messages.
+- `LoggingService`: A service for handling logging, allowing for better management of log messages.
 
 ## Frontend
 
