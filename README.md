@@ -104,7 +104,7 @@ shusha
 
 ## License
 
-Shusha-DM is licensed under the GNU GENERAL PUBLIC LICENSE. See the [LICENSE](https://github.com/FourtyThree43/shusha/edit/main/LICENSE) file for more details.
+`shusha` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
 
 
 # About Shusha
