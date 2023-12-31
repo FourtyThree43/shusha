@@ -21,17 +21,7 @@ Shusha is a download manager that wraps around [aria2](https://aria2.github.io/)
 
 ## Installation
 
-To install Shusha-DM, you need to have Python 3 and aria2 installed on your system. You can download Python 3 from [here](https://github.com/aria2/aria2) and aria2 from [here](https://linuxconfig.org/aria2-all-in-one-command-line-download-tool). You also need to install the following Python modules:
-
-- requests
-- tkinter
-- tkcalendar
-
-You can install them using pip:
-
-```bash
-pip install requests tkinter tkcalendar
-```
+To install Shusha-DM, you need to have Python 3 and aria2 installed on your system. You can download Python 3 from [here](https://github.com/aria2/aria2) and aria2 from [here](https://linuxconfig.org/aria2-all-in-one-command-line-download-tool).
 
 To run Shusha-DM, you need to start aria2 in daemon mode with RPC enabled. You can do this by running the following command:
 
