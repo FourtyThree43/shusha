@@ -1,11 +1,6 @@
-from pathlib import Path, PurePath
-import platform
-import subprocess
-import time
+from daemon import Daemon, logger
+from pathlib import Path
 import xmlrpc.client
-import logging
-
-logging.basicConfig(level=logging.INFO)
 
 
 class XMLRPCClientException(Exception):
@@ -19,90 +14,52 @@ class XMLRPCClientException(Exception):
             faultString: The fault string describing the error.
         """
         super().__init__()
-        self.faultCode = faultCode
-        self.faultString = faultString
+        self.errCode = faultCode
+        self.errMsg = faultString
 
     def __str__(self):
-        return f"XML-RPC Error - Code: {self.faultCode}, Message: {self.faultString}"
+        return f"XML-RPC Error - Code: {self.errCode}, Message: {self.errMsg}"
 
     def __bool__(self):
         return False
 
 
-class Aria2Client:
-    ARIA2_OPTIONS = [
-        "--no-conf",
-        "--enable-rpc",
-        "--rpc-listen-all",
-        "--quiet=true",
-        # Add other options as needed
-    ]
+class Client:
 
-    def __init__(self, host, port, aria2_path="", secret=None):
-        self.aria2_path = Path(aria2_path)
-        self.host = host
-        self.port = port
-        self.server_uri = f"http://{host}:{port}/rpc"
+    def __init__(self, daemon: Daemon):
+        self.remote = daemon
+        self.secret = None
+        self.server_uri = f"http://{self.remote.host}:{self.remote.port}/rpc"
         self.server = xmlrpc.client.ServerProxy(self.server_uri,
                                                 allow_none=True)
-        self.secret = secret
 
-    def check_aria_path(self):
-        return self.aria2_path.exists() and self.aria2_path.is_file()
+    def __str__(self):
+        return f"{self.server_uri}"
 
-    def initialize_aria2d(self):
-        if not self.check_aria_path():
-            cwd = Path(__file__).parent
-            aria2d = PurePath.joinpath(cwd, "aria2c.exe")
-        else:
-            aria2d = self.aria2_path
+    def __repr__(self):
+        return f"Client(host='{self.remote.host}', port='{self.remote.port}')"
 
-        return aria2d
-
-    def start_aria(self):
-        aria2d = self.initialize_aria2d()
-
-        if platform.system() == "Windows":
-            NO_WINDOW = 0x08000000
-            try:
-                subprocess.Popen(
-                    [
-                        str(aria2d),
-                        *self.ARIA2_OPTIONS,
-                        f"--rpc-listen-port={self.port}",
-                        "--rpc-max-request-size=2M",
-                    ],
-                    stderr=subprocess.PIPE,
-                    stdout=subprocess.PIPE,
-                    stdin=subprocess.PIPE,
-                    shell=False,
-                    creationflags=NO_WINDOW,
-                )
-                logging.info("Aria2 started successfully.")
-            except Exception as e:
-                logging.error(f"Error starting Aria2: {e}")
-        else:
-            raise NotImplementedError(
-                "Starting Aria2 is not implemented for this platform.")
-
-    def _build_request_params(self, method, params=None):
+    def _build_request_params(self, params=None):
         request_params = [self.secret] if self.secret else []
         if params:
             request_params.extend(params)
         return request_params
 
     def _call_method(self, method, params=None):
-        request_params = self._build_request_params(method, params)
+        request_params = self._build_request_params(params)
         try:
             return getattr(self.server.aria2, method)(*request_params)
         except xmlrpc.client.Fault as e:
             self._handle_xmlrpc_error(e)
             return None
+        except Exception as e:
+            logger.log(f"Unexpected error: {e}", level="error")
+            return None
 
     def _handle_xmlrpc_error(self, xmlrpc_fault):
         faultCode = xmlrpc_fault.faultCode
         faultString = xmlrpc_fault.faultString
-        raise XMLRPCClientException(faultCode, faultString)
+        logger.log(XMLRPCClientException(faultCode, faultString), level="error")
 
     def add_uri(self, uris, options=None, position=None):
         return self._call_method("addUri", [uris, options, position])
@@ -138,8 +95,17 @@ class Aria2Client:
     def unpause_all(self):
         return self._call_method("unpauseAll")
 
+    def tell_status(self, gid, keys=None):
+        return self._call_method("tellStatus", [gid, keys])
+
+    def get_uris(self, gid):
+        return self._call_method("getUris", [gid])
+
     def get_files(self, gid):
         return self._call_method("getFiles", [gid])
+
+    def get_peers(self, gid):
+        return self._call_method("getPeers", [gid])
 
     def get_servers(self, gid):
         return self._call_method("getServers", [gid])
@@ -188,7 +154,7 @@ class Aria2Client:
         return self._call_method("getSessionInfo")
 
     def shutdown(self):
-        logging.info("Shutting down Aria2.")
+        logger.log("Shutting down Aria2.")
         return self._call_method("shutdown")
 
     def force_shutdown(self):
@@ -206,39 +172,71 @@ class Aria2Client:
     def list_notifications(self):
         return self._call_method("system.listNotifications")
 
-    def get_uris(self, gid):
-        return self._call_method("getUris", [gid])
+    # Custom methods
 
-    def tell_status(self, gid, keys=None):
-        return self._call_method("tellStatus", [gid, keys])
+    # def get_all_downloads(self):
+    #     active_downloads = self.tell_active()
+    #     waiting_downloads = self.tell_waiting(0, 1000)
+    #     stopped_downloads = self.tell_stopped(0, 1000)
 
-    def get_all_downloads(self):
-        active_downloads = self.tell_active()
-        waiting_downloads = self.tell_waiting(0, 1000)
-        stopped_downloads = self.tell_stopped(0, 1000)
-
-        return active_downloads + waiting_downloads + stopped_downloads
+    #     return active_downloads + waiting_downloads + stopped_downloads
 
 
 if __name__ == "__main__":
-    aria2_path = "aria2c"
-    host = "localhost"
-    port = 6800
-    aria2_client = Aria2Client(host, port, aria2_path)
+    import os
+    import time
 
-    # Start Aria2
-    aria2_client.start_aria()
-    time.sleep(3)
+    def sizeof_fmt(num, delim=" ", suffix="B"):
+        for unit in ("", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi"):
+            if abs(num) < 1024.0:
+                return f"{num:3.1f}{delim}{unit}{suffix}"
+            num /= 1024.0
+        return f"{num:.1f}{delim}Yi{suffix}"
 
-    url = "https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4"
-    dl_path = Path(__file__).parent
+    d = Daemon()
+    pid = d.start_server()
+    logger.log(pid)
 
-    gid = aria2_client.add_uri([url], {"dir": str(dl_path)})
-    time.sleep(5)
-    print(gid)
+    try:
+        client = Client(d)
+        logger.log(client)
 
-    # listofdl = aria2_client.get_all_downloads()
-    # print(listofdl)
+        sesId = client.get_session_info().get("sessionId")
+        logger.log(sesId)
 
-    time.sleep(5)
-    aria2_client.shutdown()
+        # gids = ["27ffc223275cbba0", "eea522f44eb7d7fe", "d6b3e42d7c8a0e0e"]
+        url = "https://proof.ovh.net/files/10Mb.dat"
+        dl_path = Path(__file__).parent
+
+        gid = client.add_uri([url], {"dir": str(dl_path)})
+        logger.log(f"Download started with GID: {gid}")
+
+        status = client.tell_status(gid=gid)
+        is_active = status.get("status")
+        logger.log(is_active)
+
+        # while is_active == "active":
+        #     status = client.tell_status(gid=gid,
+        #                                 keys=[
+        #                                     "status", "totalLength",
+        #                                     "completedLength", "downloadSpeed",
+        #                                     "files"
+        #                                 ])
+        #     # logger.log(status.get("files"))
+        #     is_active = status.get("status")
+        #     # logger.log(status)
+        #     dl_sp = int(status.get("downloadSpeed"))
+        #     sz = int(status.get("completedLength"))
+
+        #     sp = f"{sizeof_fmt(dl_sp)}/s"
+        #     fs = f"{sizeof_fmt(sz)}"
+
+        #     logger.log(f"- {fs} - {sp}")
+
+        #     time.sleep(1)
+
+        # client.save_session()
+        time.sleep(5)
+
+    finally:
+        d.stop_server()
