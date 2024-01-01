@@ -1,127 +1,65 @@
 # Contributor Covenant Code of Conduct
 
-## Our Pledge
+Welcome, noble adventurers, to our cozy little corner of the digital Shire! Before you embark on this epic quest, please abide by the Hobbit Code of Conduct. We're a laid-back bunch, but even in the Shire, there are rules for good company.
 
-We as members, contributors, and leaders pledge to make participation in our
-community a harassment-free experience for everyone, regardless of age, body
-size, visible or invisible disability, ethnicity, sex characteristics, gender
-identity and expression, level of experience, education, socio-economic status,
-nationality, personal appearance, race, religion, or sexual identity
-and orientation.
+## 🍻 First Breakfast Etiquette
 
-We pledge to act and interact in ways that contribute to an open, welcoming,
-diverse, inclusive, and healthy community.
+1. **Share the Pie:**
+   Always share your pie. It's a fundamental right, like the right to bear second breakfast.
 
-## Our Standards
+2. **Merry Making, Not Mischief:**
+   Make merry, not mischief. Mischievous behavior may invoke the wrath of Gandalf (or the moderators).
 
-Examples of behavior that contributes to a positive environment for our
-community include:
+3. **Respect Bilbo's Tolerance:**
+   Respect Bilbo's tolerance for unexpected guests. Always knock before entering someone else's hobbit hole.
 
-* Demonstrating empathy and kindness toward other people
-* Being respectful of differing opinions, viewpoints, and experiences
-* Giving and gracefully accepting constructive feedback
-* Accepting responsibility and apologizing to those affected by our mistakes,
-  and learning from the experience
-* Focusing on what is best not just for us as individuals, but for the
-  overall community
+## 🌲 Treebeard's Wisdom - Slow and Steady
 
-Examples of unacceptable behavior include:
+4. **Speak Like an Ent:**
+   Speak like an Ent - slow and deliberate. Hasty words may rouse the Ents, and they're not known for their brevity.
 
-* The use of sexualized language or imagery, and sexual attention or
-  advances of any kind
-* Trolling, insulting or derogatory comments, and personal or political attacks
-* Public or private harassment
-* Publishing others' private information, such as a physical or email
-  address, without their explicit permission
-* Other conduct which could reasonably be considered inappropriate in a
-  professional setting
+5. **Leaf-Litter Cleanup:**
+   Keep the forest floor tidy. Dispose of your virtual leaf-litter responsibly (code, comments, and issues).
 
-## Enforcement Responsibilities
+## 🚪 Elven Diplomacy - Elegance in Discourse
 
-Community leaders are responsible for clarifying and enforcing our standards of
-acceptable behavior and will take appropriate and fair corrective action in
-response to any behavior that they deem inappropriate, threatening, offensive,
-or harmful.
+6. **Elvish Elegance in Discourse:**
+   Embrace Elvish elegance in discourse. Constructive criticism is welcome, but please refrain from orcish insults.
 
-Community leaders have the right and responsibility to remove, edit, or reject
-comments, commits, code, wiki edits, issues, and other contributions that are
-not aligned to this Code of Conduct, and will communicate reasons for moderation
-decisions when appropriate.
+7. **Leave No Troll Unturned:**
+   Engage trolls with diplomacy and song. If that fails, report to the moderators for a virtual exorcism.
 
-## Scope
+## ⚔️ Dwarven Determination - The Forge of Collaboration
 
-This Code of Conduct applies within all community spaces, and also applies when
-an individual is officially representing the community in public spaces.
-Examples of representing our community include using an official e-mail address,
-posting via an official social media account, or acting as an appointed
-representative at an online or offline event.
+8. **Collaborate Like Dwarves:**
+   Collaborate like Dwarves in the forge of Khazad-dûm. Bring your best tools, but don't be afraid to share a virtual pint.
 
-## Enforcement
+9. **Dwarven Grudges:**
+   Hold no virtual grudges. Dwarven grudges only slow down the quest.
 
-Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported to the community leaders responsible for enforcement at
-.
-All complaints will be reviewed and investigated promptly and fairly.
+## 🎉 Hobbit Holidays - Celebrate Diversity
 
-All community leaders are obligated to respect the privacy and security of the
-reporter of any incident.
+10. **Celebrate Hobbit Holidays:**
+    Celebrate Hobbit holidays. On these days, it's mandatory to put away the keyboard, have a pint, and sing a song.
 
-## Enforcement Guidelines
+11. **Hobbit Presents Exchange:**
+    Participate in the Hobbit presents exchange. Give virtual gifts that spark joy.
 
-Community leaders will follow these Community Impact Guidelines in determining
-the consequences for any action they deem in violation of this Code of Conduct:
+## 🌈 The Fellowship of Inclusion
 
-### 1. Correction
+12. **The Fellowship of Inclusion:**
+    Our Fellowship includes all races, genders, and backgrounds. Discrimination has no place in the Shire.
 
-**Community Impact**: Use of inappropriate language or other behavior deemed
-unprofessional or unwelcome in the community.
+## 📜 Gandalf's Parting Wisdom
 
-**Consequence**: A private, written warning from community leaders, providing
-clarity around the nature of the violation and an explanation of why the
-behavior was inappropriate. A public apology may be requested.
+By partaking in this adventure, you agree to Gandalf's parting wisdom: "Even the smallest person can change the course of the future." Uphold this Code and embark on this journey with joy and camaraderie!
 
-### 2. Warning
+May the wind under your wings bear you where the sun sails and the moon walks. 🌄
 
-**Community Impact**: A violation through a single incident or series
-of actions.
+**Disclaimer:** The Council of Elrond, the Dwarven Kingdom, and the Shire assume no responsibility for dragon attacks, orc invasions, or unexpected visits from Sauron during your stay.
 
-**Consequence**: A warning with consequences for continued behavior. No
-interaction with the people involved, including unsolicited interaction with
-those enforcing the Code of Conduct, for a specified period of time. This
-includes avoiding interactions in community spaces as well as external channels
-like social media. Violating these terms may lead to a temporary or
-permanent ban.
+# Now, let the adventure begin! 🎉🧙‍♂️
 
-### 3. Temporary Ban
-
-**Community Impact**: A serious violation of community standards, including
-sustained inappropriate behavior.
-
-**Consequence**: A temporary ban from any sort of interaction or public
-communication with the community for a specified period of time. No public or
-private interaction with the people involved, including unsolicited interaction
-with those enforcing the Code of Conduct, is allowed during this period.
-Violating these terms may lead to a permanent ban.
-
-### 4. Permanent Ban
-
-**Community Impact**: Demonstrating a pattern of violation of community
-standards, including sustained inappropriate behavior,  harassment of an
-individual, or aggression toward or disparagement of classes of individuals.
-
-**Consequence**: A permanent ban from any sort of public interaction within
-the community.
-
-## Attribution
-
-This Code of Conduct is adapted from the [Contributor Covenant][homepage],
-version 2.0, available at
-https://www.contributor-covenant.org/version/2/0/code_of_conduct.html.
-
-Community Impact Guidelines were inspired by [Mozilla's code of conduct
-enforcement ladder](https://github.com/mozilla/diversity).
-
-[homepage]: https://www.contributor-covenant.org
 
 For answers to common questions about this code of conduct, see the FAQ at
 https://www.contributor-covenant.org/faq. Translations are available at
