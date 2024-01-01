@@ -1,9 +1,9 @@
-from logger import LoggerService
 from pathlib import Path
-import subprocess
 import platform
+import subprocess
 import time
 
+from logger import LoggerService
 
 DEFAULT_HOST = "localhost"
 DEFAULT_PORT = 6800
@@ -12,6 +12,7 @@ BIN_PATH = Path("resources/bin/aria2c.exe")
 CONF_PATH = Path("resources/aria2.conf")
 
 logger = LoggerService()
+
 
 class Daemon:
 

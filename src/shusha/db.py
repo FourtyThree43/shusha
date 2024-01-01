@@ -1,8 +1,9 @@
-import sqlite3
-import json
-from threading import Lock
-from sqlite3 import Error
 from contextlib import contextmanager
+from sqlite3 import Error
+from threading import Lock
+import json
+import sqlite3
+
 from logger import LoggerService
 
 DB_FILE = "shusha.db"
