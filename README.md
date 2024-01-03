@@ -1,7 +1,7 @@
 # Shusha
 
 ![Repo size](https://img.shields.io/github/repo-size/FourtyThree43/shusha)
-![Pep8 style](https://img.shields.io/badge/PEP8-style%20guide-red?style=round-square)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 ![Repo language count](https://img.shields.io/github/languages/count/FourtyThree43/shusha?style=round-square)
 ![Repo top language](https://img.shields.io/github/languages/top/FourtyThree43/shusha?style=round-square)
 ![Commit activity](https://img.shields.io/github/commit-activity/m/FourtyThree43/shusha?style=round-square)

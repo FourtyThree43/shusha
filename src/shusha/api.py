@@ -4,7 +4,6 @@ from pathlib import Path
 
 
 class HelperUtilities:
-
     @staticmethod
     def sizeof_fmt(num, delim=" ", suffix="B"):
         for unit in ("", "K", "M", "G", "T", "P", "E", "Z"):
@@ -15,7 +14,6 @@ class HelperUtilities:
 
 
 class Api:
-
     def __init__(self, daemon=None):
         self.remote = daemon or Daemon()
         self.client = Client(self.remote)
@@ -37,7 +35,7 @@ class Api:
             logger.log(f"Download started with GID: {gid}")
             return gid
         except XMLRPCClientException as e:
-            logging.error(f"Error starting download: {e}")
+            logger.log(f"Error starting download: {e}", level="error")
             raise  # Re-raise the exception for the caller to handle
 
     def get_download_status(self, gid):
@@ -45,7 +43,9 @@ class Api:
         try:
             return self.client.tell_status(gid=gid)
         except XMLRPCClientException as e:
-            logging.error(f"Error getting download status for GID {gid}: {e}")
+            logger.log(
+                f"Error getting download status for GID {gid}: {e}", level="error"
+            )
             raise
 
     def monitor_download_progress(self, gid):
@@ -56,9 +56,11 @@ class Api:
                 is_active = status.get("status")
                 if is_active == "active":
                     dl_speed = HelperUtilities.sizeof_fmt(
-                        int(status.get("downloadSpeed")))
+                        int(status.get("downloadSpeed"))
+                    )
                     dled_size = HelperUtilities.sizeof_fmt(
-                        int(status.get("completedLength")))
+                        int(status.get("completedLength"))
+                    )
                     logger.log(
                         f"Download Speed: {dl_speed}/s, Completed Length: {dled_size}"
                     )
@@ -67,8 +69,9 @@ class Api:
                     logger.log("Download completed.")
                     break
         except XMLRPCClientException as e:
-            logging.error(
-                f"Error monitoring download progress for GID {gid}: {e}")
+            logger.log(
+                f"Error monitoring download progress for GID {gid}: {e}", level="error"
+            )
             raise
 
     def stop_download(self, gid):
@@ -77,7 +80,7 @@ class Api:
             self.client.force_remove(gid)
             logger.log(f"Download with GID {gid} stopped successfully.")
         except XMLRPCClientException as e:
-            logging.error(f"Error stopping download with GID {gid}: {e}")
+            logger.log(f"Error stopping download with GID {gid}: {e}", level="error")
             raise
 
     def shutdown(self):
@@ -86,7 +89,7 @@ class Api:
             self.client.shutdown()
             logger.log("Aria2 server shutdown initiated.")
         except XMLRPCClientException as e:
-            logging.error(f"Error initiating Aria2 server shutdown: {e}")
+            logger.log(f"Error initiating Aria2 server shutdown: {e}", level="error")
             raise
 
     def get_download(self, gid):
@@ -94,7 +97,9 @@ class Api:
         try:
             return self.client.tell_status(gid)
         except XMLRPCClientException as e:
-            logging.error(f"Error getting download details for GID {gid}: {e}")
+            logger.log(
+                f"Error getting download details for GID {gid}: {e}", level="error"
+            )
             raise
 
     def get_downloads(self, keys=None):
@@ -102,7 +107,7 @@ class Api:
         try:
             return self.client.tell_active(keys)
         except XMLRPCClientException as e:
-            logging.error(f"Error getting active downloads: {e}")
+            logger.log(f"Error getting active downloads: {e}", level="error")
             raise
 
     def move(self, gid, pos, how):
@@ -110,7 +115,7 @@ class Api:
         try:
             return self.client.change_position(gid, pos, how)
         except XMLRPCClientException as e:
-            logging.error(f"Error moving download with GID {gid}: {e}")
+            logger.log(f"Error moving download with GID {gid}: {e}", level="error")
             raise
 
     def move_to_top(self, gid):
@@ -118,7 +123,7 @@ class Api:
         try:
             return self.move(gid, 0, "POS_SET")
         except XMLRPCClientException as e:
-            logging.error(f"Error moving download to the top: {e}")
+            logger.log(f"Error moving download to the top: {e}", level="error")
             raise
 
     def move_to_bottom(self, gid):
@@ -126,7 +131,7 @@ class Api:
         try:
             return self.move(gid, -1, "POS_SET")
         except XMLRPCClientException as e:
-            logging.error(f"Error moving download to the bottom: {e}")
+            logger.log(f"Error moving download to the bottom: {e}", level="error")
             raise
 
     def move_up(self, gid):
@@ -134,7 +139,7 @@ class Api:
         try:
             return self.move(gid, -1, "POS_CUR")
         except XMLRPCClientException as e:
-            logging.error(f"Error moving download up: {e}")
+            logger.log(f"Error moving download up: {e}", level="error")
             raise
 
     def move_down(self, gid):
@@ -142,7 +147,7 @@ class Api:
         try:
             return self.move(gid, 1, "POS_CUR")
         except XMLRPCClientException as e:
-            logging.error(f"Error moving download down: {e}")
+            logger.log(f"Error moving download down: {e}", level="error")
             raise
 
     def move_to(self, gid, pos):
@@ -150,7 +155,7 @@ class Api:
         try:
             return self.move(gid, pos, "POS_SET")
         except XMLRPCClientException as e:
-            logging.error(f"Error moving download to position {pos}: {e}")
+            logger.log(f"Error moving download to position {pos}: {e}", level="error")
             raise
 
     def get_active_downloads(self, keys=None):
@@ -158,7 +163,7 @@ class Api:
         try:
             return self.client.tell_active(keys)
         except XMLRPCClientException as e:
-            logging.error(f"Error getting active downloads: {e}")
+            logger.log(f"Error getting active downloads: {e}", level="error")
             raise
 
     def get_waiting_downloads(self, offset, num, keys=None):
@@ -166,7 +171,7 @@ class Api:
         try:
             return self.client.tell_waiting(offset, num, keys)
         except XMLRPCClientException as e:
-            logging.error(f"Error getting waiting downloads: {e}")
+            logger.log(f"Error getting waiting downloads: {e}", level="error")
             raise
 
     def get_stopped_downloads(self, offset, num, keys=None):
@@ -174,7 +179,7 @@ class Api:
         try:
             return self.client.tell_stopped(offset, num, keys)
         except XMLRPCClientException as e:
-            logging.error(f"Error getting stopped downloads: {e}")
+            logger.log(f"Error getting stopped downloads: {e}", level="error")
             raise
 
     def get_global_stat(self):
@@ -182,7 +187,7 @@ class Api:
         try:
             return self.client.get_global_stat()
         except XMLRPCClientException as e:
-            logging.error(f"Error getting global statistics: {e}")
+            logger.log(f"Error getting global statistics: {e}", level="error")
             raise
 
     def get_version(self):
@@ -190,7 +195,7 @@ class Api:
         try:
             return self.client.get_version()
         except XMLRPCClientException as e:
-            logging.error(f"Error getting Aria2 version information: {e}")
+            logger.log(f"Error getting Aria2 version information: {e}", level="error")
             raise
 
     def get_session_info(self):
@@ -198,7 +203,7 @@ class Api:
         try:
             return self.client.get_session_info()
         except XMLRPCClientException as e:
-            logging.error(f"Error getting session information: {e}")
+            logger.log(f"Error getting session information: {e}", level="error")
             raise
 
     def save_session(self):
@@ -206,7 +211,7 @@ class Api:
         try:
             return self.client.save_session()
         except XMLRPCClientException as e:
-            logging.error(f"Error saving session: {e}")
+            logger.log(f"Error saving session: {e}", level="error")
             raise
 
     # def shutdown_aria2(self):
@@ -214,7 +219,7 @@ class Api:
     #     try:
     #         return self.client.shutdown()
     #     except XMLRPCClientException as e:
-    #         logging.error(f"Error initiating Aria2 server shutdown: {e}")
+    #         logger.log(f"Error initiating Aria2 server shutdown: {e}", level="error")
     #         raise
 
     def force_shutdown_aria2(self):
@@ -222,7 +227,9 @@ class Api:
         try:
             return self.client.force_shutdown()
         except XMLRPCClientException as e:
-            logging.error(f"Error forcefully shutting down Aria2 server: {e}")
+            logger.log(
+                f"Error forcefully shutting down Aria2 server: {e}", level="error"
+            )
             raise
 
     def get_global_options(self):
@@ -230,7 +237,7 @@ class Api:
         try:
             return self.client.get_global_option()
         except XMLRPCClientException as e:
-            logging.error(f"Error getting global options: {e}")
+            logger.log(f"Error getting global options: {e}", level="error")
             raise
 
     def change_global_options(self, options):
@@ -238,7 +245,7 @@ class Api:
         try:
             return self.client.change_global_option(options)
         except XMLRPCClientException as e:
-            logging.error(f"Error changing global options: {e}")
+            logger.log(f"Error changing global options: {e}", level="error")
             raise
 
 
@@ -265,11 +272,11 @@ if __name__ == "__main__":
 
     finally:
         # Stop the download
-        # logger.log("Stopping the download...")
-        # try:
-        #     api.stop_download(download_gid)
-        # except Exception as e:
-        #     logging.error(f"Error stopping the download: {e}")
+        logger.log("Stopping the download...")
+        try:
+            api.stop_download(download_gid)
+        except Exception as e:
+            logger.log(f"Error stopping the download: {e}", level="error")
 
         # Shutdown the Aria2 server
         logger.log("Shutting down Aria2 server...")
