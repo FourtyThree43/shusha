@@ -99,5 +99,6 @@ class DownloadManagerApp:
 
 
 # Instantiate the Tkinter root window and the application
-root = Tk()
-app = DownloadManagerApp(root)
+if __name__ == "__main__":
+    root = Tk()
+    app = DownloadManagerApp(root)
