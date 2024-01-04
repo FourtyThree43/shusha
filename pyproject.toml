@@ -35,6 +35,11 @@ Documentation = "https://github.com/FourtyThree43/shusha#readme"
 Issues = "https://github.com/FourtyThree43/shusha/issues"
 Source = "https://github.com/FourtyThree43/shusha"
 
+[tool.ruff]
+line-length = 80
+indent-width = 4
+
+
 [tool.hatch.version]
 path = "src/shusha/__about__.py"
 

@@ -6,8 +6,8 @@ from pathlib import Path
 class LoggerService:
     LOG_DIR = Path("logs")
     LOG_FILE_PATH = LOG_DIR / "shusha.log"
-    LOG_FORMAT = '%(asctime)s | %(levelname)s | %(message)s'
-    LOG_DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
+    LOG_FORMAT = "%(asctime)s | %(levelname)s | %(message)s"
+    LOG_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
     MAX_BYTES = 5 * 1024 * 1024  # 5 MB
 
     def __init__(self, logger_name="shusha", log_file_path=None):
@@ -32,14 +32,17 @@ class LoggerService:
         console_handler.setLevel(logging.DEBUG)
 
         # Create file handler and set level to DEBUG
-        file_handler = RotatingFileHandler(log_file_path or self.LOG_FILE_PATH,
-                                           maxBytes=self.MAX_BYTES,
-                                           backupCount=2)
+        file_handler = RotatingFileHandler(
+            log_file_path or self.LOG_FILE_PATH,
+            maxBytes=self.MAX_BYTES,
+            backupCount=2,
+        )
         file_handler.setLevel(logging.DEBUG)
 
         # Create formatter
-        formatter = logging.Formatter(fmt=self.LOG_FORMAT,
-                                      datefmt=self.LOG_DATE_FORMAT)
+        formatter = logging.Formatter(
+            fmt=self.LOG_FORMAT, datefmt=self.LOG_DATE_FORMAT
+        )
 
         # Add formatter to handlers
         console_handler.setFormatter(formatter)
@@ -71,7 +74,8 @@ class LoggerService:
             self.logger.critical(message)
         else:
             self.logger.warning(
-                f"Invalid log level: {level}. Defaulting to 'info'.")
+                f"Invalid log level: {level}. Defaulting to 'info'."
+            )
             self.logger.info(message)
 
 

@@ -1,6 +1,7 @@
+from pathlib import Path
+
 from client import Client, XMLRPCClientException
 from daemon import Daemon, logger
-from pathlib import Path
 
 
 class HelperUtilities:
@@ -44,7 +45,8 @@ class Api:
             return self.client.tell_status(gid=gid)
         except XMLRPCClientException as e:
             logger.log(
-                f"Error getting download status for GID {gid}: {e}", level="error"
+                f"Error getting download status for GID {gid}: {e}",
+                level="error",
             )
             raise
 
@@ -70,7 +72,8 @@ class Api:
                     break
         except XMLRPCClientException as e:
             logger.log(
-                f"Error monitoring download progress for GID {gid}: {e}", level="error"
+                f"Error monitoring download progress for GID {gid}: {e}",
+                level="error",
             )
             raise
 
@@ -80,7 +83,9 @@ class Api:
             self.client.force_remove(gid)
             logger.log(f"Download with GID {gid} stopped successfully.")
         except XMLRPCClientException as e:
-            logger.log(f"Error stopping download with GID {gid}: {e}", level="error")
+            logger.log(
+                f"Error stopping download with GID {gid}: {e}", level="error"
+            )
             raise
 
     def shutdown(self):
@@ -89,7 +94,9 @@ class Api:
             self.client.shutdown()
             logger.log("Aria2 server shutdown initiated.")
         except XMLRPCClientException as e:
-            logger.log(f"Error initiating Aria2 server shutdown: {e}", level="error")
+            logger.log(
+                f"Error initiating Aria2 server shutdown: {e}", level="error"
+            )
             raise
 
     def get_download(self, gid):
@@ -98,7 +105,8 @@ class Api:
             return self.client.tell_status(gid)
         except XMLRPCClientException as e:
             logger.log(
-                f"Error getting download details for GID {gid}: {e}", level="error"
+                f"Error getting download details for GID {gid}: {e}",
+                level="error",
             )
             raise
 
@@ -115,7 +123,9 @@ class Api:
         try:
             return self.client.change_position(gid, pos, how)
         except XMLRPCClientException as e:
-            logger.log(f"Error moving download with GID {gid}: {e}", level="error")
+            logger.log(
+                f"Error moving download with GID {gid}: {e}", level="error"
+            )
             raise
 
     def move_to_top(self, gid):
@@ -131,7 +141,9 @@ class Api:
         try:
             return self.move(gid, -1, "POS_SET")
         except XMLRPCClientException as e:
-            logger.log(f"Error moving download to the bottom: {e}", level="error")
+            logger.log(
+                f"Error moving download to the bottom: {e}", level="error"
+            )
             raise
 
     def move_up(self, gid):
@@ -155,7 +167,9 @@ class Api:
         try:
             return self.move(gid, pos, "POS_SET")
         except XMLRPCClientException as e:
-            logger.log(f"Error moving download to position {pos}: {e}", level="error")
+            logger.log(
+                f"Error moving download to position {pos}: {e}", level="error"
+            )
             raise
 
     def get_active_downloads(self, keys=None):
@@ -195,7 +209,9 @@ class Api:
         try:
             return self.client.get_version()
         except XMLRPCClientException as e:
-            logger.log(f"Error getting Aria2 version information: {e}", level="error")
+            logger.log(
+                f"Error getting Aria2 version information: {e}", level="error"
+            )
             raise
 
     def get_session_info(self):
@@ -228,7 +244,8 @@ class Api:
             return self.client.force_shutdown()
         except XMLRPCClientException as e:
             logger.log(
-                f"Error forcefully shutting down Aria2 server: {e}", level="error"
+                f"Error forcefully shutting down Aria2 server: {e}",
+                level="error",
             )
             raise
 

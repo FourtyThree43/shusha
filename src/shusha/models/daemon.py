@@ -1,7 +1,7 @@
-from pathlib import Path
 import platform
 import subprocess
 import time
+from pathlib import Path
 
 from logger import LoggerService
 
@@ -11,17 +11,17 @@ DEFAULT_TIMEOUT = 60.0
 BIN_PATH = Path("resources/bin/aria2c.exe")
 CONF_PATH = Path("resources/aria2.conf")
 
-logger = LoggerService()
+logger = LoggerService(logger_name="ShushaDB")
 
 
 class Daemon:
-
-    def __init__(self,
-                 aria2d=None,
-                 host=DEFAULT_HOST,
-                 port=DEFAULT_PORT,
-                 timeout=DEFAULT_TIMEOUT):
-
+    def __init__(
+        self,
+        aria2d=None,
+        host=DEFAULT_HOST,
+        port=DEFAULT_PORT,
+        timeout=DEFAULT_TIMEOUT,
+    ):
         self.aria2d = aria2d or BIN_PATH
         self.host = host
         self.port = port
@@ -52,12 +52,14 @@ class Daemon:
         creationflags = NO_WINDOW if platform.system() == "Windows" else 0
         try:
             logger.log("Starting Aria2 server...")
-            self.process = subprocess.Popen(command,
-                                            stderr=subprocess.PIPE,
-                                            stdout=subprocess.PIPE,
-                                            stdin=subprocess.PIPE,
-                                            shell=False,
-                                            creationflags=creationflags)
+            self.process = subprocess.Popen(
+                command,
+                stderr=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stdin=subprocess.PIPE,
+                shell=False,
+                creationflags=creationflags,
+            )
             time.sleep(2)
             logger.log("Aria2 server started successfully.")
             return self.process.pid
