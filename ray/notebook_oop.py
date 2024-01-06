@@ -1,3 +1,7 @@
+"""
+This module contains the DownloadManagerApp class, which is a GUI application
+"""
+
 from tkinter import *
 from tkinter import ttk
 
@@ -6,7 +10,7 @@ class DownloadManagerApp:
     def __init__(self, root):
         self.root = root
         self.root.geometry("640x480+50+50")
-        self.root.title("Download Manager")
+        self.root.title("Shusha-DM")
 
         # Initialize styles
         self.style = ttk.Style()
