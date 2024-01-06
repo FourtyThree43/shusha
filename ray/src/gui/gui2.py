@@ -2,14 +2,14 @@
 # https://github.com/ParthJadhav/Tkinter-Designer
 
 from pathlib import Path
-
 # from tkinter import *
 # Explicit imports to satisfy Flake8
-from tkinter import Tk, ttk, Canvas, Button, PhotoImage
+from tkinter import Button, Canvas, PhotoImage, Tk, ttk
 
 from PIL import Image, ImageTk
-from ttkwidgets import Table
+from ttkwidgets import DebugWindow, Table
 from ttkwidgets.autocomplete import AutocompleteCombobox
+from ttkwidgets.frames import Tooltip
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path("assets/frame0")
@@ -50,7 +50,7 @@ canvas.place(x=0, y=0)
 canvas.create_rectangle(0.0, 541.0, 864.0, 605.0, fill="#2A2E31", outline="")
 
 button_image_add = PhotoImage(file=relative_to_assets("icons8-add-64.png"))
-button__add = Button(
+button_add = Button(
     image=button_image_add,
     bg="#2A2E31",
     borderwidth=0,
@@ -58,7 +58,10 @@ button__add = Button(
     command=lambda: print("add downloads"),
     relief="flat",
 )
-button__add.place(x=10.0, y=7.0, width=50.0, height=50.0)
+button_add.place(x=10.0, y=7.0, width=50.0, height=50.0)
+button_add_ballon = Tooltip(button_add,
+                            headertext="Add download",
+                            text="Add download")
 
 button_image_play = PhotoImage(
     file=relative_to_assets("icons8-circled-play-64.png"))
@@ -67,10 +70,13 @@ button_play = Button(
     bg="#2A2E31",
     borderwidth=0,
     highlightthickness=0,
-    command=lambda: print("strat download"),
+    command=lambda: print("start download"),
     relief="flat",
 )
 button_play.place(x=65.0, y=7.0, width=50.0, height=50.0)
+button_play_ballon = Tooltip(button_play,
+                             headertext="Start download",
+                             text="Start download")
 
 button_image_pause = PhotoImage(
     file=relative_to_assets("icons8-pause-button-64.png"))
@@ -83,6 +89,9 @@ button_pause = Button(
     relief="flat",
 )
 button_pause.place(x=120.0, y=7.0, width=50.0, height=50.0)
+button_pause_ballon = Tooltip(button_pause,
+                              headertext="Pause download",
+                              text="Pause download")
 
 button_image_up = PhotoImage(file=relative_to_assets("icons8-arrow-64.png"))
 button_up = Button(
@@ -94,6 +103,9 @@ button_up = Button(
     relief="flat",
 )
 button_up.place(x=175.0, y=7.0, width=50.0, height=50.0)
+button_up_ballon = Tooltip(button_up,
+                           headertext="Move up",
+                           text="Move item up")
 
 button_image_down = PhotoImage(
     file=relative_to_assets("icons8-scroll-down-64.png"))
@@ -106,6 +118,9 @@ button_down = Button(
     relief="flat",
 )
 button_down.place(x=230.0, y=7.0, width=50.0, height=50.0)
+button_down_ballon = Tooltip(button_down,
+                             headertext="Move Down",
+                             text="Move item down")
 
 button_image_log = PhotoImage(file=relative_to_assets("icons8-log-64.png"))
 button_log = Button(
@@ -117,6 +132,9 @@ button_log = Button(
     relief="flat",
 )
 button_log.place(x=749.0, y=7.0, width=50.0, height=50.0)
+button_log_ballon = Tooltip(button_log,
+                            headertext="Logs",
+                            text="Open log view")
 
 button_image_sett = PhotoImage(
     file=relative_to_assets("icons8-slider_2-64.png"))
@@ -129,12 +147,14 @@ button_sett = Button(
     relief="flat",
 )
 button_sett.place(x=804.0, y=7.0, width=50.0, height=50.0)
+button_sett_ballon = Tooltip(button_sett,
+                             headertext="Settings",
+                             text="Open settings")
 
 ###############################################################################
 # midde table
 ###############################################################################
 
-# Create a Table widget instead of ttk.Treeview
 table_columns = [
     "LicenseNumber", "CompanyName", "UserCount", "stretch", "email",
     "password", "location"
@@ -153,7 +173,6 @@ for col in table_columns:
 for row in rowdata:
     table.insert("", "end", values=row)
 
-# Pack the Table widget
 table.place(x=0, y=65, width=864.0, height=477.0)
 
 # Create vertical scrollbar
@@ -164,10 +183,7 @@ vsb.place(x=864.0 - 20, y=65, height=477.0)
 hsb = ttk.Scrollbar(window, orient="horizontal", command=table.xview)
 hsb.place(x=0, y=65 + 465.0, width=864.0)
 
-# Configure the Table widget to use the scrollbars
 table.configure(yscrollcommand=vsb.set, xscrollcommand=hsb.set)
-
-# Pack the Table widget
 table.place(x=0, y=65, width=864.0 - 20, height=477.0)
 
 ###############################################################################
@@ -179,7 +195,7 @@ canvas.create_rectangle(0.0, 0.0, 864.0, 64.0, fill="#2A2E31", outline="")
 # entry_image_1 = PhotoImage(file=relative_to_assets("entry_1.png"))
 # entry_bg_1 = canvas.create_image(115.0, 573.5, image=entry_image_1)
 entry_1 = AutocompleteCombobox(window, completevalues=dir(window))
-entry_1.config(font=('Arial', 22, "bold"))
+entry_1.config(font=('Arial', 18, "bold"))
 entry_1.place(x=10.0, y=551.0, width=210.0, height=43.0)
 
 button_image_play2 = PhotoImage(
@@ -193,6 +209,9 @@ button_play2 = Button(
     relief="flat",
 )
 button_play2.place(x=230.0, y=548.0, width=50.0, height=50.0)
+button_play2_ballon = Tooltip(button_play2,
+                              headertext="Start Queue",
+                              text="Start current queue downloads")
 
 button_image_pause2 = PhotoImage(
     file=relative_to_assets("icons8-pause-button-64.png"))
@@ -203,8 +222,12 @@ button_pause2 = Button(
     highlightthickness=0,
     command=lambda: print("pause queue"),
     relief="flat",
+    text="pause queue",
 )
 button_pause2.place(x=285.0, y=548.0, width=50.0, height=50.0)
+button_pause2_ballon = Tooltip(button_pause2,
+                               headertext="Pause Queue",
+                               text="Pause the current queue")
 
 button_image_sett2 = PhotoImage(
     file=relative_to_assets("icons8-slider-64.png"))
@@ -217,5 +240,9 @@ button_sett2 = Button(
     relief="flat",
 )
 button_sett2.place(x=340.0, y=548.0, width=50.0, height=50.0)
+button_sett2_ballon = Tooltip(button_sett2,
+                              headertext="Queue settings",
+                              text="Open queue settings")
 
+DebugWindow(window)
 window.mainloop()
