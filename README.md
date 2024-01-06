@@ -63,35 +63,32 @@ shusha
 │   └── shusha
 │       ├── __about__.py
 │       ├── __init__.py
-│       ├── frontend
+│       ├── __main__.py
+│       ├── models
 │       │   ├── __init__.py
-│       │   ├── model
-│       │   │   ├── __init__.py
-│       │   │   └── gui_model.py
-│       │   ├── view
-│       │   │   ├── __init__.py
-│       │   │   └── main_view.py
-│       │   └── controller
-│       │       ├── __init__.py
-│       │       └── gui_controller.py
-│       ├── backend
+│       │   ├── client.py
+│       │   ├── daemon.py
+│       │   ├── db.py
+│       │   ├── download.py
+│       │   ├── logger.py
+│       │   ├── options.py
+│       │   ├── stats.py
+│       │   └── utility.py
+│       ├── view
 │       │   ├── __init__.py
-│       │   ├── model
-│       │   │   ├── __init__.py
-│       │   │   └── aria2c_connector.py
-│       │   ├── middleware
-│       │   │   ├── __init__.py
-│       │   │   └── download_manager_middleware.py
-│       │   └── controller
-│       │       ├── __init__.py
-│       │       └── download_manager_controller.py
+│       │   └── main_view.py
+│       ├── controller
+│       │  ├── __init__.py
+│       │  ├── controller.py
+│       │  └── gui_controller.py
 │       ├── resources
 │       │   ├── __init__.py
 │       │   ├── aria2c
 │       │   │   └── (aria2c-related resources)
 │       │   └── assets
 │       │       └── (icons, images, canvas, etc.)
-│       └── main.py
+│       ├── shusha.ico
+│       └── ShushaDM.py
 ├── tests
 │   └── __init__.py
 ├── docs

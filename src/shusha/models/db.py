@@ -1,8 +1,8 @@
+import json
+import sqlite3
 from contextlib import contextmanager
 from sqlite3 import Error
 from threading import Lock
-import json
-import sqlite3
 
 from logger import LoggerService
 
@@ -14,6 +14,24 @@ class StructsDB:
     TABLE_FILES = "files_t"
     TABLE_BITTORRENT = "bittorrent_t"
     TABLE_QUEUE = "queue_t"
+
+    DOWNLOAD_COLUMNS = [
+        "gid", "status", "totalLength", "completedLength", "uploadLength",
+        "bitfield", "downloadSpeed", "uploadSpeed", "infoHash", "numSeeders",
+        "seeder", "pieceLength", "numPieces", "connections", "errorCode",
+        "errorMessage", "followedBy", "following", "belongsTo", "dir",
+        "verifiedLength", "verifyIntegrityPending", "timestamp"
+    ]
+
+    FILES_COLUMNS = [
+        "id", "file_index", "path", "length", "completed_length", "selected",
+        "uris", "download_id"
+    ]
+
+    BITTORRENT_COLUMNS = [
+        "id", "announce_list", "comment", "creation_date", "mode", "info_name",
+        "download_id"
+    ]
 
     def __init__(self, db_path=DB_FILE):
         self.db_path = db_path
@@ -38,7 +56,8 @@ class StructsDB:
             except Error as e:
                 # Rollback transaction on error
                 self.connection.rollback()
-                self.logger.log(f"Error during transaction: {e}", level="error")
+                self.logger.log(f"Error during transaction: {e}",
+                                level="error")
                 raise e
 
     def _execute_query(self, cursor, query, value=None):
@@ -166,14 +185,14 @@ class StructsDB:
             "verifyIntegrityPending",
         ]
         values = [gid] + [
-            info.get(column, 0)
-            if column != "followedBy"
-            else json.dumps(info.get("followedBy", []))
-            for column in columns[1:]
+            info.get(column, 0) if column != "followedBy" else json.dumps(
+                info.get("followedBy", [])) for column in columns[1:]
         ]
         placeholders = ", ".join(["?" for _ in columns])
 
-        query = f"INSERT INTO {StructsDB.TABLE_DOWNLOAD} ({', '.join(columns)}) VALUES ({placeholders})"
+        query = f"""INSERT INTO {StructsDB.TABLE_DOWNLOAD} ({', '.join(columns)})
+                    VALUES ({placeholders})
+                 """
 
         self._execute_query(cursor, query, values)
 
@@ -191,19 +210,20 @@ class StructsDB:
             "download_id",
         ]
         values = [
-            file_info.get(column, 0)
-            if column != "uris"
-            else json.dumps(file_info.get("uris", []))
-            for column in columns[:-1]
+            file_info.get(column, 0) if column != "uris" else json.dumps(
+                file_info.get("uris", [])) for column in columns[:-1]
         ] + [gid]
 
-        query = f"INSERT INTO files_t ({', '.join(columns)}) VALUES ({', '.join(['?' for _ in columns])})"
+        query = f"""INSERT INTO files_t ({', '.join(columns)})
+                    VALUES ({', '.join(['?' for _ in columns])})
+                 """
 
         self._execute_query(cursor, query, values)
 
     def insert_bittorrent_info(self, cursor, bittorrent_info_entry, gid):
         """
-        Insert BitTorrent information linked to downloads into the 'bittorrent_t' table.
+        Insert BitTorrent information linked to downloads into the 'bittorrent_t'
+        table.
         """
         columns = [
             "announce_list",
@@ -222,7 +242,9 @@ class StructsDB:
             gid,
         ]
 
-        query = f"INSERT INTO bittorrent_t ({', '.join(columns)}) VALUES ({', '.join(['?' for _ in columns])})"
+        query = f"""INSERT INTO bittorrent_t ({', '.join(columns)})
+                    VALUES ({', '.join(['?' for _ in columns])})
+                 """
 
         self._execute_query(cursor, query, values)
 
@@ -231,8 +253,7 @@ class StructsDB:
             cursor = conn.cursor()
 
             set_columns = ", ".join(
-                [f"{column} = ?" for column, _ in set_values.items()]
-            )
+                [f"{column} = ?" for column, _ in set_values.items()])
             query = f"UPDATE {table_name} SET {set_columns} WHERE {where_column} = ?"
 
             values = list(set_values.values()) + [where_value]
@@ -254,6 +275,18 @@ class StructsDB:
             bittorrent_info = info.get("bittorrent", [])
             for bittorrent_info_entry in bittorrent_info:
                 self.insert_bittorrent_info(cursor, bittorrent_info_entry, gid)
+
+    def _as_dicts_list(self, results, columns):
+        """
+        Convert a list of results into a list of dictionaries using given columns.
+        """
+        result_dicts = []
+        for result in results:
+            result_dicts.append(dict(zip(columns, result)))
+        return result_dicts
+
+    def to_dict(self, results, columns):
+        return self._as_dicts_list(results, columns)
 
     def get_all_downloads(self):
         with self.connection:
@@ -287,31 +320,33 @@ class StructsDB:
                 WHERE gid = ?
             """
 
-            return self._execute_query_and_fetchone(cursor, query, (gid,))
+            return self._execute_query_and_fetchone(cursor, query, (gid, ))
 
     def get_files_info(self, gid):
         with self.connection:
             cursor = self.connection.cursor()
 
             query = f"""
-                SELECT id, file_index, path, length, completed_length, selected, uris, download_id
+                SELECT id, file_index, path, length, completed_length, selected,
+                       uris, download_id
                 FROM {StructsDB.TABLE_FILES}
                 WHERE download_id = ?
             """
 
-            return self._execute_query_and_fetchall(cursor, query, (gid,))
+            return self._execute_query_and_fetchall(cursor, query, (gid, ))
 
     def get_bittorrent_info(self, gid):
         with self.connection:
             cursor = self.connection.cursor()
 
             query = f"""
-                SELECT id, announce_list, comment, creation_date, mode, info_name, download_id
+                SELECT id, announce_list, comment, creation_date, mode, info_name,
+                       download_id
                 FROM {StructsDB.TABLE_BITTORRENT}
                 WHERE download_id = ?
             """
 
-            return self._execute_query_and_fetchall(cursor, query, (gid,))
+            return self._execute_query_and_fetchall(cursor, query, (gid, ))
 
     def reset_database(self):
         """
@@ -328,9 +363,8 @@ class StructsDB:
         Update download status in the 'downloads' table based on 'gid'.
         """
         where_column = "gid"
-        self.update_table(
-            StructsDB.TABLE_DOWNLOAD, info_updates, where_column, gid
-        )
+        self.update_table(StructsDB.TABLE_DOWNLOAD, info_updates, where_column,
+                          gid)
 
     def close_connection(self):
         """Close the database connection if it is open."""
@@ -339,9 +373,8 @@ class StructsDB:
                 self.connection.close()
                 self.logger.log("Database connection closed.")
             except Error as e:
-                self.logger.log(
-                    f"Error closing database connection: {e}", level="error"
-                )
+                self.logger.log(f"Error closing database connection: {e}",
+                                level="error")
 
 
 # Example usage:
@@ -352,44 +385,85 @@ if __name__ == "__main__":
 
     # Example: Storing download information
     download_info = {
-        "gid": "3089b05edsas3d829",
-        "status": "complete",
-        "totalLength": "34896138",
-        "completedLength": "34896138",
-        "uploadLength": "0",
-        "bitfield": "ffff80",
-        "downloadSpeed": "0",
-        "uploadSpeed": "0",
-        "infoHash": "",
-        "numSeeders": "0",
-        "seeder": "0",
-        "pieceLength": "2097152",
-        "numPieces": "17",
-        "connections": "0",
-        "errorCode": "0",
-        "errorMessage": "",
+        "gid":
+        "1089b05edsas3d829",
+        "status":
+        "complete",
+        "totalLength":
+        "34896138",
+        "completedLength":
+        "34896138",
+        "uploadLength":
+        "0",
+        "bitfield":
+        "ffff80",
+        "downloadSpeed":
+        "0",
+        "uploadSpeed":
+        "0",
+        "infoHash":
+        "",
+        "numSeeders":
+        "0",
+        "seeder":
+        "0",
+        "pieceLength":
+        "2097152",
+        "numPieces":
+        "17",
+        "connections":
+        "0",
+        "errorCode":
+        "0",
+        "errorMessage":
+        "",
         "followedBy": [],
-        "following": "",
-        "belongsTo": "",
-        "dir": "/downloads",
-        "verifiedLength": "0",
-        "verifyIntegrityPending": "0",
+        "following":
+        "",
+        "belongsTo":
+        "",
+        "dir":
+        "/downloads",
+        "verifiedLength":
+        "0",
+        "verifyIntegrityPending":
+        "0",
+        'files': [{
+            'index':
+            '1',
+            'length':
+            '34896138',
+            'completedLength':
+            '34896138',
+            'path':
+            '/downloads/file',
+            'selected':
+            'true',
+            'uris': [{
+                'status': 'used',
+                'uri': 'http://example.org/file'
+            }]
+        }],
     }
 
     db.store_download_info(download_info["gid"], download_info)
 
     # Example: Retrieving all download information
-    all_downloads = db.get_all_downloads()
-    for download in all_downloads:
-        db.logger.log(download)
+    # dl_res = db.get_all_downloads()
+    # res_dict = db.to_dict(dl_res, db.DOWNLOAD_COLUMNS)
+    # for download in res_dict:
+    #     db.logger.log(download, level="debug")
 
     # Example: Retrieving files information linked to a download
-    files_for_download = db.get_files_info(download_info["gid"])
-    for file_info in files_for_download:
+    files_res = db.get_files_info(download_info["gid"])
+    files_list = db.to_dict(files_res, db.FILES_COLUMNS)
+
+    for file_info in files_list:
         # Convert 'file_index' to 'index' when presenting the data
         file_info_dict = dict(file_info)
         file_info_dict["index"] = file_info_dict.pop("file_index")
         db.logger.log(f"Files for download: {file_info_dict}")
+        db.logger.log(file_info_dict, level="debug")
 
     # Example: Retrieving BitTorrent information linked to a download
     bittorrent_info_for_download = db.get_bittorrent_info(download_info["gid"])
