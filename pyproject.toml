@@ -37,7 +37,7 @@ Source = "https://github.com/FourtyThree43/shusha"
 
 [tool.ruff]
 line-length = 80
-indent-width = 4
+# indent-width = 4
 
 
 [tool.hatch.version]
