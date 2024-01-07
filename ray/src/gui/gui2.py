@@ -189,7 +189,7 @@ table.place(x=0, y=65, width=864.0 - 20, height=477.0)
 
 
 # Example: Creating RightClickMenu for the table
-def handle_table_right_click(self, option, event=None):
+def handle_table_right_click(option, event=None):
     print(f"Table Right Click: {option}")
 
 

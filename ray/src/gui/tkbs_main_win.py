@@ -157,29 +157,30 @@ class MyApp(ttk.Frame):
         self.table_lf = ttk.Labelframe(self, text="Downloads List")
         self.table_lf.pack(fill=BOTH, expand=YES, side=TOP)
 
-        coldata = [
-            {
-                "text": "LicenseNumber",
-                "stretch": False
-            },
-            "CompanyName",
-            "UserCount",
-            "UserName",
-            "CountyName",
-            "TownName",
-            "CityName",
+        _columns = [
+            "Filename", "Status", "Size", "Progress", "Speed", "ETA", "Date",
+            "Note"
         ]
 
-        rowdata = [('A123', 'IzzyCo', 12), ('A136', 'Kimdee Inc.', 45),
-                   ('A158', 'Farmadding Co.', 36)]
+        _rowdata = []
+        # add items to download_list
+        for i in range(1, 15):
+            for j in range(2, 10):
+                x = j + i
+                y = x + 2
+                _rowdata.append([
+                    f"Lorem Ipsum dolor sit amet", f"Downloading",
+                    f"{i}{x}{j} MB", f"{y}.2{i}%", f"{x}{i}{y}.{j}{i} KB/s",
+                    f"{j}.13m", f"Dec 24 08:36:59 2023"
+                ])
 
         self.dt = Tableview(master=self.table_lf,
-                            coldata=coldata,
-                            rowdata=rowdata,
+                            coldata=_columns,
+                            rowdata=_rowdata,
                             paginated=True,
                             searchable=True,
                             bootstyle="warning",
-                            stripecolor=(self.colors.dark, self.colors.light))
+                            stripecolor=(self.colors.dark, None))
         self.dt.pack(fill=tk.BOTH, expand=tk.YES, padx=10)
 
     def create_bottom_bar(self):
