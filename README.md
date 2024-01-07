@@ -1,7 +1,7 @@
 # Shusha
 
 ![Repo size](https://img.shields.io/github/repo-size/FourtyThree43/shusha)
-![Pep8 style](https://img.shields.io/badge/PEP8-style%20guide-red?style=round-square)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 ![Repo language count](https://img.shields.io/github/languages/count/FourtyThree43/shusha?style=round-square)
 ![Repo top language](https://img.shields.io/github/languages/top/FourtyThree43/shusha?style=round-square)
 ![Commit activity](https://img.shields.io/github/commit-activity/m/FourtyThree43/shusha?style=round-square)
@@ -21,17 +21,7 @@ Shusha is a download manager that wraps around [aria2](https://aria2.github.io/)
 
 ## Installation
 
-To install Shusha-DM, you need to have Python 3 and aria2 installed on your system. You can download Python 3 from [here](https://github.com/aria2/aria2) and aria2 from [here](https://linuxconfig.org/aria2-all-in-one-command-line-download-tool). You also need to install the following Python modules:
-
-- requests
-- tkinter
-- tkcalendar
-
-You can install them using pip:
-
-```bash
-pip install requests tkinter tkcalendar
-```
+To install Shusha-DM, you need to have Python 3 and aria2 installed on your system. You can download Python 3 from [here](https://github.com/aria2/aria2) and aria2 from [here](https://linuxconfig.org/aria2-all-in-one-command-line-download-tool).
 
 To run Shusha-DM, you need to start aria2 in daemon mode with RPC enabled. You can do this by running the following command:
 
@@ -63,9 +53,55 @@ To save or load a session, you can use the File -> Save Session or File -> Load 
 
 To exit Shusha-DM, you can use the File -> Exit menu or press Alt+F4. You will be asked if you want to save the current session before exiting.
 
+## Project Structure
+
+* The Project Structure as per the Model-View-Controller (MVC) pattern of software architectural pattern:  
+
+```
+shusha
+├── src
+│   └── shusha
+│       ├── __about__.py
+│       ├── __init__.py
+│       ├── __main__.py
+│       ├── models
+│       │   ├── __init__.py
+│       │   ├── client.py
+│       │   ├── daemon.py
+│       │   ├── db.py
+│       │   ├── download.py
+│       │   ├── logger.py
+│       │   ├── options.py
+│       │   ├── stats.py
+│       │   └── utility.py
+│       ├── view
+│       │   ├── __init__.py
+│       │   └── main_view.py
+│       ├── controller
+│       │  ├── __init__.py
+│       │  ├── controller.py
+│       │  └── gui_controller.py
+│       ├── resources
+│       │   ├── __init__.py
+│       │   ├── aria2c
+│       │   │   └── (aria2c-related resources)
+│       │   └── assets
+│       │       └── (icons, images, canvas, etc.)
+│       ├── shusha.ico
+│       └── ShushaDM.py
+├── tests
+│   └── __init__.py
+├── docs
+│   └── index.html
+├── LICENSE.txt
+├── README.md
+└── pyproject.toml
+
+```
+
 ## License
 
-Shusha-DM is licensed under the GNU GENERAL PUBLIC LICENSE. See the [LICENSE](https://github.com/FourtyThree43/shusha/edit/main/LICENSE) file for more details.
+`shusha` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
 
 
 # About Shusha
