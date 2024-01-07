@@ -19,14 +19,15 @@ class AddWindow(ttk.Toplevel):
         add_dl_notebook.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
         # application variables
-        _url = "One URL task per line"
-        self.url_var = ttk.StringVar(value=_url)
+        _url = ""
         _path = pathlib.Path().absolute().as_posix()
+        _rename = ""
+        _split = 8
 
+        self.url_var = ttk.StringVar(value=_url)
         self.path_var = ttk.StringVar(value=_path)
-
-        _rename = "Optional"
         self.rename_var = ttk.StringVar(value=_rename)
+        self.split_var = ttk.IntVar(value=_split)
 
         self.create_page_frames(add_dl_notebook)
         self.create_url_page(add_dl_notebook)
@@ -68,18 +69,23 @@ class AddWindow(ttk.Toplevel):
 
         url_row = ttk.Frame(url_page)
         url_row.pack(fill=tk.X, expand=tk.YES)
-        url_lbl = ttk.Label(url_row, text="URL:", width=8)
+        url_lbl = ttk.Label(url_row, text="URL:", width=5)
         url_lbl.pack(side=tk.LEFT, padx=(15, 0))
         url_ent = ttk.Entry(url_row, textvariable=self.url_var)
         url_ent.pack(side=tk.LEFT,
                      fill=tk.BOTH,
                      expand=tk.YES,
                      padx=5,
-                     ipady=20)
+                     pady=5,
+                     ipady=30)
 
         # header and labelframe option container
         option_lf = ttk.Labelframe(url_page, text="File Download Options")
-        option_lf.pack(fill=tk.BOTH, expand=tk.YES, pady=20, anchor=tk.N)
+        option_lf.pack(fill=tk.BOTH,
+                       expand=tk.YES,
+                       padx=5,
+                       ipady=30,
+                       anchor=tk.N)
 
         # rename row
         rename_row = ttk.Frame(option_lf)
@@ -90,29 +96,44 @@ class AddWindow(ttk.Toplevel):
         rename_ent = ttk.Entry(rename_row, textvariable=self.rename_var)
         rename_ent.pack(side=tk.LEFT, fill=tk.X, expand=tk.YES, padx=5)
 
-        splits_lbl = ttk.Label(rename_row, text="Splits", width=8)
+        splits_lbl = ttk.Label(rename_row, text="Splits:", width=8)
         splits_lbl.pack(side=tk.LEFT, padx=(15, 0))
-        splits_spinbox = ttk.Spinbox(rename_row, from_=8, to=64, width=3)
+        splits_spinbox = ttk.Spinbox(rename_row,
+                                     from_=8,
+                                     to=64,
+                                     width=3,
+                                     textvariable=self.split_var)
         splits_spinbox.pack(side=tk.LEFT, padx=(0, 15))
 
         # path row
         path_row = ttk.Frame(option_lf)
         path_row.pack(fill=tk.X, expand=tk.YES)
-        path_lbl = ttk.Label(path_row, text="Path", width=8)
+        path_lbl = ttk.Label(path_row, text="Save to:", width=8)
         path_lbl.pack(side=tk.LEFT, padx=(15, 0))
         path_ent = ttk.Entry(path_row, textvariable=self.path_var)
         path_ent.pack(side=tk.LEFT, fill=tk.X, expand=tk.YES, padx=5)
+
         browse_btn = ttk.Button(master=path_row,
                                 text="Browse",
                                 command=self.on_browse,
                                 width=8)
         browse_btn.pack(side=tk.LEFT, padx=5)
 
-        add_btn = ttk.Button(master=url_row,
-                             text="Add",
-                             command=lambda: self.on_add_url(),
-                             width=8)
-        add_btn.pack(side=tk.LEFT, padx=5)
+        # submit row
+        submit_row = ttk.Frame(url_page)
+        submit_row.pack(fill=tk.X, expand=tk.YES, pady=(20, 0))
+
+        submit_btn = ttk.Button(master=submit_row,
+                                text="Submit",
+                                command=lambda: self.on_add_url(),
+                                width=8)
+        submit_btn.pack(side=tk.RIGHT, padx=5)
+
+        cancel_btn = ttk.Button(master=submit_row,
+                                text="Cancel",
+                                command=lambda: self.destroy(),
+                                width=8)
+        cancel_btn.pack(side=tk.RIGHT, padx=5)
 
     def create_torrent_page(self, notebook):
         """Create Torrent page"""
