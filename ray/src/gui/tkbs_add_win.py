@@ -71,21 +71,29 @@ class AddWindow(ttk.Toplevel):
         url_row.pack(fill=tk.X, expand=tk.YES)
         url_lbl = ttk.Label(url_row, text="URL:", width=5)
         url_lbl.pack(side=tk.LEFT, padx=(15, 0))
-        url_ent = ttk.Entry(url_row, textvariable=self.url_var)
-        url_ent.pack(side=tk.LEFT,
-                     fill=tk.BOTH,
-                     expand=tk.YES,
-                     padx=5,
-                     pady=5,
-                     ipady=30)
+        url_ent = ttk.Entry(
+            url_row,
+            textvariable=self.url_var,
+            bootstyle=ttk.WARNING,
+        )
+        url_ent.pack(
+            side=tk.LEFT,
+            fill=tk.BOTH,
+            expand=tk.YES,
+            padx=5,
+            pady=5,
+            ipady=30,
+        )
 
         # header and labelframe option container
         option_lf = ttk.Labelframe(url_page, text="File Download Options")
-        option_lf.pack(fill=tk.BOTH,
-                       expand=tk.YES,
-                       padx=5,
-                       ipady=30,
-                       anchor=tk.N)
+        option_lf.pack(
+            fill=tk.BOTH,
+            expand=tk.YES,
+            padx=5,
+            ipady=30,
+            anchor=tk.N,
+        )
 
         # rename row
         rename_row = ttk.Frame(option_lf)
@@ -93,16 +101,23 @@ class AddWindow(ttk.Toplevel):
 
         rename_lbl = ttk.Label(rename_row, text="Rename:", width=8)
         rename_lbl.pack(side=tk.LEFT, padx=(15, 0))
-        rename_ent = ttk.Entry(rename_row, textvariable=self.rename_var)
+        rename_ent = ttk.Entry(
+            rename_row,
+            textvariable=self.rename_var,
+            bootstyle=ttk.WARNING,
+        )
         rename_ent.pack(side=tk.LEFT, fill=tk.X, expand=tk.YES, padx=5)
 
         splits_lbl = ttk.Label(rename_row, text="Splits:", width=8)
         splits_lbl.pack(side=tk.LEFT, padx=(15, 0))
-        splits_spinbox = ttk.Spinbox(rename_row,
-                                     from_=8,
-                                     to=64,
-                                     width=3,
-                                     textvariable=self.split_var)
+        splits_spinbox = ttk.Spinbox(
+            rename_row,
+            textvariable=self.split_var,
+            from_=1,
+            to=64,
+            width=3,
+            bootstyle=ttk.WARNING,
+        )
         splits_spinbox.pack(side=tk.LEFT, padx=(0, 15))
 
         # path row
@@ -110,29 +125,42 @@ class AddWindow(ttk.Toplevel):
         path_row.pack(fill=tk.X, expand=tk.YES)
         path_lbl = ttk.Label(path_row, text="Save to:", width=8)
         path_lbl.pack(side=tk.LEFT, padx=(15, 0))
-        path_ent = ttk.Entry(path_row, textvariable=self.path_var)
+        path_ent = ttk.Entry(
+            path_row,
+            textvariable=self.path_var,
+            bootstyle=ttk.WARNING,
+        )
         path_ent.pack(side=tk.LEFT, fill=tk.X, expand=tk.YES, padx=5)
 
-        browse_btn = ttk.Button(master=path_row,
-                                text="Browse",
-                                command=self.on_browse,
-                                width=8)
+        browse_btn = ttk.Button(
+            master=path_row,
+            text="Browse",
+            command=self.on_browse,
+            width=8,
+            bootstyle=ttk.WARNING,
+        )
         browse_btn.pack(side=tk.LEFT, padx=5)
 
         # submit row
         submit_row = ttk.Frame(url_page)
         submit_row.pack(fill=tk.X, expand=tk.YES, pady=(20, 0))
 
-        submit_btn = ttk.Button(master=submit_row,
-                                text="Submit",
-                                command=lambda: self.on_add_url(),
-                                width=8)
+        submit_btn = ttk.Button(
+            master=submit_row,
+            text="Submit",
+            command=lambda: self.on_add_url(),
+            width=8,
+            bootstyle=ttk.SUCCESS,
+        )
         submit_btn.pack(side=tk.RIGHT, padx=5)
 
-        cancel_btn = ttk.Button(master=submit_row,
-                                text="Cancel",
-                                command=lambda: self.destroy(),
-                                width=8)
+        cancel_btn = ttk.Button(
+            master=submit_row,
+            text="Cancel",
+            command=lambda: self.destroy(),
+            width=8,
+            bootstyle=ttk.DANGER,
+        )
         cancel_btn.pack(side=tk.RIGHT, padx=5)
 
     def create_torrent_page(self, notebook):
@@ -144,10 +172,12 @@ class AddWindow(ttk.Toplevel):
         torrent_lbl.pack(side=tk.LEFT, padx=(15, 0))
         torrent_ent = ttk.Entry(torrent_row)
         torrent_ent.pack(side=tk.LEFT, fill=tk.X, expand=tk.YES, padx=5)
-        add_btn = ttk.Button(master=torrent_row,
-                             text="Add",
-                             command=lambda: print("add torrent"),
-                             width=8)
+        add_btn = ttk.Button(
+            master=torrent_row,
+            text="Add",
+            command=lambda: print("add torrent"),
+            width=8,
+        )
         add_btn.pack(side=tk.LEFT, padx=5)
 
     def create_schedule_page(self, notebook):
@@ -159,10 +189,13 @@ class AddWindow(ttk.Toplevel):
         schedule_lbl.pack(side=tk.LEFT, padx=(15, 0))
         schedule_ent = ttk.Entry(schedule_row)
         schedule_ent.pack(side=tk.LEFT, fill=tk.X, expand=tk.YES, padx=5)
-        add_btn = ttk.Button(master=schedule_row,
-                             text="Add",
-                             command=lambda: print("add schedule"),
-                             width=8)
+
+        add_btn = ttk.Button(
+            master=schedule_row,
+            text="Add",
+            command=lambda: print("add schedule"),
+            width=8,
+        )
         add_btn.pack(side=tk.LEFT, padx=5)
 
     def on_add_url(self):
