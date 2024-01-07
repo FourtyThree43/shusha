@@ -7,6 +7,7 @@ from pathlib import Path
 from tkinter import Button, Canvas, PhotoImage, Tk, ttk
 
 from PIL import Image, ImageTk
+from rcmenu import RightClickMenu
 from ttkwidgets import DebugWindow, Table
 from ttkwidgets.autocomplete import AutocompleteCombobox
 from ttkwidgets.frames import Tooltip
@@ -128,7 +129,7 @@ button_log = Button(
     bg="#2A2E31",
     borderwidth=0,
     highlightthickness=0,
-    command=lambda: print("open logs"),
+    command=lambda: DebugWindow(window),
     relief="flat",
 )
 button_log.place(x=749.0, y=7.0, width=50.0, height=50.0)
@@ -185,6 +186,21 @@ hsb.place(x=0, y=65 + 465.0, width=864.0)
 
 table.configure(yscrollcommand=vsb.set, xscrollcommand=hsb.set)
 table.place(x=0, y=65, width=864.0 - 20, height=477.0)
+
+
+# Example: Creating RightClickMenu for the table
+def handle_table_right_click(self, option, event=None):
+    print(f"Table Right Click: {option}")
+
+
+right_click_options = [
+    'Select All', 'Select None', 'Select Completed', 'Select Uncompleted'
+]
+table_right_click_menu = RightClickMenu(
+    table,
+    right_click_options,
+    callback=lambda option, event=None: handle_table_right_click(
+        option, event))
 
 ###############################################################################
 # bottom panel
@@ -244,5 +260,4 @@ button_sett2_ballon = Tooltip(button_sett2,
                               headertext="Queue settings",
                               text="Open queue settings")
 
-DebugWindow(window)
 window.mainloop()
