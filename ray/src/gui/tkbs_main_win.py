@@ -202,7 +202,7 @@ class MyApp(ttk.Frame):
         category = ttk.Combobox(master=opts_row,
                                 values=["Category 1", "Category 2"],
                                 width=12)
-        category.pack(side=ttk.LEFT, padx=(1, 0), pady=1)
+        category.pack(side=ttk.LEFT, padx=10, pady=1)
         ToolTip(category,
                 text="Select category",
                 bootstyle=(ttk.WARNING, ttk.INVERSE))
