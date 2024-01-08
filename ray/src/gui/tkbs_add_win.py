@@ -6,9 +6,8 @@ import ttkbootstrap as ttk
 
 
 class AddWindow(ttk.Toplevel):
-
-    def __init__(self, master):
-        super().__init__(master)
+    def __init__(self, master: ttk.Frame):
+        super().__init__(master=master)
         self.title("Add Download")
         self.geometry("720x380")
         self.resizable(False, False)
@@ -34,7 +33,7 @@ class AddWindow(ttk.Toplevel):
         self.create_torrent_page(add_dl_notebook)
         self.create_schedule_page(add_dl_notebook)
 
-    def create_page_frames(self, notebook):
+    def create_page_frames(self, notebook: ttk.Notebook):
         """Create notebook pages"""
         # URL Page
         self.url_page = ttk.Frame(notebook)
@@ -48,45 +47,25 @@ class AddWindow(ttk.Toplevel):
         self.schedule_page = ttk.Frame(notebook)
         notebook.add(self.schedule_page, text="Schedule")
 
-    def create_path_row(self):
-        """Add path row to labelframe"""
-        path_row = ttk.Frame(self.option_lf)
-        path_row.pack(fill=tk.X, expand=tk.YES)
-        path_lbl = ttk.Label(path_row, text="Path", width=8)
-        path_lbl.pack(side=tk.LEFT, padx=(15, 0))
-        path_ent = ttk.Entry(path_row, textvariable=self.path_var)
-        path_ent.pack(side=tk.LEFT, fill=tk.X, expand=tk.YES, padx=5)
-        browse_btn = ttk.Button(master=path_row,
-                                text="Browse",
-                                command=self.on_browse,
-                                width=8)
-        browse_btn.pack(side=tk.LEFT, padx=5)
-
-    def create_url_page(self, notebook):
+    def create_url_page(self, notebook: ttk.Notebook):
         """Create URL page"""
-        #  header for Url and Options
-        url_page = notebook.nametowidget(notebook.tabs()[0])
 
-        url_row = ttk.Frame(url_page)
+        #  header for Url and Options
+        url_row = ttk.Frame(self.url_page)
         url_row.pack(fill=tk.X, expand=tk.YES)
         url_lbl = ttk.Label(url_row, text="URL:", width=5)
         url_lbl.pack(side=tk.LEFT, padx=(15, 0))
-        url_ent = ttk.Entry(
-            url_row,
-            textvariable=self.url_var,
-            bootstyle=ttk.WARNING,
-        )
+        url_ent = ttk.Entry(url_row, textvariable=self.url_var, bootstyle=ttk.WARNING)
         url_ent.pack(
             side=tk.LEFT,
             fill=tk.BOTH,
             expand=tk.YES,
             padx=5,
             pady=5,
-            ipady=30,
         )
 
         # header and labelframe option container
-        option_lf = ttk.Labelframe(url_page, text="File Download Options")
+        option_lf = ttk.Labelframe(self.url_page, text="File Download Options")
         option_lf.pack(
             fill=tk.BOTH,
             expand=tk.YES,
@@ -102,9 +81,7 @@ class AddWindow(ttk.Toplevel):
         rename_lbl = ttk.Label(rename_row, text="Rename:", width=8)
         rename_lbl.pack(side=tk.LEFT, padx=(15, 0))
         rename_ent = ttk.Entry(
-            rename_row,
-            textvariable=self.rename_var,
-            bootstyle=ttk.WARNING,
+            rename_row, textvariable=self.rename_var, bootstyle=ttk.WARNING
         )
         rename_ent.pack(side=tk.LEFT, fill=tk.X, expand=tk.YES, padx=5)
 
@@ -142,13 +119,13 @@ class AddWindow(ttk.Toplevel):
         browse_btn.pack(side=tk.LEFT, padx=5)
 
         # submit row
-        submit_row = ttk.Frame(url_page)
+        submit_row = ttk.Frame(self.url_page)
         submit_row.pack(fill=tk.X, expand=tk.YES, pady=(20, 0))
 
         submit_btn = ttk.Button(
             master=submit_row,
             text="Submit",
-            command=lambda: self.on_add_url(),
+            command=self.on_add_url,
             width=8,
             bootstyle=ttk.SUCCESS,
         )
@@ -157,17 +134,17 @@ class AddWindow(ttk.Toplevel):
         cancel_btn = ttk.Button(
             master=submit_row,
             text="Cancel",
-            command=lambda: self.destroy(),
+            command=self.destroy,
             width=8,
             bootstyle=ttk.DANGER,
         )
         cancel_btn.pack(side=tk.RIGHT, padx=5)
 
-    def create_torrent_page(self, notebook):
+    def create_torrent_page(self, notebook: ttk.Notebook):
         """Create Torrent page"""
-        torrent_page = notebook.nametowidget(notebook.tabs()[1])
+        # torrent_page = notebook.nametowidget(notebook.tabs()[1])
 
-        torrent_row = ttk.Frame(torrent_page)
+        torrent_row = ttk.Frame(self.torrent_page)
         torrent_row.pack(fill=tk.X, expand=tk.YES)
 
         torrent_lbl = ttk.Label(torrent_row, text="Torrent", width=8)
@@ -183,11 +160,10 @@ class AddWindow(ttk.Toplevel):
             expand=tk.YES,
             padx=5,
             pady=5,
-            ipady=30,
         )
 
         # header and labelframe option container
-        option_lf = ttk.Labelframe(torrent_page, text="File Download Options")
+        option_lf = ttk.Labelframe(self.torrent_page, text="File Download Options")
         option_lf.pack(
             fill=tk.BOTH,
             expand=tk.YES,
@@ -243,7 +219,7 @@ class AddWindow(ttk.Toplevel):
         browse_btn.pack(side=tk.LEFT, padx=5)
 
         # submit row
-        submit_row = ttk.Frame(torrent_page)
+        submit_row = ttk.Frame(self.torrent_page)
         submit_row.pack(fill=tk.X, expand=tk.YES, pady=(20, 0))
 
         submit_btn = ttk.Button(
@@ -264,10 +240,10 @@ class AddWindow(ttk.Toplevel):
         )
         cancel_btn.pack(side=tk.RIGHT, padx=5)
 
-    def create_schedule_page(self, notebook):
+    def create_schedule_page(self, notebook: ttk.Notebook):
         """Create Schedule page"""
-        schedule_page = notebook.nametowidget(notebook.tabs()[2])
-        schedule_row = ttk.Frame(schedule_page)
+        # schedule_page = notebook.nametowidget(notebook.tabs()[2])
+        schedule_row = ttk.Frame(self.schedule_page)
         schedule_row.pack(fill=tk.X, expand=tk.YES)
         schedule_lbl = ttk.Label(schedule_row, text="Schedule", width=8)
         schedule_lbl.pack(side=tk.LEFT, padx=(15, 0))
@@ -298,7 +274,7 @@ class AddWindow(ttk.Toplevel):
             self.path_var.set(path)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     root = ttk.Window(themename="darkly", position=(900, 100))
     app = AddWindow(root)
     root.mainloop()
