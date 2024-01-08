@@ -29,9 +29,9 @@ class AddWindow(ttk.Toplevel):
         self.split_var = ttk.IntVar(value=_split)
 
         self.create_page_frames(add_dl_notebook)
-        self.create_url_page(add_dl_notebook)
-        self.create_torrent_page(add_dl_notebook)
-        self.create_schedule_page(add_dl_notebook)
+        self.create_url_page()
+        self.create_torrent_page()
+        self.create_schedule_page()
 
     def create_page_frames(self, notebook: ttk.Notebook):
         """Create notebook pages"""
@@ -47,16 +47,18 @@ class AddWindow(ttk.Toplevel):
         self.schedule_page = ttk.Frame(notebook)
         notebook.add(self.schedule_page, text="Schedule")
 
-    def create_url_page(self, notebook: ttk.Notebook):
+    def create_page(self, master, torrent=False):
         """Create URL page"""
 
         #  header for Url and Options
-        url_row = ttk.Frame(self.url_page)
+        url_row = ttk.Frame(master)
         url_row.pack(fill=tk.X, expand=tk.YES)
         url_lbl = ttk.Label(url_row, text="URL:", width=5)
         url_lbl.pack(side=tk.LEFT, padx=(15, 0))
-        url_ent = ttk.Entry(url_row, textvariable=self.url_var, bootstyle=ttk.WARNING)
-        url_ent.pack(
+        main_ent = ttk.Entry(url_row, textvariable=self.url_var, bootstyle=ttk.WARNING)
+        if torrent:
+            main_ent.configure(state="readonly")
+        main_ent.pack(
             side=tk.LEFT,
             fill=tk.BOTH,
             expand=tk.YES,
@@ -65,7 +67,7 @@ class AddWindow(ttk.Toplevel):
         )
 
         # header and labelframe option container
-        option_lf = ttk.Labelframe(self.url_page, text="File Download Options")
+        option_lf = ttk.Labelframe(master, text="File Download Options")
         option_lf.pack(
             fill=tk.BOTH,
             expand=tk.YES,
@@ -119,7 +121,7 @@ class AddWindow(ttk.Toplevel):
         browse_btn.pack(side=tk.LEFT, padx=5)
 
         # submit row
-        submit_row = ttk.Frame(self.url_page)
+        submit_row = ttk.Frame(master)
         submit_row.pack(fill=tk.X, expand=tk.YES, pady=(20, 0))
 
         submit_btn = ttk.Button(
@@ -140,107 +142,14 @@ class AddWindow(ttk.Toplevel):
         )
         cancel_btn.pack(side=tk.RIGHT, padx=5)
 
-    def create_torrent_page(self, notebook: ttk.Notebook):
+    def create_url_page(self):
+        self.create_page(self.url_page)
+
+    def create_torrent_page(self):
         """Create Torrent page"""
-        # torrent_page = notebook.nametowidget(notebook.tabs()[1])
+        self.create_page(self.torrent_page, torrent=True)
 
-        torrent_row = ttk.Frame(self.torrent_page)
-        torrent_row.pack(fill=tk.X, expand=tk.YES)
-
-        torrent_lbl = ttk.Label(torrent_row, text="Torrent", width=8)
-        torrent_lbl.pack(side=tk.LEFT, padx=(15, 0))
-        torrent_ent = ttk.Entry(
-            torrent_row,
-            bootstyle=ttk.WARNING,
-        )
-        torrent_ent.configure(state="readonly")
-        torrent_ent.pack(
-            side=tk.LEFT,
-            fill=tk.BOTH,
-            expand=tk.YES,
-            padx=5,
-            pady=5,
-        )
-
-        # header and labelframe option container
-        option_lf = ttk.Labelframe(self.torrent_page, text="File Download Options")
-        option_lf.pack(
-            fill=tk.BOTH,
-            expand=tk.YES,
-            padx=5,
-            ipady=30,
-            anchor=tk.N,
-        )
-
-        # rename row
-        rename_row = ttk.Frame(option_lf)
-        rename_row.pack(fill=tk.X, expand=tk.YES)
-
-        rename_lbl = ttk.Label(rename_row, text="Rename:", width=8)
-        rename_lbl.pack(side=tk.LEFT, padx=(15, 0))
-        rename_ent = ttk.Entry(
-            rename_row,
-            textvariable=self.rename_var,
-            bootstyle=ttk.WARNING,
-        )
-        rename_ent.pack(side=tk.LEFT, fill=tk.X, expand=tk.YES, padx=5)
-
-        splits_lbl = ttk.Label(rename_row, text="Splits:", width=8)
-        splits_lbl.pack(side=tk.LEFT, padx=(15, 0))
-        splits_spinbox = ttk.Spinbox(
-            rename_row,
-            textvariable=self.split_var,
-            from_=1,
-            to=64,
-            width=3,
-            bootstyle=ttk.WARNING,
-        )
-        splits_spinbox.pack(side=tk.LEFT, padx=(0, 15))
-
-        # path row
-        path_row = ttk.Frame(option_lf)
-        path_row.pack(fill=tk.X, expand=tk.YES)
-        path_lbl = ttk.Label(path_row, text="Save to:", width=8)
-        path_lbl.pack(side=tk.LEFT, padx=(15, 0))
-        path_ent = ttk.Entry(
-            path_row,
-            textvariable=self.path_var,
-            bootstyle=ttk.WARNING,
-        )
-        path_ent.pack(side=tk.LEFT, fill=tk.X, expand=tk.YES, padx=5)
-
-        browse_btn = ttk.Button(
-            master=path_row,
-            text="Browse",
-            command=self.on_browse,
-            width=8,
-            bootstyle=ttk.WARNING,
-        )
-        browse_btn.pack(side=tk.LEFT, padx=5)
-
-        # submit row
-        submit_row = ttk.Frame(self.torrent_page)
-        submit_row.pack(fill=tk.X, expand=tk.YES, pady=(20, 0))
-
-        submit_btn = ttk.Button(
-            master=submit_row,
-            text="Submit",
-            command=lambda: self.on_add_url(),
-            width=8,
-            bootstyle=ttk.SUCCESS,
-        )
-        submit_btn.pack(side=tk.RIGHT, padx=5)
-
-        cancel_btn = ttk.Button(
-            master=submit_row,
-            text="Cancel",
-            command=lambda: self.destroy(),
-            width=8,
-            bootstyle=ttk.DANGER,
-        )
-        cancel_btn.pack(side=tk.RIGHT, padx=5)
-
-    def create_schedule_page(self, notebook: ttk.Notebook):
+    def create_schedule_page(self):
         """Create Schedule page"""
         # schedule_page = notebook.nametowidget(notebook.tabs()[2])
         schedule_row = ttk.Frame(self.schedule_page)
