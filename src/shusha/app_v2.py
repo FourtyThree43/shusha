@@ -73,7 +73,7 @@ class Aria2Gui(ttk.Frame):
         add_btn = ttk.Button(master=opts_row,
                              text="Add",
                              image='add-download',
-                             command=lambda: AddWindow(self.master),
+                             command=AddWindow,
                              width=8,
                              bootstyle="outline-dark")
         add_btn.pack(side=tk.LEFT, padx=(1, 0), pady=1)
