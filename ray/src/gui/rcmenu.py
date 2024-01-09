@@ -11,8 +11,16 @@ import tkinter as tk
 class RightClickMenu(tk.Menu):
     """Context menu or right click menu popup"""
 
-    def __init__(self, parent, menu_items, callback=None, bg='white', fg='black', abg='blue', afg='white',
-                 bind_left_click=False, bind_right_click=True):
+    def __init__(self,
+                 parent,
+                 menu_items,
+                 callback=None,
+                 bg='white',
+                 fg='black',
+                 abg='blue',
+                 afg='white',
+                 bind_left_click=False,
+                 bind_right_click=True):
         """initialize
         Args:
             parent: tkinter widget to show this menu when right clicked
@@ -40,13 +48,21 @@ class RightClickMenu(tk.Menu):
         self.callback = callback
 
         # initialize super
-        tk.Menu.__init__(self, parent, tearoff=0, bg=bg, fg=fg, activebackground=abg, activeforeground=afg)
+        tk.Menu.__init__(self,
+                         parent,
+                         tearoff=0,
+                         bg=bg,
+                         fg=fg,
+                         activebackground=abg,
+                         activeforeground=afg)
 
         for option in menu_items:
             if option == '---':
                 self.add_separator()
             else:
-                self.add_command(label=f' {option}', command=lambda x=option: self.context_menu_handler(x))
+                self.add_command(
+                    label=f' {option}',
+                    command=lambda x=option: self.context_menu_handler(x))
 
         self.parent = parent
 

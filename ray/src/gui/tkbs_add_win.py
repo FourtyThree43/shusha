@@ -6,10 +6,11 @@ import ttkbootstrap as ttk
 
 
 class AddWindow(ttk.Toplevel):
-    def __init__(self, master: ttk.Frame):
-        super().__init__(master=master)
+
+    def __init__(self):
+        super().__init__()
         self.title("Add Download")
-        self.geometry("720x380")
+        self.geometry("720x380+50+50")
         self.resizable(False, False)
         self.config(padx=15, pady=15)
 
@@ -55,7 +56,9 @@ class AddWindow(ttk.Toplevel):
         url_row.pack(fill=tk.X, expand=tk.YES)
         url_lbl = ttk.Label(url_row, text="URL:", width=5)
         url_lbl.pack(side=tk.LEFT, padx=(15, 0))
-        main_ent = ttk.Entry(url_row, textvariable=self.url_var, bootstyle=ttk.WARNING)
+        main_ent = ttk.Entry(url_row,
+                             textvariable=self.url_var,
+                             bootstyle=ttk.WARNING)
         if torrent:
             main_ent.configure(state="readonly")
         main_ent.pack(
@@ -82,9 +85,9 @@ class AddWindow(ttk.Toplevel):
 
         rename_lbl = ttk.Label(rename_row, text="Rename:", width=8)
         rename_lbl.pack(side=tk.LEFT, padx=(15, 0))
-        rename_ent = ttk.Entry(
-            rename_row, textvariable=self.rename_var, bootstyle=ttk.WARNING
-        )
+        rename_ent = ttk.Entry(rename_row,
+                               textvariable=self.rename_var,
+                               bootstyle=ttk.WARNING)
         rename_ent.pack(side=tk.LEFT, fill=tk.X, expand=tk.YES, padx=5)
 
         splits_lbl = ttk.Label(rename_row, text="Splits:", width=8)
@@ -181,9 +184,10 @@ class AddWindow(ttk.Toplevel):
         path = askdirectory(title="Browse directory")
         if path:
             self.path_var.set(path)
+            print(self.path_var.get())
 
 
 if __name__ == "__main__":
     root = ttk.Window(themename="darkly", position=(900, 100))
-    app = AddWindow(root)
+    AddWindow()
     root.mainloop()
