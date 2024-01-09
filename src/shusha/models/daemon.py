@@ -3,7 +3,8 @@ import subprocess
 import time
 from pathlib import Path
 
-from logger import LoggerService
+from models.logger import LoggerService
+
 
 DEFAULT_HOST = "localhost"
 DEFAULT_PORT = 6800
@@ -11,10 +12,11 @@ DEFAULT_TIMEOUT = 60.0
 BIN_PATH = Path("resources/bin/aria2c.exe")
 CONF_PATH = Path("resources/aria2.conf")
 
-logger = LoggerService(logger_name="ShushaDB")
+logger = LoggerService(logger_name="ShushaServer")
 
 
 class Daemon:
+
     def __init__(
         self,
         aria2d=None,

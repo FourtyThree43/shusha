@@ -1,10 +1,10 @@
-import time
 import logging
 import threading
+import time
 import tkinter as tk
-from tkinter import ttk
-from tkinter import filedialog
-from status_window import StatusWindow
+from tkinter import filedialog, ttk
+
+from status_window_2 import StatusWindow
 
 logging.basicConfig(level=logging.INFO)
 

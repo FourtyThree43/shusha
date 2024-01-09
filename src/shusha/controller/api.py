@@ -1,10 +1,16 @@
 from pathlib import Path
 
-from client import Client, XMLRPCClientException
-from daemon import Daemon, logger
+from models.client import Client, XMLRPCClientException
+from models.daemon import Daemon
+from models.logger import LoggerService
+from platformdirs import user_downloads_dir
+
+logger = LoggerService(logger_name="ShushaAPI")
+DEFAULT_DIR = Path(user_downloads_dir())
 
 
 class HelperUtilities:
+
     @staticmethod
     def sizeof_fmt(num, delim=" ", suffix="B"):
         for unit in ("", "K", "M", "G", "T", "P", "E", "Z"):
@@ -15,9 +21,11 @@ class HelperUtilities:
 
 
 class Api:
+
     def __init__(self, daemon=None):
         self.remote = daemon or Daemon()
         self.client = Client(self.remote)
+        self._options = {} or self.get_global_options()
 
     def start_server(self):
         pid = self.remote.start_server()
@@ -58,11 +66,9 @@ class Api:
                 is_active = status.get("status")
                 if is_active == "active":
                     dl_speed = HelperUtilities.sizeof_fmt(
-                        int(status.get("downloadSpeed"))
-                    )
+                        int(status.get("downloadSpeed")))
                     dled_size = HelperUtilities.sizeof_fmt(
-                        int(status.get("completedLength"))
-                    )
+                        int(status.get("completedLength")))
                     logger.log(
                         f"Download Speed: {dl_speed}/s, Completed Length: {dled_size}"
                     )
@@ -77,32 +83,73 @@ class Api:
             )
             raise
 
-    def stop_download(self, gid):
-        """Stop a download given its GID."""
+    def remove(self, gid):
+        """Remove a download given its GID."""
+        try:
+            self.client.remove(gid)
+            logger.log(f"Download with GID {gid} removed successfully.")
+        except XMLRPCClientException as e:
+            logger.log(f"Error removing download with GID {gid}: {e}",
+                       level="error")
+            raise
+
+    def remove_f(self, gid):
+        """Remove a download given its GID and delete the downloaded file."""
         try:
             self.client.force_remove(gid)
             logger.log(f"Download with GID {gid} stopped successfully.")
         except XMLRPCClientException as e:
-            logger.log(
-                f"Error stopping download with GID {gid}: {e}", level="error"
-            )
+            logger.log(f"Error stopping download with GID {gid}: {e}",
+                       level="error")
             raise
 
-    def shutdown(self):
-        """Shutdown the Aria2 server."""
+    def pause(self, gid):
+        """Pause a download given its GID."""
         try:
-            self.client.shutdown()
-            logger.log("Aria2 server shutdown initiated.")
+            if gid:
+                self.client.pause(gid)
+                logger.log(f"Download with GID {gid} paused successfully.")
+            else:
+                logger.log(f"No GID:{gid} provided.", level="warning")
         except XMLRPCClientException as e:
-            logger.log(
-                f"Error initiating Aria2 server shutdown: {e}", level="error"
-            )
+            logger.log(f"Error pausing download with GID {gid}: {e}",
+                       level="error")
+            raise
+
+    def pause_all(self):
+        """Pause all active downloads."""
+        try:
+            self.client.pause_all()
+            logger.log(f"All active downloads paused successfully.")
+        except XMLRPCClientException as e:
+            logger.log(f"Error pausing all active downloads: {e}",
+                       level="error")
+            raise
+
+    def un_pause(self, gid):
+        """Un-pause a download given its GID."""
+        try:
+            self.client.unpause(gid)
+            logger.log(f"Download with GID {gid} un-paused successfully.")
+        except XMLRPCClientException as e:
+            logger.log(f"Error un-pausing download with GID {gid}: {e}",
+                       level="error")
+            raise
+
+    def un_pause_all(self):
+        """Un-pause all active downloads."""
+        try:
+            self.client.unpause_all()
+            logger.log(f"All active downloads un-paused successfully.")
+        except XMLRPCClientException as e:
+            logger.log(f"Error un-pausing all active downloads: {e}",
+                       level="error")
             raise
 
     def get_download(self, gid):
         """Get detailed information about a specific download."""
         try:
-            return self.client.tell_status(gid)
+            return self.client.tell_status(gid=gid)
         except XMLRPCClientException as e:
             logger.log(
                 f"Error getting download details for GID {gid}: {e}",
@@ -123,9 +170,8 @@ class Api:
         try:
             return self.client.change_position(gid, pos, how)
         except XMLRPCClientException as e:
-            logger.log(
-                f"Error moving download with GID {gid}: {e}", level="error"
-            )
+            logger.log(f"Error moving download with GID {gid}: {e}",
+                       level="error")
             raise
 
     def move_to_top(self, gid):
@@ -141,9 +187,8 @@ class Api:
         try:
             return self.move(gid, -1, "POS_SET")
         except XMLRPCClientException as e:
-            logger.log(
-                f"Error moving download to the bottom: {e}", level="error"
-            )
+            logger.log(f"Error moving download to the bottom: {e}",
+                       level="error")
             raise
 
     def move_up(self, gid):
@@ -167,9 +212,8 @@ class Api:
         try:
             return self.move(gid, pos, "POS_SET")
         except XMLRPCClientException as e:
-            logger.log(
-                f"Error moving download to position {pos}: {e}", level="error"
-            )
+            logger.log(f"Error moving download to position {pos}: {e}",
+                       level="error")
             raise
 
     def get_active_downloads(self, keys=None):
@@ -196,7 +240,7 @@ class Api:
             logger.log(f"Error getting stopped downloads: {e}", level="error")
             raise
 
-    def get_global_stat(self):
+    def get_stats(self):
         """Get global statistics about downloads."""
         try:
             return self.client.get_global_stat()
@@ -209,9 +253,8 @@ class Api:
         try:
             return self.client.get_version()
         except XMLRPCClientException as e:
-            logger.log(
-                f"Error getting Aria2 version information: {e}", level="error"
-            )
+            logger.log(f"Error getting Aria2 version information: {e}",
+                       level="error")
             raise
 
     def get_session_info(self):
@@ -219,24 +262,35 @@ class Api:
         try:
             return self.client.get_session_info()
         except XMLRPCClientException as e:
-            logger.log(f"Error getting session information: {e}", level="error")
+            logger.log(f"Error getting session information: {e}",
+                       level="error")
             raise
 
     def save_session(self):
         """Save the current session."""
         try:
-            return self.client.save_session()
+            save_session_option = self._options.get("save-session")
+            if save_session_option is not None:
+                return self.client.save_session()
+            else:
+                logger.log(
+                    "Session file not set. Please set the 'save-session' option.",
+                    level="warning",
+                )
+
         except XMLRPCClientException as e:
             logger.log(f"Error saving session: {e}", level="error")
             raise
 
-    # def shutdown_aria2(self):
-    #     """Shutdown the Aria2 server."""
-    #     try:
-    #         return self.client.shutdown()
-    #     except XMLRPCClientException as e:
-    #         logger.log(f"Error initiating Aria2 server shutdown: {e}", level="error")
-    #         raise
+    def shutdown(self):
+        """Shutdown the Aria2 server."""
+        try:
+            self.client.shutdown()
+            logger.log("Aria2 server shutdown initiated.")
+        except XMLRPCClientException as e:
+            logger.log(f"Error initiating Aria2 server shutdown: {e}",
+                       level="error")
+            raise
 
     def force_shutdown_aria2(self):
         """Forcefully shutdown the Aria2 server."""
@@ -247,6 +301,22 @@ class Api:
                 f"Error forcefully shutting down Aria2 server: {e}",
                 level="error",
             )
+            raise
+
+    def get_options(self, gid: str):
+        """Get options."""
+        try:
+            return self.client.get_option(gid=gid)
+        except XMLRPCClientException as e:
+            logger.log(f"Error getting options: {e}", level="error")
+            raise
+
+    def change_options(self, gid: str, options: dict):
+        """Change options."""
+        try:
+            return self.client.change_option(gid, options)
+        except XMLRPCClientException as e:
+            logger.log(f"Error changing options: {e}", level="error")
             raise
 
     def get_global_options(self):
