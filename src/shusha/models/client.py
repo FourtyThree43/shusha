@@ -1,8 +1,10 @@
 import xmlrpc.client
 from pathlib import Path
 
-from daemon import Daemon
-from logger import LoggerService as logger
+from models.daemon import Daemon
+from models.logger import LoggerService
+
+logger = LoggerService(logger_name="ShushaClient")
 
 
 class XMLRPCClientException(Exception):
@@ -27,14 +29,14 @@ class XMLRPCClientException(Exception):
 
 
 class Client:
+
     def __init__(self, daemon: Daemon):
-        self.logger = logger(logger_name="ShushaClient")
+        # self.logger = logger(logger_name="ShushaClient")
         self.remote = daemon
         self.secret = None
         self.server_uri = f"http://{self.remote.host}:{self.remote.port}/rpc"
-        self.server = xmlrpc.client.ServerProxy(
-            self.server_uri, allow_none=True
-        )
+        self.server = xmlrpc.client.ServerProxy(self.server_uri,
+                                                allow_none=True)
 
     def __str__(self):
         return f"{self.server_uri}"
@@ -56,23 +58,21 @@ class Client:
             self._handle_xmlrpc_error(e)
             return None
         except Exception as e:
-            self.logger.log(f"Unexpected error: {e}", level="error")
+            logger.log(f"Unexpected error: {e}", level="error")
             return None
 
     def _handle_xmlrpc_error(self, xmlrpc_fault):
         faultCode = xmlrpc_fault.faultCode
         faultString = xmlrpc_fault.faultString
-        self.logger.log(
-            XMLRPCClientException(faultCode, faultString), level="error"
-        )
+        logger.log(XMLRPCClientException(faultCode, faultString),
+                   level="error")
 
     def add_uri(self, uris, options=None, position=None):
         return self._call_method("addUri", [uris, options, position])
 
     def add_torrent(self, torrent, uris=None, options=None, position=None):
-        return self._call_method(
-            "addTorrent", [torrent, uris, options, position]
-        )
+        return self._call_method("addTorrent",
+                                 [torrent, uris, options, position])
 
     def add_metalink(self, metalink, options=None, position=None):
         return self._call_method("addMetalink", [metalink, options, position])
@@ -130,8 +130,7 @@ class Client:
 
     def change_uri(self, gid, file_index, del_uris, add_uris, position=None):
         return self._call_method(
-            "changeUri", [gid, file_index, del_uris, add_uris, position]
-        )
+            "changeUri", [gid, file_index, del_uris, add_uris, position])
 
     def get_option(self, gid):
         return self._call_method("getOption", [gid])
@@ -202,24 +201,24 @@ if __name__ == "__main__":
     d = Daemon()
     client = Client(d)
     pid = d.start_server()
-    client.logger.log(pid)
+    logger.log(pid)
 
     try:
-        client.logger.log(client)
+        logger.log(client)
 
         sesId = client.get_session_info().get("sessionId")
-        client.logger.log(sesId)
+        logger.log(sesId)
 
         # gids = ["27ffc223275cbba0", "eea522f44eb7d7fe", "d6b3e42d7c8a0e0e"]
         url = "https://proof.ovh.net/files/10Mb.dat"
         dl_path = Path(__file__).parent
 
         gid = client.add_uri([url], {"dir": str(dl_path)})
-        client.logger.log(f"Download started with GID: {gid}")
+        logger.log(f"Download started with GID: {gid}")
 
         status = client.tell_status(gid=gid)
         is_active = status.get("status")
-        client.logger.log(is_active)
+        logger.log(is_active)
 
         # while is_active == "active":
         #     status = client.tell_status(gid=gid,

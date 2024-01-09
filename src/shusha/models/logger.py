@@ -2,9 +2,11 @@ import logging
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
+from platformdirs import user_log_dir
+
 
 class LoggerService:
-    LOG_DIR = Path("logs")
+    LOG_DIR = Path(user_log_dir("shusha"))
     LOG_FILE_PATH = LOG_DIR / "shusha.log"
     LOG_FORMAT = "%(asctime)s | %(levelname)s | %(message)s"
     LOG_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
@@ -40,9 +42,8 @@ class LoggerService:
         file_handler.setLevel(logging.DEBUG)
 
         # Create formatter
-        formatter = logging.Formatter(
-            fmt=self.LOG_FORMAT, datefmt=self.LOG_DATE_FORMAT
-        )
+        formatter = logging.Formatter(fmt=self.LOG_FORMAT,
+                                      datefmt=self.LOG_DATE_FORMAT)
 
         # Add formatter to handlers
         console_handler.setFormatter(formatter)
@@ -74,8 +75,7 @@ class LoggerService:
             self.logger.critical(message)
         else:
             self.logger.warning(
-                f"Invalid log level: {level}. Defaulting to 'info'."
-            )
+                f"Invalid log level: {level}. Defaulting to 'info'.")
             self.logger.info(message)
 
 

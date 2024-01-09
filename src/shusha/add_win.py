@@ -7,8 +7,8 @@ import ttkbootstrap as ttk
 
 class AddWindow(ttk.Toplevel):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, master):
+        super().__init__(master)
         self.title("Add Download")
         self.geometry("720x380")
         self.resizable(False, False)
@@ -286,5 +286,5 @@ class AddWindow(ttk.Toplevel):
 
 if __name__ == '__main__':
     root = ttk.Window(themename="darkly", position=(900, 100))
-    app = AddWindow()
+    app = AddWindow(root)
     root.mainloop()
