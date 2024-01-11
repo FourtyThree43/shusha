@@ -7,13 +7,8 @@ import ttkbootstrap as ttk
 
 class AddWindow(ttk.Toplevel):
 
-<<<<<<< HEAD
-    def __init__(self):
-        super().__init__()
-=======
     def __init__(self, callback):
         super().__init__(callback)
->>>>>>> dev_2
         self.title("Add Download")
         self.geometry("720x380")
         self.resizable(False, False)
