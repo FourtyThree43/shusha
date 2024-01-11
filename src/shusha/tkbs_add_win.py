@@ -7,19 +7,13 @@ import ttkbootstrap as ttk
 
 class AddWindow(ttk.Toplevel):
 
-<<<<<<< HEAD
-    def __init__(self):
-        super().__init__()
-=======
-    def __init__(self, callback):
-        super().__init__(callback)
->>>>>>> dev_2
+    def __init__(self, master):
+        super().__init__(master)
         self.title("Add Download")
         self.geometry("720x380")
         self.resizable(False, False)
         self.config(padx=15, pady=15)
 
-        self.callback = callback
         # create notebook
         add_dl_notebook = ttk.Notebook(self)
         add_dl_notebook.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
@@ -32,7 +26,6 @@ class AddWindow(ttk.Toplevel):
 
         self.url_var = ttk.StringVar(value=_url)
         self.path_var = ttk.StringVar(value=_path)
-        self.checkbox_var = tk.BooleanVar(value=False)
         self.rename_var = ttk.StringVar(value=_rename)
         self.split_var = ttk.IntVar(value=_split)
 
@@ -40,12 +33,6 @@ class AddWindow(ttk.Toplevel):
         self.create_url_page(add_dl_notebook)
         self.create_torrent_page(add_dl_notebook)
         self.create_schedule_page(add_dl_notebook)
-
-    def parse_lines_to_stringvars(self):
-        content = self.urls.get("1.0", tk.END).strip()
-        lines = content.split("\n")
-        var_list = [ttk.StringVar(value=line) for line in lines]
-        return var_list
 
     def create_page_frames(self, notebook):
         """Create notebook pages"""
@@ -68,15 +55,21 @@ class AddWindow(ttk.Toplevel):
 
         url_row = ttk.Frame(url_page)
         url_row.pack(fill=tk.X, expand=tk.YES)
-        url_lbl = ttk.Label(url_row, text="URLs:", width=5)
+        url_lbl = ttk.Label(url_row, text="URL:", width=5)
         url_lbl.pack(side=tk.LEFT, padx=(15, 0))
-        self.urls = ttk.ScrolledText(
+        url_ent = ttk.Entry(
             url_row,
-            wrap=tk.WORD,
-            width=97,
-            height=6,
+            textvariable=self.url_var,
+            bootstyle=ttk.WARNING,
         )
-        self.urls.pack(side=tk.LEFT, expand=True, padx=5, pady=5)
+        url_ent.pack(
+            side=tk.LEFT,
+            fill=tk.BOTH,
+            expand=tk.YES,
+            padx=5,
+            pady=5,
+            ipady=30,
+        )
 
         # header and labelframe option container
         option_lf = ttk.Labelframe(url_page, text="File Download Options")
@@ -92,25 +85,14 @@ class AddWindow(ttk.Toplevel):
         rename_row = ttk.Frame(option_lf)
         rename_row.pack(fill=tk.X, expand=tk.YES)
 
-        checkbox = ttk.Checkbutton(
-            rename_row,
-            variable=self.checkbox_var,
-            command=lambda: self.on_checkbox_click(
-                self.checkbox_var,
-                self.rename_ent1,
-            ),
-            bootstyle=ttk.WARNING,
-        )
-        checkbox.pack(side=tk.LEFT, padx=(15, 0))
-
         rename_lbl = ttk.Label(rename_row, text="Rename:", width=8)
         rename_lbl.pack(side=tk.LEFT, padx=(15, 0))
-        self.rename_ent1 = ttk.Entry(
+        rename_ent = ttk.Entry(
             rename_row,
             textvariable=self.rename_var,
             bootstyle=ttk.WARNING,
         )
-        self.rename_ent1.pack(side=tk.LEFT, fill=tk.X, expand=tk.YES, padx=5)
+        rename_ent.pack(side=tk.LEFT, fill=tk.X, expand=tk.YES, padx=5)
 
         splits_lbl = ttk.Label(rename_row, text="Splits:", width=8)
         splits_lbl.pack(side=tk.LEFT, padx=(15, 0))
@@ -152,7 +134,7 @@ class AddWindow(ttk.Toplevel):
         submit_btn = ttk.Button(
             master=submit_row,
             text="Submit",
-            command=lambda: self.submit(),
+            command=lambda: self.on_add_url(),
             width=8,
             bootstyle=ttk.SUCCESS,
         )
@@ -204,26 +186,14 @@ class AddWindow(ttk.Toplevel):
         rename_row = ttk.Frame(option_lf)
         rename_row.pack(fill=tk.X, expand=tk.YES)
 
-        checkbox = ttk.Checkbutton(
-            rename_row,
-            variable=self.checkbox_var,
-            command=lambda: self.on_checkbox_click(
-                self.checkbox_var,
-                self.rename_ent,
-            ),
-            bootstyle=ttk.WARNING,
-        )
-        checkbox.pack(side=tk.LEFT, padx=(15, 0))
-
         rename_lbl = ttk.Label(rename_row, text="Rename:", width=8)
         rename_lbl.pack(side=tk.LEFT, padx=(15, 0))
-        self.rename_ent = ttk.Entry(
+        rename_ent = ttk.Entry(
             rename_row,
             textvariable=self.rename_var,
             bootstyle=ttk.WARNING,
         )
-        self.rename_ent.pack(side=tk.LEFT, fill=tk.X, expand=tk.YES, padx=5)
-        self.rename_ent.configure(state=tk.DISABLED)
+        rename_ent.pack(side=tk.LEFT, fill=tk.X, expand=tk.YES, padx=5)
 
         splits_lbl = ttk.Label(rename_row, text="Splits:", width=8)
         splits_lbl.pack(side=tk.LEFT, padx=(15, 0))
@@ -265,7 +235,7 @@ class AddWindow(ttk.Toplevel):
         submit_btn = ttk.Button(
             master=submit_row,
             text="Submit",
-            command=lambda: self.submit(),
+            command=lambda: self.on_add_url(),
             width=8,
             bootstyle=ttk.SUCCESS,
         )
@@ -313,24 +283,8 @@ class AddWindow(ttk.Toplevel):
         if path:
             self.path_var.set(path)
 
-    def submit(self):
-        """Callback for submit button"""
-        uris = self.parse_lines_to_stringvars()
-        dpath = pathlib.Path(self.path_var.get())
-
-        self.callback(uris, dpath)
-
-        # self.destroy()
-        # return uris, dpath
-
-    def on_checkbox_click(self, checkbox_var, entry_box):
-        if checkbox_var.get():
-            entry_box.config(state=tk.NORMAL)
-        else:
-            entry_box.config(state=tk.DISABLED)
-
 
 if __name__ == '__main__':
     root = ttk.Window(themename="darkly", position=(900, 100))
-    app = AddWindow()
+    app = AddWindow(root)
     root.mainloop()

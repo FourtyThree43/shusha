@@ -2,10 +2,10 @@
 #
 # SPDX-License-Identifier: MIT
 
-import signal
 import time
 
-from app import Aria2Gui
+import ttkbootstrap as ttk
+from app_v2 import Aria2Gui
 from models.logger import LoggerService
 
 logger = LoggerService(__name__)
@@ -36,15 +36,21 @@ def main(argv: list[str] | None = None):
         None
   """
 
-    app = Aria2Gui()
+    def on_close():
+        my_app_instance.cleanup()
 
-    try:
-        app.run()
-    except KeyboardInterrupt:
-        # Handle KeyboardInterrupt (Ctrl+C) to ensure proper cleanup
-        logger.log("Received KeyboardInterrupt. Cleaning up...",
-                   level="warning")
-        app.cleanup()
+        # Destroy the ttk.Window instance
+        app.destroy()
+
+    app = ttk.Window(title="App",
+                     themename="darkly",
+                     size=(1270, 550),
+                     resizable=(False, False),
+                     position=(10, 140))
+
+    my_app_instance = Aria2Gui(app)
+    app.wm_protocol("WM_DELETE_WINDOW", on_close)
+    app.mainloop()
 
 
 if __name__ == "__main__":

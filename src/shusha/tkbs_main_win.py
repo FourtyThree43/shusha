@@ -1,36 +1,26 @@
 import datetime
-import threading
 import tkinter as tk
 from pathlib import Path
 
 import ttkbootstrap as ttk
-from add_win import AddWindow
-from controller.api import Api
-from models.client import Client
-from models.logger import LoggerService
-from models.utilities import sizeof_fmt
+from tkbs_add_win import AddWindow
 from ttkbootstrap.tableview import Tableview
 from ttkbootstrap.toast import ToastNotification
 from ttkbootstrap.tooltip import ToolTip
 
-logger = LoggerService(logger_name="ShushaAPP")
 OUTPUT_PATH = Path(__file__).parent
-ASSETS_PATH = OUTPUT_PATH / Path("resources/assets/frame0")
+ASSETS_PATH = OUTPUT_PATH / Path("assets/frame0")
 
 
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
 
-class Aria2Gui(ttk.Frame):
+class MyApp(ttk.Frame):
 
     def __init__(self, master):
         super().__init__(master, padding=10)
         self.pack(fill=tk.BOTH, expand=tk.YES)
-
-        self.api = Api()
-        self.api.start_server()
-        self.download_gid = None
 
         self.colors = ttk.Style().colors
 
@@ -58,8 +48,8 @@ class Aria2Gui(ttk.Frame):
         self.create_buttonbar()
         self.create_table_view()
         self.create_bottom_bar()
-
-        self.after(1000, self.stats)
+        # self.show_toast()
+        self.file_add = AddWindow(self.master)
 
     def create_buttonbar(self):
         # top buttonbar
@@ -73,11 +63,7 @@ class Aria2Gui(ttk.Frame):
         add_btn = ttk.Button(master=opts_row,
                              text="Add",
                              image='add-download',
-<<<<<<< HEAD
-                             command=AddWindow,
-=======
-                             command=self.open_toplevel,
->>>>>>> dev_2
+                             command=lambda: self.show_toast(),
                              width=8,
                              bootstyle="outline-dark")
         add_btn.pack(side=tk.LEFT, padx=(1, 0), pady=1)
@@ -88,7 +74,7 @@ class Aria2Gui(ttk.Frame):
         start_btn = ttk.Button(master=opts_row,
                                text="Start",
                                image='start-download',
-                               command=self.start_download,
+                               command=lambda: print("start downloads"),
                                width=8,
                                bootstyle="outline-dark")
         start_btn.pack(side=tk.LEFT, padx=(1, 0), pady=1)
@@ -99,7 +85,7 @@ class Aria2Gui(ttk.Frame):
         pause_btn = ttk.Button(master=opts_row,
                                text="Pause",
                                image='pause-download',
-                               command=self.stop_downloads,
+                               command=lambda: print("pause downloads"),
                                width=8,
                                bootstyle="outline-dark")
         pause_btn.pack(side=tk.LEFT, padx=(1, 0), pady=1)
@@ -166,7 +152,7 @@ class Aria2Gui(ttk.Frame):
         logs_btn = ttk.Button(master=opts_row,
                               text="Logs",
                               image='logs',
-                              command=lambda: self.show_toast(),
+                              command=lambda: print("Open Logs"),
                               width=8,
                               bootstyle="outline-dark")
         logs_btn.pack(side=tk.RIGHT, padx=(0, 1), pady=1)
@@ -185,6 +171,15 @@ class Aria2Gui(ttk.Frame):
 
         _rowdata = []
         # add items to download_list
+        for i in range(1, 15):
+            for j in range(2, 10):
+                x = j + i
+                y = x + 2
+                _rowdata.append([
+                    "Lorem Ipsum dolor sit amet", "Downloading",
+                    f"{i}{x}{j} MB", f"{y}.2{i}%", f"{x}{i}{y}.{j}{i} KB/s",
+                    f"{j}.13m", f"{datetime.date.today().ctime()}"
+                ])
 
         self.dt = Tableview(master=self.table_lf,
                             coldata=_columns,
@@ -256,136 +251,21 @@ class Aria2Gui(ttk.Frame):
                 text="Open queue settings",
                 bootstyle=(ttk.WARNING, ttk.INVERSE))
 
-        self.stats_frame = tk.Frame(opts_row)
-        self.stats_frame.pack(side=tk.RIGHT, padx=10, pady=10)
-
-    def modify_stats_keys(self, gstats):
-        # Mapping of keys to display names
-        key_mapping = {
-            'downloadSpeed': 'Download Speed',
-            'numActive': 'Active',
-            'numStopped': 'Stopped',
-            'numStoppedTotal': 'Total Stopped',
-            'numWaiting': 'Waiting',
-            'uploadSpeed': 'Upload Speed'
-        }
-
-        # Modify keys as needed
-        modified_gstats = {
-            f"{key_mapping.get(key, key)}": value
-            for key, value in gstats.items()
-        }
-        return modified_gstats
-
-    def update_stats_frame(self, gstats):
-        # gstats = self.api.get_stats()
-        modified_gstats = self.modify_stats_keys(gstats)
-
-        column_index = 0
-        for key, value in modified_gstats.items():
-            label = tk.Label(self.stats_frame, text=f"{key}:")
-            label.grid(row=0, column=column_index, sticky="w", padx=5)
-
-            if key in ['Download Speed', 'Upload Speed']:
-                value = sizeof_fmt(float(value), suffix="B/s")
-
-            value_label = tk.Label(self.stats_frame, text=value)
-            value_label.grid(row=1, column=column_index, sticky="e", padx=5)
-
-            column_index += 1
-
-    def show_toast(self, message="This is a toast message"):
+    def show_toast(self):
         toast = ToastNotification(
             title="ttkbootstrap toast message",
-            message=message,
+            message="This is a toast message",
             duration=3000,
         )
 
         toast.show_toast()
 
-    def open_toplevel(self):
-
-        def handle_result(uris, path):
-            for uri in uris:
-                # logger.log(f"uri: {str(uri.get())}")
-                # logger.log(f"path: {path}")
-
-                self.api.start_download(uri.get(), path)
-
-        # create a new toplevel window
-        AddWindow(callback=handle_result)
-
-        #     self.api.start_download(uris, path)
-
-    def download_thread(self, url):
-        try:
-            gid = self.api.start_download(url)
-            self.download_gid = gid
-            msg = f"Download started with GID: {gid}"
-            self.show_toast(message=msg)
-        except Exception as e:
-            self.log_error(f"Error starting download: {e}")
-
-    def start_download(self):
-        logger.log("Starting download...")
-        url = "https://proof.ovh.net/files/10Mb.dat"
-        threading.Thread(target=self.download_thread, args=(url, )).start()
-
-    def pause_download(self):
-        if self.download_gid:
-            logger.log("Stopping download...")
-            threading.Thread(target=self.api_operations,
-                             args=(self.api.pause, self.download_gid)).start()
-
-    def stop_downloads(self):
-        logger.log("Stopping download...")
-        threading.Thread(target=self.api_operations,
-                         args=(self.api.pause_all, )).start()
-
-    def stats(self):
-        try:
-            gstats = self.api.get_stats()
-
-            if gstats:
-                self.update_stats_frame(gstats)
-
-                # Schedule the next update after 1 second
-                self.after(1000, self.stats)
-        except Exception as e:
-            self.log_error(f"Error in get_stats: {e}")
-
-    def cleanup(self):
-        logger.log("Performing cleanup...")
-        if self.download_gid:
-            self.stop_downloads()
-
-        self.api.save_session()
-        self.api.stop_server()
-
-    def api_operations(self, api_method, *args):
-        try:
-            api_method(*args)
-        except Exception as e:
-            self.log_error(f"Error in API operation: {e}")
-
-    def log_error(self, message):
-        logger.log(message, level="error")
-
 
 if __name__ == '__main__':
-
-    def on_close():
-        my_app_instance.cleanup()
-
-        # Destroy the ttk.Window instance
-        app.destroy()
-
     app = ttk.Window(title="App",
                      themename="darkly",
                      size=(1270, 550),
-                     resizable=(False, False),
+                     resizable=(0, 0),
                      position=(10, 140))
-
-    my_app_instance = Aria2Gui(app)
-    app.wm_protocol("WM_DELETE_WINDOW", on_close)
+    MyApp(app)
     app.mainloop()
