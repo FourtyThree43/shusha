@@ -73,7 +73,7 @@ class Aria2Gui(ttk.Frame):
         add_btn = ttk.Button(master=opts_row,
                              text="Add",
                              image='add-download',
-                             command=lambda: AddWindow(self.master),
+                             command=self.open_toplevel,
                              width=8,
                              bootstyle="outline-dark")
         add_btn.pack(side=tk.LEFT, padx=(1, 0), pady=1)
@@ -298,6 +298,20 @@ class Aria2Gui(ttk.Frame):
         )
 
         toast.show_toast()
+
+    def open_toplevel(self):
+
+        def handle_result(uris, path):
+            for uri in uris:
+                # logger.log(f"uri: {str(uri.get())}")
+                # logger.log(f"path: {path}")
+
+                self.api.start_download(uri.get(), path)
+
+        # create a new toplevel window
+        AddWindow(callback=handle_result)
+
+        #     self.api.start_download(uris, path)
 
     def download_thread(self, url):
         try:
