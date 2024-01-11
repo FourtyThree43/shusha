@@ -314,9 +314,7 @@ class AddWindow(ttk.Toplevel):
         dpath = pathlib.Path(self.path_var.get())
 
         self.callback(uris, dpath)
-
-        # self.destroy()
-        # return uris, dpath
+        self.destroy()
 
     def on_checkbox_click(self, checkbox_var, entry_box):
         if checkbox_var.get():
