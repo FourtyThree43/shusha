@@ -166,3 +166,7 @@ cython_debug/
 
 # SublimeText
 *.sublime*
+
+
+# ShashaDB Persistence Files
+ shusha.db.*
