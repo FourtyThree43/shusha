@@ -16,16 +16,16 @@ class DownloadMeter(ttk.Meter):
 
     def start(self):
         self.paused.set(NO)
-        i = self.amountusedvar.get()
-        while i <= 100:
+        # i = self.amountusedvar.get()
+        while self.amountusedvar.get() <= self.amounttotalvar.get():
             if self.paused.get():
                 break
-            if i == 100:
+            if self.amountusedvar.get() == self.amounttotalvar.get():
                 self.configure(subtext="Download complete")
                 break
             self.step()
-            time.sleep(1)
-            i = self.amountusedvar.get()
+            time.sleep(0.25)
+            # i = self.amountusedvar.get()
             self.master.update_idletasks()
 
     def pause(self):
@@ -85,10 +85,14 @@ class DownloadWindow(ttk.Toplevel):
         self.meter.pause()
         self.start_btn.state(["!disabled"])
 
+        if self.meter.amountusedvar.get() < self.meter.amounttotalvar.get():
+            self.start_btn.configure(text="Resume")
+
     def reset(self):
         self.pause()
         self.meter.configure(subtext="downloaded")
         self.meter.reset()
+        self.start_btn.configure(text="Start")
 
 
 ttk.Window(themename="darkly")
