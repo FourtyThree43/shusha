@@ -69,7 +69,7 @@ class Api:
             table = self.db.table('downloads')
             # print(new_doc)
             try:
-                logger.log(f"Inserting new doc")
+                logger.log(f"Live Inserting new doc")
                 table.insert(new_doc)
                 self.db.save()
             except Exception as e:

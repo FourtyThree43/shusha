@@ -5,8 +5,8 @@
 import time
 
 import ttkbootstrap as ttk
-from app_v2 import Aria2Gui
 from models.logger import LoggerService
+from view.app import Aria2Gui
 
 logger = LoggerService(__name__)
 

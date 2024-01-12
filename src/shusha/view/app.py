@@ -4,7 +4,6 @@ import tkinter as tk
 from pathlib import Path
 
 import ttkbootstrap as ttk
-from add_win import AddWindow
 from controller.api import Api
 from models.client import Client
 from models.logger import LoggerService
@@ -12,10 +11,11 @@ from models.utilities import sizeof_fmt
 from ttkbootstrap.tableview import Tableview
 from ttkbootstrap.toast import ToastNotification
 from ttkbootstrap.tooltip import ToolTip
+from view.add_win import AddWindow
 
 logger = LoggerService(logger_name="ShushaAPP")
 OUTPUT_PATH = Path(__file__).parent
-ASSETS_PATH = OUTPUT_PATH / Path("resources/assets/frame0")
+ASSETS_PATH = OUTPUT_PATH / Path("../resources/assets/")
 
 
 def relative_to_assets(path: str) -> Path:
@@ -199,10 +199,18 @@ class Aria2Gui(ttk.Frame):
 
         opts_row = ttk.Frame(self.bottom_bar)
         opts_row.pack(fill=tk.X, expand=tk.YES)
+        _categories = [
+            "All",
+            "Active",
+            "Completed",
+            "Seeding",
+            "Inactive",
+            "Error",
+            "Paused",
+            "Queued",
+        ]
 
-        category = ttk.Combobox(master=opts_row,
-                                values=["Category 1", "Category 2"],
-                                width=12)
+        category = ttk.Combobox(master=opts_row, values=_categories, width=12)
         category.pack(side=ttk.LEFT, padx=10, pady=1)
         ToolTip(category,
                 text="Select category",
@@ -330,13 +338,12 @@ class Aria2Gui(ttk.Frame):
     def pause_download(self):
         if self.download_gid:
             logger.log("Stopping download...")
-            threading.Thread(target=self.api_operations,
-                             args=(self.api.pause, self.download_gid)).start()
+            threading.Thread(target=self.api.pause,
+                             args=(self.download_gid)).start()
 
     def stop_downloads(self):
         logger.log("Stopping download...")
-        threading.Thread(target=self.api_operations,
-                         args=(self.api.pause_all, )).start()
+        threading.Thread(target=self.api.pause_all, args=()).start()
 
     def stats(self):
         try:
@@ -357,12 +364,6 @@ class Aria2Gui(ttk.Frame):
 
         self.api.save_session()
         self.api.stop_server()
-
-    def api_operations(self, api_method, *args):
-        try:
-            api_method(*args)
-        except Exception as e:
-            self.log_error(f"Error in API operation: {e}")
 
     def log_error(self, message):
         logger.log(message, level="error")
