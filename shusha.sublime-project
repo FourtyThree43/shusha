@@ -1,0 +1,19 @@
+{
+	"folders":
+	[
+		{
+			"path": ".",
+		}
+	],
+	"virtualenv": "D:\\CODE\\@Repos\\dlm\\shusha\\.venv",
+	"settings":
+	{
+		"LSP":
+		{
+			"formatters":
+			{
+				"source.python.3": "LSP-pylsp",
+			},
+		},
+	},
+}

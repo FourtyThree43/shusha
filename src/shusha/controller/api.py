@@ -3,6 +3,7 @@ from pathlib import Path
 from models.client import Client, XMLRPCClientException
 from models.daemon import Daemon
 from models.logger import LoggerService
+from models.ShushaDB import Query, ShushaDB
 from platformdirs import user_downloads_dir
 
 logger = LoggerService(logger_name="ShushaAPI")
@@ -25,7 +26,10 @@ class Api:
     def __init__(self, daemon=None):
         self.remote = daemon or Daemon()
         self.client = Client(self.remote)
-        self._options = {} or self.get_global_options()
+        self.db = ShushaDB(filename="shusha.db")
+        self._downloads = self.db.all()
+        self._options = {}
+        self._gids = set()
 
     def start_server(self):
         pid = self.remote.start_server()
@@ -36,16 +40,65 @@ class Api:
         self.remote.stop_server()
         logger.log("Aria2 server stopped.")
 
+    def load_db(self):
+        self.db.load()
+
+    def save_db(self):
+        self.db.save()
+
+    def persistence(self):
+        _downloads = []
+        _all_downloads = self.get_all_downloads()
+
+        if _all_downloads:
+            _downloads.append(_all_downloads)
+            table = self.db.table('downloads')
+            try:
+                logger.log(f"Saving session downloads to db:")
+                self.db.begin_transaction()
+                table.insert_multiple(_downloads)
+                self.db.commit_transaction()
+            except Exception as e:
+                logger.log(f"Error inserting new doc: {e}", level="error")
+
+    def live(self, gid):
+        """Live monitoring of a download."""
+        new_doc = self.get_download(gid)
+        if new_doc:
+            self._gids.add(gid)
+            table = self.db.table('downloads')
+            # print(new_doc)
+            try:
+                logger.log(f"Inserting new doc")
+                table.insert(new_doc)
+                self.db.save()
+            except Exception as e:
+                logger.log(f"Error inserting new doc: {e}", level="error")
+
+    def updatedb(self):
+        """ Update the db with new download status """
+        for gid in self._gids:
+            new_doc = self.get_download(gid)
+            if new_doc:
+                table = self.db.table('downloads')
+                try:
+                    logger.log(f"Updating new doc")
+                    table.update(new_data=new_doc, query=gid)
+                    self.db.save()
+                except Exception as e:
+                    logger.log(f"Error updating new doc: {e}", level="error")
+
     def start_download(self, url, download_dir=None):
         """Start a download and return the GID (Download ID)."""
         download_dir = download_dir or Path(__file__).parent
         try:
             gid = self.client.add_uri([url], {"dir": str(download_dir)})
             logger.log(f"Download started with GID: {gid}")
+            self.live(gid)
             return gid
         except XMLRPCClientException as e:
             logger.log(f"Error starting download: {e}", level="error")
-            raise  # Re-raise the exception for the caller to handle
+            # Re- the exception for the caller to handle
 
     def get_download_status(self, gid):
         """Get the status of a download given its GID."""
@@ -56,7 +109,6 @@ class Api:
                 f"Error getting download status for GID {gid}: {e}",
                 level="error",
             )
-            raise
 
     def monitor_download_progress(self, gid):
         """Monitor and log the progress of a download."""
@@ -81,7 +133,6 @@ class Api:
                 f"Error monitoring download progress for GID {gid}: {e}",
                 level="error",
             )
-            raise
 
     def remove(self, gid):
         """Remove a download given its GID."""
@@ -91,7 +142,6 @@ class Api:
         except XMLRPCClientException as e:
             logger.log(f"Error removing download with GID {gid}: {e}",
                        level="error")
-            raise
 
     def remove_f(self, gid):
         """Remove a download given its GID and delete the downloaded file."""
@@ -101,7 +151,6 @@ class Api:
         except XMLRPCClientException as e:
             logger.log(f"Error stopping download with GID {gid}: {e}",
                        level="error")
-            raise
 
     def pause(self, gid):
         """Pause a download given its GID."""
@@ -114,7 +163,6 @@ class Api:
         except XMLRPCClientException as e:
             logger.log(f"Error pausing download with GID {gid}: {e}",
                        level="error")
-            raise
 
     def pause_all(self):
         """Pause all active downloads."""
@@ -124,7 +172,6 @@ class Api:
         except XMLRPCClientException as e:
             logger.log(f"Error pausing all active downloads: {e}",
                        level="error")
-            raise
 
     def un_pause(self, gid):
         """Un-pause a download given its GID."""
@@ -134,7 +181,6 @@ class Api:
         except XMLRPCClientException as e:
             logger.log(f"Error un-pausing download with GID {gid}: {e}",
                        level="error")
-            raise
 
     def un_pause_all(self):
         """Un-pause all active downloads."""
@@ -144,7 +190,6 @@ class Api:
         except XMLRPCClientException as e:
             logger.log(f"Error un-pausing all active downloads: {e}",
                        level="error")
-            raise
 
     def get_download(self, gid):
         """Get detailed information about a specific download."""
@@ -155,7 +200,6 @@ class Api:
                 f"Error getting download details for GID {gid}: {e}",
                 level="error",
             )
-            raise
 
     def get_downloads(self, keys=None):
         """Get information about active downloads."""
@@ -163,7 +207,6 @@ class Api:
             return self.client.tell_active(keys)
         except XMLRPCClientException as e:
             logger.log(f"Error getting active downloads: {e}", level="error")
-            raise
 
     def move(self, gid, pos, how):
         """Change the position of a download in the download queue."""
@@ -172,7 +215,6 @@ class Api:
         except XMLRPCClientException as e:
             logger.log(f"Error moving download with GID {gid}: {e}",
                        level="error")
-            raise
 
     def move_to_top(self, gid):
         """Move a download to the top of the download queue."""
@@ -180,7 +222,6 @@ class Api:
             return self.move(gid, 0, "POS_SET")
         except XMLRPCClientException as e:
             logger.log(f"Error moving download to the top: {e}", level="error")
-            raise
 
     def move_to_bottom(self, gid):
         """Move a download to the bottom of the download queue."""
@@ -189,7 +230,6 @@ class Api:
         except XMLRPCClientException as e:
             logger.log(f"Error moving download to the bottom: {e}",
                        level="error")
-            raise
 
     def move_up(self, gid):
         """Move a download up in the download queue."""
@@ -197,7 +237,6 @@ class Api:
             return self.move(gid, -1, "POS_CUR")
         except XMLRPCClientException as e:
             logger.log(f"Error moving download up: {e}", level="error")
-            raise
 
     def move_down(self, gid):
         """Move a download down in the download queue."""
@@ -205,7 +244,6 @@ class Api:
             return self.move(gid, 1, "POS_CUR")
         except XMLRPCClientException as e:
             logger.log(f"Error moving download down: {e}", level="error")
-            raise
 
     def move_to(self, gid, pos):
         """Move a download to a specific position in the download queue."""
@@ -214,31 +252,51 @@ class Api:
         except XMLRPCClientException as e:
             logger.log(f"Error moving download to position {pos}: {e}",
                        level="error")
-            raise
 
-    def get_active_downloads(self, keys=None):
+    def get_active(self, keys=None):
         """Get information about active downloads."""
         try:
             return self.client.tell_active(keys)
         except XMLRPCClientException as e:
             logger.log(f"Error getting active downloads: {e}", level="error")
-            raise
+            return []
 
-    def get_waiting_downloads(self, offset, num, keys=None):
+    def get_waiting(self, offset, num, keys=None):
         """Get information about waiting downloads."""
         try:
             return self.client.tell_waiting(offset, num, keys)
         except XMLRPCClientException as e:
             logger.log(f"Error getting waiting downloads: {e}", level="error")
-            raise
+            return []
 
-    def get_stopped_downloads(self, offset, num, keys=None):
+    def get_stopped(self, offset, num, keys=None):
         """Get information about stopped downloads."""
         try:
             return self.client.tell_stopped(offset, num, keys)
         except XMLRPCClientException as e:
             logger.log(f"Error getting stopped downloads: {e}", level="error")
-            raise
+            return []
+
+    def get_all_downloads(self, keys=None):
+        """Get information about all downloads."""
+        try:
+            all_downloads = []
+            waiting = self.get_waiting(0, 1000, keys) or []
+            stopped = self.get_stopped(0, 1000, keys) or []
+            active = self.get_active(keys) or []
+
+            if waiting and stopped and active or waiting or stopped or active:
+                logger.log("Fetched all downloads")
+                all_downloads.append(waiting)
+                all_downloads.append(stopped)
+                all_downloads.append(active)
+                return all_downloads
+            else:
+                logger.log("No downloads found.")
+                return []
+        except XMLRPCClientException as e:
+            logger.log(f"Error getting all downloads: {e}", level="error")
+            return []
 
     def get_stats(self):
         """Get global statistics about downloads."""
@@ -246,7 +304,6 @@ class Api:
             return self.client.get_global_stat()
         except XMLRPCClientException as e:
             logger.log(f"Error getting global statistics: {e}", level="error")
-            raise
 
     def get_version(self):
         """Get version information of Aria2."""
@@ -255,7 +312,6 @@ class Api:
         except XMLRPCClientException as e:
             logger.log(f"Error getting Aria2 version information: {e}",
                        level="error")
-            raise
 
     def get_session_info(self):
         """Get session information."""
@@ -264,14 +320,15 @@ class Api:
         except XMLRPCClientException as e:
             logger.log(f"Error getting session information: {e}",
                        level="error")
-            raise
 
     def save_session(self):
         """Save the current session."""
         try:
-            save_session_option = self._options.get("save-session")
-            if save_session_option is not None:
-                return self.client.save_session()
+            if self._options is None:
+                self._options = self.get_global_options()
+                save_session_option = self._options.get("save-session")
+                if save_session_option is not None:
+                    return self.client.save_session()
             else:
                 logger.log(
                     "Session file not set. Please set the 'save-session' option.",
@@ -280,7 +337,6 @@ class Api:
 
         except XMLRPCClientException as e:
             logger.log(f"Error saving session: {e}", level="error")
-            raise
 
     def shutdown(self):
         """Shutdown the Aria2 server."""
@@ -290,7 +346,6 @@ class Api:
         except XMLRPCClientException as e:
             logger.log(f"Error initiating Aria2 server shutdown: {e}",
                        level="error")
-            raise
 
     def force_shutdown_aria2(self):
         """Forcefully shutdown the Aria2 server."""
@@ -301,7 +356,6 @@ class Api:
                 f"Error forcefully shutting down Aria2 server: {e}",
                 level="error",
             )
-            raise
 
     def get_options(self, gid: str):
         """Get options."""
@@ -309,7 +363,6 @@ class Api:
             return self.client.get_option(gid=gid)
         except XMLRPCClientException as e:
             logger.log(f"Error getting options: {e}", level="error")
-            raise
 
     def change_options(self, gid: str, options: dict):
         """Change options."""
@@ -317,7 +370,6 @@ class Api:
             return self.client.change_option(gid, options)
         except XMLRPCClientException as e:
             logger.log(f"Error changing options: {e}", level="error")
-            raise
 
     def get_global_options(self):
         """Get global options."""
@@ -325,7 +377,6 @@ class Api:
             return self.client.get_global_option()
         except XMLRPCClientException as e:
             logger.log(f"Error getting global options: {e}", level="error")
-            raise
 
     def change_global_options(self, options):
         """Change global options."""
@@ -333,7 +384,6 @@ class Api:
             return self.client.change_global_option(options)
         except XMLRPCClientException as e:
             logger.log(f"Error changing global options: {e}", level="error")
-            raise
 
 
 if __name__ == "__main__":
