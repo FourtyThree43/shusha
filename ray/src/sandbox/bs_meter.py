@@ -1,8 +1,7 @@
-import asyncio
-from time import sleep
-
 import ttkbootstrap as ttk
 from PIL import Image
+import threading
+import time
 from ttkbootstrap.constants import NO, YES
 
 Image.CUBIC = Image.BICUBIC  # ttkbootstrap uses an attribute Image.CUBIC which
@@ -18,7 +17,6 @@ class DownloadMeter(ttk.Meter):
     def start(self):
         self.paused.set(NO)
         i = self.amountusedvar.get()
-        print("Amount used:", i)
         while i <= 100:
             if self.paused.get():
                 break
@@ -26,12 +24,13 @@ class DownloadMeter(ttk.Meter):
                 self.configure(subtext="Download complete")
                 break
             self.step()
+            time.sleep(1)
             i = self.amountusedvar.get()
-            print("Amount used:", i, end="\r")
-            # await asyncio.sleep(1)
+            self.master.update_idletasks()
 
     def pause(self):
         self.paused.set(YES)
+        # self.master.update_idletasks()
 
     def reset(self):
         self.amountusedvar.set(0)
@@ -53,7 +52,7 @@ class DownloadWindow(ttk.Toplevel):
                                    metertype="semi",
                                    textright="%",
                                    subtext="downloaded",
-                                   interactive=True,
+                                   interactive=False,
                                    stripethickness=5)
         self.meter.pack(expand=YES)
 
@@ -80,7 +79,7 @@ class DownloadWindow(ttk.Toplevel):
 
     def start(self):
         self.start_btn.state(["disabled"])
-        self.meter.start()
+        threading.Thread(target=self.meter.start).start()
 
     def pause(self):
         self.meter.pause()
@@ -90,9 +89,7 @@ class DownloadWindow(ttk.Toplevel):
         self.pause()
         self.meter.configure(subtext="downloaded")
         self.meter.reset()
-        # self.start_btn.state(["!disabled"])
 
 
 ttk.Window(themename="darkly")
 DownloadWindow().mainloop()
-# app.mainloop()
