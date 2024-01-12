@@ -1,19 +1,94 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "shusha"
-version = "0.1.0"
-description = "Default template for PDM package"
+dynamic = ["version"]
+description = 'Shuha download manager is a GUI for aria2.'
+readme = "README.md"
+requires-python = ">=3.8"
+license = "MIT"
+keywords = [
+  "aria2", "aria2c", "download-manager", "downloader", "aria2-gui", "python",
+  "tkinter", "RPC", "xmlrpc", "aria2-webui"
+]
 authors = [
-    {name = "FourtyThree43", email = "shaqmwa@outlook.com"},
-    {name = "Kemboiray", email = "kemboiray@gmail.com"}
+  { name = "FourtyThree43", email = "shaqmwa@outlook.com" },
+  { name = "Kemboiray", email = "kemboiray@gmail.com" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
     "ttkbootstrap>=1.10.1",
     "platformdirs>=4.1.0",
+    "tomli==2.0.1"
 ]
-requires-python = ">=3.10"
-readme = "README.md"
-license = {text = "MIT"}
+
+[project.urls]
+Documentation = "https://github.com/FourtyThree43/shusha#readme"
+Issues = "https://github.com/FourtyThree43/shusha/issues"
+Source = "https://github.com/FourtyThree43/shusha"
+
+[tool.ruff]
+line-length = 80
+# indent-width = 4
 
 
-[tool.pdm]
-package-type = "application"
+[tool.hatch.version]
+path = "src/shusha/__about__.py"
+
+[tool.hatch.envs.default]
+dependencies = [
+  "coverage[toml]>=6.5",
+  "pytest",
+]
+[tool.hatch.envs.default.scripts]
+test = "pytest {args:tests}"
+test-cov = "coverage run -m pytest {args:tests}"
+cov-report = [
+  "- coverage combine",
+  "coverage report",
+]
+cov = [
+  "test-cov",
+  "cov-report",
+]
+
+[[tool.hatch.envs.all.matrix]]
+python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
+
+[tool.hatch.envs.types]
+dependencies = [
+  "mypy>=1.0.0",
+]
+[tool.hatch.envs.types.scripts]
+check = "mypy --install-types --non-interactive {args:src/shusha tests}"
+
+[tool.coverage.run]
+source_pkgs = ["shusha", "tests"]
+branch = true
+parallel = true
+omit = [
+  "src/shusha/__about__.py",
+]
+
+[tool.coverage.paths]
+shusha = ["src/shusha", "*/shusha/src/shusha"]
+tests = ["tests", "*/shusha/tests"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
