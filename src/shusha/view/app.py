@@ -310,12 +310,13 @@ class Aria2Gui(ttk.Frame):
 
     def open_toplevel(self):
 
-        def handle_result(uris, path):
+        def handle_result(uris, path, options):
             for uri in uris:
                 logger.log(f"uri: {str(uri.get())}")
                 logger.log(f"path: {path}")
+                logger.log(f"options: {options}")
 
-                _gid = self.api.start_download(uri.get(), path)
+                _gid = self.api.start_download(uri.get(), path, options)
                 _keys = [
                     "status", "totalLength", "completedLength", "connections",
                     "downloadSpeed", "files"

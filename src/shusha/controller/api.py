@@ -89,14 +89,22 @@ class Api:
                 except Exception as e:
                     logger.log(f"Error updating new doc: {e}", level="error")
 
-    def start_download(self, url, download_dir=None):
+    def start_download(self, url, download_dir=None, opts: dict = {}):
         """Start a download and return the GID (Download ID)."""
-        download_dir = download_dir or Path(__file__).parent
+        download_dir = download_dir or DEFAULT_DIR or Path(__file__).parent
+        print(opts)
+        if opts:
+            options = {**opts, "dir": str(download_dir)}
+            print(f"opts: {options}")
+        else:
+            options = {"dir": str(download_dir)}
+            print(f"!opts: {options}")
+
         try:
-            gid = self.client.add_uri([url], {"dir": str(download_dir)})
+            gid = self.client.add_uri([url], options)
             logger.log(f"Download started with GID: {gid}")
-            self.live(gid)
             self.gid = gid
+            self.live(gid)
             return gid
         except XMLRPCClientException as e:
             logger.log(f"Error starting download: {e}", level="error")

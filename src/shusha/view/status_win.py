@@ -134,6 +134,19 @@ class DownloadWindow(ttk.Toplevel):
         self.update_stats_frame(st_struct)
 
         # Check if the download is complete
+        if st_struct.get("status") == "active":
+            self.pause_btn.state(["!disabled"])
+            self.resume_btn.state(["disabled"])
+            self.start_btn.state(["disabled"])
+            self.cancel_btn.configure(text="Cancel")
+        if st_struct.get("status") == "error":
+            self.pause_btn.state(["disabled"])
+            self.resume_btn.state(["disabled"])
+            self.start_btn.state(["!disabled"])
+            self.start_btn.configure(text="Restart")
+            self.cancel_btn.configure(text="Close")
+            self.meter.configure(subtext="Download failed")
+            self.meter.reset()
         if st_struct.get("status") == "complete":
             self.pause_btn.state(["disabled"])
             self.resume_btn.state(["disabled"])

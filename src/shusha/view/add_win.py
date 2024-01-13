@@ -312,8 +312,12 @@ class AddWindow(ttk.Toplevel):
         """Callback for submit button"""
         uris = self.parse_lines_to_stringvars()
         dpath = pathlib.Path(self.path_var.get())
+        split = self.split_var.get()
+        rename = self.rename_var.get()
 
-        self.callback(uris, dpath)
+        opts = {"split": split, "out": rename}
+
+        self.callback(uris, dpath, opts)
         self.destroy()
 
     def on_checkbox_click(self, checkbox_var, entry_box):
