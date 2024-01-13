@@ -3,6 +3,9 @@ import tkinter as tk
 from tkinter.filedialog import askdirectory
 
 import ttkbootstrap as ttk
+from platformdirs import user_downloads_dir
+
+DEFAULT_DIR = pathlib.Path(user_downloads_dir())
 
 
 class AddWindow(ttk.Toplevel):
@@ -21,7 +24,7 @@ class AddWindow(ttk.Toplevel):
 
         # application variables
         _url = ""
-        _path = pathlib.Path().absolute().as_posix()
+        _path = DEFAULT_DIR
         _rename = ""
         _split = 8
 
