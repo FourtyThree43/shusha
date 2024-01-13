@@ -12,6 +12,7 @@ from ttkbootstrap.tableview import Tableview
 from ttkbootstrap.toast import ToastNotification
 from ttkbootstrap.tooltip import ToolTip
 from view.add_win import AddWindow
+from view.status_win import DownloadWindow
 
 logger = LoggerService(logger_name="ShushaAPP")
 OUTPUT_PATH = Path(__file__).parent
@@ -84,7 +85,7 @@ class Aria2Gui(ttk.Frame):
         start_btn = ttk.Button(master=opts_row,
                                text="Start",
                                image='start-download',
-                               command=self.start_download,
+                               command=lambda: DownloadWindow(api=self.api),
                                width=8,
                                bootstyle="outline-dark")
         start_btn.pack(side=tk.LEFT, padx=(1, 0), pady=1)
@@ -311,15 +312,23 @@ class Aria2Gui(ttk.Frame):
 
         def handle_result(uris, path):
             for uri in uris:
-                # logger.log(f"uri: {str(uri.get())}")
-                # logger.log(f"path: {path}")
+                logger.log(f"uri: {str(uri.get())}")
+                logger.log(f"path: {path}")
 
-                self.api.start_download(uri.get(), path)
+                _gid = self.api.start_download(uri.get(), path)
+                _keys = [
+                    "status", "totalLength", "completedLength", "connections",
+                    "downloadSpeed", "files"
+                ]
+                _struct = self.api.get_download_status(gid=_gid, keys=_keys)
+
+                logger.log(f"Download GID: {_gid}")
+                logger.log(f"Download status: {_struct}")
+                download_window = DownloadWindow(api=self.api)
+                download_window.update_stats_frame(_struct)
 
         # create a new toplevel window
         AddWindow(callback=handle_result)
-
-        #     self.api.start_download(uris, path)
 
     def download_thread(self, url):
         try:

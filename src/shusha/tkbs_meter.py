@@ -2,11 +2,14 @@ import threading
 import time
 
 import ttkbootstrap as ttk
+from controller.api import Api
 from PIL import Image
 from ttkbootstrap.constants import NO, YES
 
 Image.CUBIC = Image.BICUBIC  # ttkbootstrap uses an attribute Image.CUBIC which
 # was replaced by Image.BICUBIC in Pillow v10.0.0
+
+api = Api()
 
 
 def sizeof_fmt(num, delim=" ", suffix="B"):
@@ -160,15 +163,17 @@ class DownloadWindow(ttk.Toplevel):
         self.start_btn.configure(text="Start")
 
 
-ttk.Window(themename="darkly")
-sample_stats = {
-    "uri": "https://proof.ovh.net/files/10Mb.dat",
-    "status": "Active",
-    "completedLength": "6942000",
-    "totalLength": "15000000",
-    "downloadSpeed": "3000000",
-    "connections": "3",
-}
-download_window = DownloadWindow()
-download_window.update_stats_frame(sample_stats)
-DownloadWindow().mainloop()
+if __name__ == '__main__':
+
+    ttk.Window(themename="darkly")
+    sample_stats = {
+        "uri": "https://proof.ovh.net/files/10Mb.dat",
+        "status": "Active",
+        "completedLength": "6942000",
+        "totalLength": "15000000",
+        "downloadSpeed": "3000000",
+        "connections": "3",
+    }
+    download_window = DownloadWindow()
+    download_window.update_stats_frame(sample_stats)
+    DownloadWindow().mainloop()

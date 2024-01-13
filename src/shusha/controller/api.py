@@ -30,6 +30,7 @@ class Api:
         self._downloads = self.db.all()
         self._options = {}
         self._gids = set()
+        self.gid = None
 
     def start_server(self):
         pid = self.remote.start_server()
@@ -95,15 +96,16 @@ class Api:
             gid = self.client.add_uri([url], {"dir": str(download_dir)})
             logger.log(f"Download started with GID: {gid}")
             self.live(gid)
+            self.gid = gid
             return gid
         except XMLRPCClientException as e:
             logger.log(f"Error starting download: {e}", level="error")
             # Re- the exception for the caller to handle
 
-    def get_download_status(self, gid):
+    def get_download_status(self, gid, keys=None):
         """Get the status of a download given its GID."""
         try:
-            return self.client.tell_status(gid=gid)
+            return self.client.tell_status(gid=gid, keys=keys)
         except XMLRPCClientException as e:
             logger.log(
                 f"Error getting download status for GID {gid}: {e}",
@@ -191,10 +193,10 @@ class Api:
             logger.log(f"Error un-pausing all active downloads: {e}",
                        level="error")
 
-    def get_download(self, gid):
+    def get_download(self, gid, keys=None):
         """Get detailed information about a specific download."""
         try:
-            return self.client.tell_status(gid=gid)
+            return self.client.tell_status(gid=gid, keys=keys)
         except XMLRPCClientException as e:
             logger.log(
                 f"Error getting download details for GID {gid}: {e}",
