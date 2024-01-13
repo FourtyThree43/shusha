@@ -42,12 +42,13 @@ def main(argv: list[str] | None = None):
         # Destroy the ttk.Window instance
         app.destroy()
 
-    app = ttk.Window(title="App",
+    app = ttk.Window(title="Shusha",
                      themename="darkly",
                      size=(1270, 550),
                      resizable=(False, False),
                      position=(10, 140))
 
+    app.iconbitmap("shusha.ico")
     my_app_instance = Aria2Gui(app)
     app.wm_protocol("WM_DELETE_WINDOW", on_close)
     app.mainloop()
