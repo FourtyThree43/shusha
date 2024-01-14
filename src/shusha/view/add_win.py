@@ -3,9 +3,9 @@ import tkinter as tk
 from tkinter.filedialog import askdirectory
 
 import ttkbootstrap as ttk
-from platformdirs import user_downloads_dir
+from models.utilities import download_dir
 
-DEFAULT_DIR = pathlib.Path(user_downloads_dir())
+DEFAULT_DIR = download_dir()
 
 
 class AddWindow(ttk.Toplevel):

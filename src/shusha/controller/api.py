@@ -4,21 +4,10 @@ from models.client import Client, XMLRPCClientException
 from models.daemon import Daemon
 from models.logger import LoggerService
 from models.ShushaDB import Query, ShushaDB
-from platformdirs import user_downloads_dir
+from models.utilities import download_dir, format_size, format_speed
 
 logger = LoggerService(logger_name="ShushaAPI")
-DEFAULT_DIR = Path(user_downloads_dir())
-
-
-class HelperUtilities:
-
-    @staticmethod
-    def sizeof_fmt(num, delim=" ", suffix="B"):
-        for unit in ("", "K", "M", "G", "T", "P", "E", "Z"):
-            if abs(num) < 1024.0:
-                return f"{num:3.1f}{delim}{unit}{suffix}"
-            num /= 1024.0
-        return f"{num:.1f}{delim}Yi{suffix}"
+DEFAULT_DIR = download_dir()
 
 
 class Api:
@@ -127,10 +116,8 @@ class Api:
                 status = self.get_download_status(gid)
                 is_active = status.get("status")
                 if is_active == "active":
-                    dl_speed = HelperUtilities.sizeof_fmt(
-                        int(status.get("downloadSpeed")))
-                    dled_size = HelperUtilities.sizeof_fmt(
-                        int(status.get("completedLength")))
+                    dl_speed = format_speed(int(status.get("downloadSpeed")))
+                    dled_size = format_size(int(status.get("completedLength")))
                     logger.log(
                         f"Download Speed: {dl_speed}/s, Completed Length: {dled_size}"
                     )

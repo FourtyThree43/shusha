@@ -79,8 +79,7 @@ shusha
 │       │   └── main_view.py
 │       ├── controller
 │       │  ├── __init__.py
-│       │  ├── controller.py
-│       │  └── gui_controller.py
+│       │  └── controller.py
 │       ├── resources
 │       │   ├── __init__.py
 │       │   ├── aria2c

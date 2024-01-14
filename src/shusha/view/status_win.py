@@ -2,27 +2,12 @@ import threading
 import time
 
 import ttkbootstrap as ttk
+from models.utilities import format_size, format_speed
 from PIL import Image
 from ttkbootstrap.constants import NO, YES
 
 Image.CUBIC = Image.BICUBIC  # ttkbootstrap uses an attribute Image.CUBIC which
 # was replaced by Image.BICUBIC in Pillow v10.0.0
-
-
-def sizeof_fmt(num, delim=" ", suffix="B"):
-    for unit in ("", "K", "M", "G", "T", "P", "E", "Z"):
-        if abs(num) < 1024.0:
-            return f"{num:3.1f}{delim}{unit}{suffix}"
-        num /= 1024.0
-    return f"{num:.1f}{delim}Yi{suffix}"
-
-
-def format_speed(speed):
-    return sizeof_fmt(speed, suffix="B/s")
-
-
-def format_size(size):
-    return sizeof_fmt(size, suffix="B")
 
 
 class DownloadMeter(ttk.Meter):
@@ -206,9 +191,9 @@ class DownloadWindow(ttk.Toplevel):
 
         for key, value in modified_stats.items():
             if key in ['Transfer Rate', 'Upload Speed']:
-                value = sizeof_fmt(float(value))
+                value = format_speed(float(value))
             elif key in ['Downloaded', 'Total Size']:
-                value = sizeof_fmt(float(value))
+                value = format_size(float(value))
 
             label_text = f"{key} : {value}"
             label = ttk.Label(self.stats_f, text=label_text, wraplength=300)

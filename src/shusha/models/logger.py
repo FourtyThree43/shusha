@@ -2,11 +2,11 @@ import logging
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
-from platformdirs import user_log_dir
+from models.utilities import log_dir
 
 
 class LoggerService:
-    LOG_DIR = Path(user_log_dir("shusha"))
+    LOG_DIR = log_dir(appname="shusha")
     LOG_FILE_PATH = LOG_DIR / "shusha.log"
     LOG_FORMAT = "%(asctime)s | %(levelname)s | %(message)s"
     LOG_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"

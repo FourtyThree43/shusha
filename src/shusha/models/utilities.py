@@ -8,15 +8,107 @@ if sys.version_info < (3, 11):
 else:
     import tomllib
 
-from platformdirs import user_config_dir, user_downloads_dir
+from platformdirs import (user_cache_dir, user_config_dir, user_data_dir,
+                          user_downloads_dir, user_log_dir)
+
+
+def download_dir() -> Path:
+    """Return the default download directory.
+
+    Returns:
+        The default download directory.
+    """
+    return Path(user_downloads_dir())
+
+
+def config_dir(appname: str) -> Path:
+    """Return the default user configuration directory.
+
+    Args:
+        appname (str): The name of the application.
+
+    Returns:
+        The default user configuration directory.
+    """
+    return Path(user_config_dir(appname))
+
+
+def data_dir(appname: str) -> Path:
+    """Return the default user data directory.
+
+    Args:
+        appname (str): The name of the application.
+
+    Returns:
+        The default user data directory.
+    """
+    return Path(user_data_dir(appname))
+
+
+def cache_dir(appname: str) -> Path:
+    """Return the default user cache directory.
+
+    Args:
+        appname (str): The name of the application.
+
+    Returns:
+        The default user cache directory.
+    """
+    return Path(user_cache_dir(appname))
+
+
+def log_dir(appname: str) -> Path:
+    """Return the default user log directory.
+
+    Args:
+        appname (str): The name of the application.
+
+    Returns:
+        The default user log directory.
+    """
+    return Path(user_log_dir(appname))
 
 
 def sizeof_fmt(num, delim=" ", suffix="B"):
+    """ Convert a number of bytes into a human readable format.
+
+    Args:
+        num (int): The number of bytes.
+        delim (str, optional): The delimiter. Defaults to " ".
+        suffix (str, optional): The suffix. Defaults to "B".
+
+    Returns:
+        str: The human readable format.
+    """
     for unit in ("", "K", "M", "G", "T", "P", "E", "Z"):
         if abs(num) < 1024.0:
             return f"{num:3.1f}{delim}{unit}{suffix}"
         num /= 1024.0
     return f"{num:.1f}{delim}Yi{suffix}"
+
+
+def format_speed(speed):
+    """ Format a number of bytes into a human readable format.
+
+    Args:
+        speed (int): The number of bytes.
+
+    Returns:
+        str: The human readable format.
+    """
+    return sizeof_fmt(speed, suffix="B/s")
+
+
+def format_size(size):
+    """ Format a number of bytes into a human readable format.
+
+    Args:
+        size (int): The number of bytes.
+
+    Returns:
+        str: The human readable format.
+    """
+    return sizeof_fmt(size, suffix="B")
 
 
 def get_version() -> str:

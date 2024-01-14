@@ -3,8 +3,12 @@ import threading
 import uuid
 
 from models.logger import LoggerService
+from models.utilities import data_dir
 
 logger = LoggerService(__name__)
+DEFAULT_DB_DIR = data_dir(appname="shusha")
+DEFAULT_DB_FILENAME = "shusha.db"
+DEFAULT_DB_PATH = DEFAULT_DB_DIR / DEFAULT_DB_FILENAME
 
 
 class Condition:
@@ -70,7 +74,7 @@ class ShushaDB:
 
     default_table_name = '_default'
 
-    def __init__(self, filename="shusha.db"):
+    def __init__(self, filename=DEFAULT_DB_FILENAME):
         self.filename = filename
         self._tables = {self.default_table_name: {}}
         self.current_table = self.default_table_name

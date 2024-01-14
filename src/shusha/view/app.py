@@ -1,13 +1,11 @@
-import datetime
 import threading
 import tkinter as tk
 from pathlib import Path
 
 import ttkbootstrap as ttk
 from controller.api import Api
-from models.client import Client
 from models.logger import LoggerService
-from models.utilities import sizeof_fmt
+from models.utilities import format_speed
 from ttkbootstrap.tableview import Tableview
 from ttkbootstrap.toast import ToastNotification
 from ttkbootstrap.tooltip import ToolTip
@@ -292,7 +290,7 @@ class Aria2Gui(ttk.Frame):
             label.grid(row=0, column=column_index, sticky="w", padx=5)
 
             if key in ['Download Speed', 'Upload Speed']:
-                value = sizeof_fmt(float(value), suffix="B/s")
+                value = format_speed(float(value))
 
             value_label = tk.Label(self.stats_frame, text=value)
             value_label.grid(row=1, column=column_index, sticky="e", padx=5)
@@ -340,10 +338,10 @@ class Aria2Gui(ttk.Frame):
         except Exception as e:
             self.log_error(f"Error starting download: {e}")
 
-    def start_download(self):
-        logger.log("Starting download...")
-        url = "https://proof.ovh.net/files/10Mb.dat"
-        threading.Thread(target=self.download_thread, args=(url, )).start()
+    # def start_download(self):
+    #     logger.log("Starting download...")
+    #     url = "https://proof.ovh.net/files/10Mb.dat"
+    #     threading.Thread(target=self.download_thread, args=(url, )).start()
 
     def pause_download(self):
         if self.download_gid:
