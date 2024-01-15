@@ -10,6 +10,8 @@ DB_FILE = "shusha.db"
 
 
 class StructsDB:
+    """ Database for storing download information. """
+
     TABLE_DOWNLOAD = "downloads_t"
     TABLE_FILES = "files_t"
     TABLE_BITTORRENT = "bittorrent_t"
@@ -61,6 +63,17 @@ class StructsDB:
                 raise e
 
     def _execute_query(self, cursor, query, value=None):
+        """
+        Execute a query.
+
+        Args:
+            cursor: Cursor object.
+            query: Query to execute.
+            value: Value to pass to the query.
+
+        Returns:
+            None
+        """
         try:
             if value:
                 cursor.execute(query, value)
@@ -70,6 +83,17 @@ class StructsDB:
             self.logger.log(f"Error executing query: {e}", level="error")
 
     def _execute_query_and_fetchall(self, cursor, query, params=None):
+        """
+        Execute a query and fetch all results.
+
+        Args:
+            cursor: Cursor object.
+            query: Query to execute.
+            params: Parameters to pass to the query.
+
+        Returns:
+            List of results.
+        """
         try:
             if params:
                 cursor.execute(query, params)
@@ -81,6 +105,17 @@ class StructsDB:
             return []
 
     def _execute_query_and_fetchone(self, cursor, query, params=None):
+        """
+        Execute a query and fetch one result.
+
+        Args:
+            cursor: Cursor object.
+            query: Query to execute.
+            params: Parameters to pass to the query.
+
+        Returns:
+            One result.
+        """
         try:
             if params:
                 cursor.execute(query, params)
@@ -92,6 +127,9 @@ class StructsDB:
             return None
 
     def create_tables(self):
+        """
+        Create tables if they do not exist.
+        """
         with self.connection:
             cursor = self.connection.cursor()
 
@@ -249,6 +287,9 @@ class StructsDB:
         self._execute_query(cursor, query, values)
 
     def update_table(self, table_name, set_values, where_column, where_value):
+        """
+        Update a table with given values.
+        """
         with self.database_transaction() as conn:
             cursor = conn.cursor()
 
@@ -286,9 +327,15 @@ class StructsDB:
         return result_dicts
 
     def to_dict(self, results, columns):
+        """
+        Convert a list of results into a list of dictionaries using given columns.
+        """
         return self._as_dicts_list(results, columns)
 
     def get_all_downloads(self):
+        """
+        Get all download status from the 'downloads' table.
+        """
         with self.connection:
             cursor = self.connection.cursor()
 
@@ -323,6 +370,10 @@ class StructsDB:
             return self._execute_query_and_fetchone(cursor, query, (gid, ))
 
     def get_files_info(self, gid):
+        """
+        Get files information linked to a download from the 'files_t' table
+        based on 'gid'.
+        """
         with self.connection:
             cursor = self.connection.cursor()
 
@@ -336,6 +387,9 @@ class StructsDB:
             return self._execute_query_and_fetchall(cursor, query, (gid, ))
 
     def get_bittorrent_info(self, gid):
+        """
+        Get BitTorrent information linked to a download from the 'bittorrent_t'
+        """
         with self.connection:
             cursor = self.connection.cursor()
 

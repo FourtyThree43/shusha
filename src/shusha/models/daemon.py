@@ -5,7 +5,6 @@ from pathlib import Path
 
 from models.logger import LoggerService
 
-
 DEFAULT_HOST = "localhost"
 DEFAULT_PORT = 6800
 DEFAULT_TIMEOUT = 60.0
@@ -16,6 +15,7 @@ logger = LoggerService(logger_name="ShushaServer")
 
 
 class Daemon:
+    """A wrapper class for the Aria2 server."""
 
     def __init__(
         self,
@@ -31,6 +31,11 @@ class Daemon:
         self.process = None
 
     def _build_command(self):
+        """ Build the command to start the Aria2 server.
+
+        Returns:
+            The command to start the Aria2 server.
+        """
         command = [
             str(self.aria2d),
             # "--enable-rpc",
@@ -44,6 +49,11 @@ class Daemon:
         return command
 
     def start_server(self):
+        """Start the Aria2 server.
+
+        Returns:
+            The process ID of the Aria2 server.
+        """
         if self.process and self.process.poll() is None:
             logger.log("Aria2 server is already running.", level="warning")
             return
@@ -73,6 +83,7 @@ class Daemon:
             logger.log(f"Unexpected error starting Aria2 server: {e}")
 
     def stop_server(self):
+        """ Stop the Aria2 server. """
         if not self.process or self.process.poll() is not None:
             logger.log("Aria2 server is not running.", level="warning")
             return
@@ -88,6 +99,7 @@ class Daemon:
             self.process = None
 
     def restart_server(self):
+        """ Restart the Aria2 server. """
         try:
             self.stop_server()
             time.sleep(3)
