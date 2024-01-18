@@ -34,7 +34,7 @@ def main(argv: list[str] | None = None):
 
     Returns:
         None
-  """
+    """
 
     def on_close():
         my_app_instance.cleanup()
