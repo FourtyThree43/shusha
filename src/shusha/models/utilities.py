@@ -1,5 +1,6 @@
 import sys
 import textwrap
+from datetime import timedelta
 from importlib import metadata
 from pathlib import Path
 
@@ -109,6 +110,64 @@ def format_size(size):
         str: The human readable format.
     """
     return sizeof_fmt(size, suffix="B")
+
+
+def timedelta_fmt(value: timedelta, precision: int = 0) -> str:
+    """
+    Format a timedelta into a human readable format.
+
+    Args:
+        value (timedelta): The timedelta.
+        precision (int, optional): The precision. Defaults to 0.
+
+            - `0` to display all units
+            - `1` to display the biggest unit only
+            - `2` to display the first two biggest units only
+            - `n` for the first N biggest units, etc.
+
+    Returns:
+        str: The human readable format.
+    """
+    pieces = []
+
+    def add_piece(unit: int, label: str):
+        """
+        Add a formatted piece to the pieces list.
+        """
+        if unit > 0:
+            piece_fmt = f"{unit}{label}" if unit > 1 else f"{unit}{label[:-1]}"
+            pieces.append(piece_fmt)
+
+    add_piece(value.days, " day ")
+
+    hours, seconds = divmod(value.seconds, 3600)
+    minutes, seconds = divmod(seconds, 60)
+
+    add_piece(hours, " Hour ")
+    add_piece(minutes, " Minute ")
+    add_piece(seconds, " Second ")
+
+    return "".join(pieces[:precision] if precision > 0 else pieces)
+
+
+def format_eta(eta: timedelta, precision: int = 0) -> str:
+    """ Format a number of seconds into a human readable format.
+
+    Args:
+        eta (int): The number of seconds.
+        precision (int, optional): The precision. Defaults to 0.
+
+            - `0` to display all units
+            - `1` to display the biggest unit only
+            - `2` to display the first two biggest units only
+            - `n` for the first N biggest units, etc.
+
+    Returns:
+        str: The human readable format.
+    """
+    if eta == timedelta.max:
+        return "-"
+    return timedelta_fmt(eta, precision=precision)
 
 
 def get_version() -> str:

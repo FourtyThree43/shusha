@@ -391,9 +391,15 @@ class ShushaDB:
     def begin_transaction(self, isolation_level='read_committed'):
         """
         Begins a transaction with the given isolation level.
-        Supported isolation levels:
-            - read_uncommitted
-            - read_committed
+
+        Args:
+            isolation_level (str, optional): The isolation level to use.
+
+            Defaults to 'read_committed'.
+
+                    - read_uncommitted
+                    - read_committed
+
         """
         if self.transaction_in_progress:
             raise TransactionError("Nested transactions are not supported.")
@@ -853,6 +859,42 @@ class ShushaDB:
         """
         return set(self._tables.keys())
 
+    def get_table(self, table_name: str):
+        """
+        Returns the table with the given name.
+
+        Args:
+            table_name (str): The name of the table.
+
+        Returns:
+            The table with the given name.
+        """
+        return self._tables.get(table_name, {})
+
+    def get_current_table(self):
+        """
+        Returns the current table.
+        """
+        return self._tables.get(self.current_table, {})
+
+    def get_table_size(self, table_name: str):
+        """
+        Returns the number of documents in the given table.
+
+        Args:
+            table_name (str): The name of the table.
+
+        Returns:
+            The number of documents in the given table.
+        """
+        return len(self._tables.get(table_name, {}))
+
+    def get_current_table_size(self):
+        """
+        Returns the number of documents in the current table.
+        """
+        return len(self._tables.get(self.current_table, {}))
+
     # Persistence (File I/O)
     def save(self):
         """
@@ -881,6 +923,31 @@ class ShushaDB:
             self.commit_transaction()
         except Exception as e:
             print(f"Error loading data: {e}")
+            self.rollback_transaction()
+
+    def reload(self):
+        """
+        Reloads the database from a file.
+        """
+        try:
+            self.begin_transaction()
+            self._tables = self._load_tables_from_disk()
+            self.commit_transaction()
+        except Exception as e:
+            print(f"Error reloading data: {e}")
+            self.rollback_transaction()
+
+    def remove_database(self):
+        """
+        Removes the database file from disk.
+        """
+        try:
+            self.begin_transaction()
+            with shelve.open(self.filename, writeback=True) as db:
+                db.clear()
+            self.commit_transaction()
+        except Exception as e:
+            print(f"Error dropping data: {e}")
             self.rollback_transaction()
 
 

@@ -1,6 +1,6 @@
 import unittest
 
-from shusha.models.ShushaDB import Query, ShushaDB
+from shusha.models.database import Query, ShushaDB
 
 
 class TestShushaDB(unittest.TestCase):

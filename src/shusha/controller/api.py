@@ -2,8 +2,8 @@ from pathlib import Path
 
 from models.client import Client, XMLRPCClientException
 from models.daemon import Daemon
+from models.database import ShushaDB
 from models.logger import LoggerService
-from models.ShushaDB import Query, ShushaDB
 from models.utilities import download_dir, format_size, format_speed
 
 logger = LoggerService(logger_name="ShushaAPI")
