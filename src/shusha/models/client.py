@@ -1,8 +1,8 @@
 import xmlrpc.client
 from pathlib import Path
 
-from models.daemon import Daemon
-from models.logger import LoggerService
+from shusha.models.daemon import Daemon
+from shusha.models.logger import LoggerService
 
 logger = LoggerService(logger_name="ShushaClient")
 

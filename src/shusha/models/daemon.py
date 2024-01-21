@@ -3,13 +3,14 @@ import subprocess
 import time
 from pathlib import Path
 
-from models.logger import LoggerService
+from shusha.models.logger import LoggerService
 
 DEFAULT_HOST = "localhost"
 DEFAULT_PORT = 6800
 DEFAULT_TIMEOUT = 60.0
-BIN_PATH = Path("resources/bin/aria2c.exe")
-CONF_PATH = Path("resources/aria2.conf")
+OUTPUT_PATH = Path(__file__).parent
+BIN_PATH = OUTPUT_PATH / Path("../resources/bin/aria2c.exe")
+CONF_PATH = OUTPUT_PATH / Path("../resources/aria2.conf")
 
 logger = LoggerService(logger_name="ShushaServer")
 
@@ -31,7 +32,7 @@ class Daemon:
         self.process = None
 
     def _build_command(self):
-        """ Build the command to start the Aria2 server.
+        """Build the command to start the Aria2 server.
 
         Returns:
             The command to start the Aria2 server.
@@ -83,7 +84,7 @@ class Daemon:
             logger.log(f"Unexpected error starting Aria2 server: {e}")
 
     def stop_server(self):
-        """ Stop the Aria2 server. """
+        """Stop the Aria2 server."""
         if not self.process or self.process.poll() is not None:
             logger.log("Aria2 server is not running.", level="warning")
             return
@@ -99,7 +100,7 @@ class Daemon:
             self.process = None
 
     def restart_server(self):
-        """ Restart the Aria2 server. """
+        """Restart the Aria2 server."""
         try:
             self.stop_server()
             time.sleep(3)

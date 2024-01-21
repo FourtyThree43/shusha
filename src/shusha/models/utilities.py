@@ -9,8 +9,13 @@ if sys.version_info < (3, 11):
 else:
     import tomllib
 
-from platformdirs import (user_cache_dir, user_config_dir, user_data_dir,
-                          user_downloads_dir, user_log_dir)
+from platformdirs import (
+    user_cache_dir,
+    user_config_dir,
+    user_data_dir,
+    user_downloads_dir,
+    user_log_dir,
+)
 
 
 def download_dir() -> Path:
@@ -71,7 +76,7 @@ def log_dir(appname: str) -> Path:
 
 
 def sizeof_fmt(num, delim=" ", suffix="B"):
-    """ Convert a number of bytes into a human readable format.
+    """Convert a number of bytes into a human readable format.
 
     Args:
         num (int): The number of bytes.
@@ -89,7 +94,7 @@ def sizeof_fmt(num, delim=" ", suffix="B"):
 
 
 def format_speed(speed):
-    """ Format a number of bytes into a human readable format.
+    """Format a number of bytes into a human readable format.
 
     Args:
         speed (int): The number of bytes.
@@ -101,7 +106,7 @@ def format_speed(speed):
 
 
 def format_size(size):
-    """ Format a number of bytes into a human readable format.
+    """Format a number of bytes into a human readable format.
 
     Args:
         size (int): The number of bytes.
@@ -151,7 +156,7 @@ def timedelta_fmt(value: timedelta, precision: int = 0) -> str:
 
 
 def format_eta(eta: timedelta, precision: int = 0) -> str:
-    """ Format a number of seconds into a human readable format.
+    """Format a number of seconds into a human readable format.
 
     Args:
         eta (int): The number of seconds.

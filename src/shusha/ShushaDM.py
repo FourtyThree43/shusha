@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+from pathlib import Path
 import time
 
 import ttkbootstrap as ttk
@@ -9,6 +10,8 @@ from models.logger import LoggerService
 from view.app import Aria2Gui
 
 logger = LoggerService(__name__)
+OUTPUT_PATH = Path(__file__).parent
+ICON_PATH = OUTPUT_PATH / Path("shusha.ico")
 
 
 def cleanup(api):
@@ -34,7 +37,7 @@ def main(argv: list[str] | None = None):
 
     Returns:
         None
-  """
+    """
 
     def on_close():
         my_app_instance.cleanup()
@@ -42,13 +45,15 @@ def main(argv: list[str] | None = None):
         # Destroy the ttk.Window instance
         app.destroy()
 
-    app = ttk.Window(title="Shusha",
-                     themename="darkly",
-                     size=(1270, 550),
-                     resizable=(False, False),
-                     position=(10, 140))
+    app = ttk.Window(
+        title="Shusha",
+        themename="darkly",
+        size=(1270, 550),
+        resizable=(False, False),
+        position=(10, 140),
+    )
 
-    app.iconbitmap("shusha.ico")
+    app.iconbitmap(str(ICON_PATH))
     my_app_instance = Aria2Gui(app)
     app.wm_protocol("WM_DELETE_WINDOW", on_close)
     app.mainloop()

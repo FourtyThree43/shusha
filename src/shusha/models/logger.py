@@ -2,7 +2,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
-from models.utilities import log_dir
+from shusha.models.utilities import log_dir
 
 
 class LoggerService:

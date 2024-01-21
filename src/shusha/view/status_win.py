@@ -2,9 +2,10 @@ import threading
 import time
 
 import ttkbootstrap as ttk
-from models.utilities import format_size, format_speed
 from PIL import Image
 from ttkbootstrap.constants import NO, YES
+
+from shusha.models.utilities import format_size, format_speed
 
 Image.CUBIC = Image.BICUBIC  # ttkbootstrap uses an attribute Image.CUBIC which
 # was replaced by Image.BICUBIC in Pillow v10.0.0

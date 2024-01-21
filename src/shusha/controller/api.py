@@ -1,17 +1,16 @@
 from pathlib import Path
 
-from models.client import Client, XMLRPCClientException
-from models.daemon import Daemon
-from models.database import ShushaDB
-from models.logger import LoggerService
-from models.utilities import download_dir, format_size, format_speed
+from shusha.models.client import Client, XMLRPCClientException
+from shusha.models.daemon import Daemon
+from shusha.models.database import ShushaDB
+from shusha.models.logger import LoggerService
+from shusha.models.utilities import download_dir, format_size, format_speed
 
 logger = LoggerService(logger_name="ShushaAPI")
 DEFAULT_DIR = download_dir()
 
 
 class Api:
-
     def __init__(self, daemon=None):
         self.remote = daemon or Daemon()
         self.client = Client(self.remote)
@@ -42,9 +41,9 @@ class Api:
 
         if _all_downloads:
             _downloads.append(_all_downloads)
-            table = self.db.table('downloads')
+            table = self.db.table("downloads")
             try:
-                logger.log(f"Saving session downloads to db:")
+                logger.log("Saving session downloads to db:")
                 self.db.begin_transaction()
                 table.insert_multiple(_downloads)
                 self.db.commit_transaction()
@@ -56,23 +55,23 @@ class Api:
         new_doc = self.get_download(gid)
         if new_doc:
             self._gids.add(gid)
-            table = self.db.table('downloads')
+            table = self.db.table("downloads")
             # print(new_doc)
             try:
-                logger.log(f"Live Inserting new doc")
+                logger.log("Live Inserting new doc")
                 table.insert(new_doc)
                 self.db.save()
             except Exception as e:
                 logger.log(f"Error inserting new doc: {e}", level="error")
 
     def updatedb(self):
-        """ Update the db with new download status """
+        """Update the db with new download status"""
         for gid in self._gids:
             new_doc = self.get_download(gid)
             if new_doc:
-                table = self.db.table('downloads')
+                table = self.db.table("downloads")
                 try:
-                    logger.log(f"Updating new doc")
+                    logger.log("Updating new doc")
                     table.update(new_data=new_doc, query=gid)
                     self.db.save()
                 except Exception as e:
@@ -137,8 +136,9 @@ class Api:
             self.client.remove(gid)
             logger.log(f"Download with GID {gid} removed successfully.")
         except XMLRPCClientException as e:
-            logger.log(f"Error removing download with GID {gid}: {e}",
-                       level="error")
+            logger.log(
+                f"Error removing download with GID {gid}: {e}", level="error"
+            )
 
     def remove_f(self, gid):
         """Remove a download given its GID and delete the downloaded file."""
@@ -146,8 +146,9 @@ class Api:
             self.client.force_remove(gid)
             logger.log(f"Download with GID {gid} stopped successfully.")
         except XMLRPCClientException as e:
-            logger.log(f"Error stopping download with GID {gid}: {e}",
-                       level="error")
+            logger.log(
+                f"Error stopping download with GID {gid}: {e}", level="error"
+            )
 
     def pause(self, gid):
         """Pause a download given its GID."""
@@ -158,17 +159,19 @@ class Api:
             else:
                 logger.log(f"No GID:{gid} provided.", level="warning")
         except XMLRPCClientException as e:
-            logger.log(f"Error pausing download with GID {gid}: {e}",
-                       level="error")
+            logger.log(
+                f"Error pausing download with GID {gid}: {e}", level="error"
+            )
 
     def pause_all(self):
         """Pause all active downloads."""
         try:
             self.client.pause_all()
-            logger.log(f"All active downloads paused successfully.")
+            logger.log("All active downloads paused successfully.")
         except XMLRPCClientException as e:
-            logger.log(f"Error pausing all active downloads: {e}",
-                       level="error")
+            logger.log(
+                f"Error pausing all active downloads: {e}", level="error"
+            )
 
     def un_pause(self, gid):
         """Un-pause a download given its GID."""
@@ -176,17 +179,19 @@ class Api:
             self.client.unpause(gid)
             logger.log(f"Download with GID {gid} un-paused successfully.")
         except XMLRPCClientException as e:
-            logger.log(f"Error un-pausing download with GID {gid}: {e}",
-                       level="error")
+            logger.log(
+                f"Error un-pausing download with GID {gid}: {e}", level="error"
+            )
 
     def un_pause_all(self):
         """Un-pause all active downloads."""
         try:
             self.client.unpause_all()
-            logger.log(f"All active downloads un-paused successfully.")
+            logger.log("All active downloads un-paused successfully.")
         except XMLRPCClientException as e:
-            logger.log(f"Error un-pausing all active downloads: {e}",
-                       level="error")
+            logger.log(
+                f"Error un-pausing all active downloads: {e}", level="error"
+            )
 
     def get_download(self, gid, keys=None):
         """Get detailed information about a specific download."""
@@ -210,8 +215,9 @@ class Api:
         try:
             return self.client.change_position(gid, pos, how)
         except XMLRPCClientException as e:
-            logger.log(f"Error moving download with GID {gid}: {e}",
-                       level="error")
+            logger.log(
+                f"Error moving download with GID {gid}: {e}", level="error"
+            )
 
     def move_to_top(self, gid):
         """Move a download to the top of the download queue."""
@@ -225,8 +231,9 @@ class Api:
         try:
             return self.move(gid, -1, "POS_SET")
         except XMLRPCClientException as e:
-            logger.log(f"Error moving download to the bottom: {e}",
-                       level="error")
+            logger.log(
+                f"Error moving download to the bottom: {e}", level="error"
+            )
 
     def move_up(self, gid):
         """Move a download up in the download queue."""
@@ -247,8 +254,9 @@ class Api:
         try:
             return self.move(gid, pos, "POS_SET")
         except XMLRPCClientException as e:
-            logger.log(f"Error moving download to position {pos}: {e}",
-                       level="error")
+            logger.log(
+                f"Error moving download to position {pos}: {e}", level="error"
+            )
 
     def get_active(self, keys=None):
         """Get information about active downloads."""
@@ -307,16 +315,16 @@ class Api:
         try:
             return self.client.get_version()
         except XMLRPCClientException as e:
-            logger.log(f"Error getting Aria2 version information: {e}",
-                       level="error")
+            logger.log(
+                f"Error getting Aria2 version information: {e}", level="error"
+            )
 
     def get_session_info(self):
         """Get session information."""
         try:
             return self.client.get_session_info()
         except XMLRPCClientException as e:
-            logger.log(f"Error getting session information: {e}",
-                       level="error")
+            logger.log(f"Error getting session information: {e}", level="error")
 
     def save_session(self):
         """Save the current session."""
@@ -341,8 +349,9 @@ class Api:
             self.client.shutdown()
             logger.log("Aria2 server shutdown initiated.")
         except XMLRPCClientException as e:
-            logger.log(f"Error initiating Aria2 server shutdown: {e}",
-                       level="error")
+            logger.log(
+                f"Error initiating Aria2 server shutdown: {e}", level="error"
+            )
 
     def force_shutdown_aria2(self):
         """Forcefully shutdown the Aria2 server."""
@@ -408,7 +417,7 @@ if __name__ == "__main__":
         # Stop the download
         logger.log("Stopping the download...")
         try:
-            api.stop_download(download_gid)
+            api.pause(download_gid)
         except Exception as e:
             logger.log(f"Error stopping the download: {e}", level="error")
 

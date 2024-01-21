@@ -4,13 +4,14 @@ from pathlib import Path
 
 import ttkbootstrap as ttk
 from controller.api import Api
-from models.logger import LoggerService
-from models.utilities import format_speed
 from ttkbootstrap.tableview import Tableview
 from ttkbootstrap.toast import ToastNotification
 from ttkbootstrap.tooltip import ToolTip
 from view.add_win import AddWindow
 from view.status_win import DownloadWindow
+
+from shusha.models.logger import LoggerService
+from shusha.models.utilities import format_speed
 
 logger = LoggerService(logger_name="ShushaAPP")
 OUTPUT_PATH = Path(__file__).parent

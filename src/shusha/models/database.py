@@ -5,8 +5,8 @@ import threading
 import uuid
 from typing import Any, Dict, List, Optional, Union
 
-from models.logger import LoggerService
-from models.utilities import data_dir
+from shusha.models.logger import LoggerService
+from shusha.models.utilities import data_dir
 
 logger = LoggerService(__name__)
 DEFAULT_DB_DIR = data_dir(appname="shusha")
@@ -15,7 +15,7 @@ DEFAULT_DB_PATH = DEFAULT_DB_DIR / DEFAULT_DB_FILENAME
 
 
 class Condition:
-    """ A class for building query conditions to filter data in a query. """
+    """A class for building query conditions to filter data in a query."""
 
     def __init__(self, field_name: str, operator: Optional[str], value: Any):
         """
@@ -41,7 +41,7 @@ class Condition:
             A new Condition instance.
         """
         if isinstance(other, Condition):
-            return Condition('', 'OR', (self, other))
+            return Condition("", "OR", (self, other))
         else:
             raise TypeError(
                 f"Unsupported operand type(s) for |: {type(self)} and {type(other)}"
@@ -58,7 +58,7 @@ class Condition:
             A new Condition instance.
         """
         if isinstance(other, Condition):
-            return Condition('', 'AND', (self, other))
+            return Condition("", "AND", (self, other))
         else:
             raise TypeError(
                 f"Unsupported operand type(s) for &: {type(self)} and {type(other)}"
@@ -71,11 +71,11 @@ class Condition:
         Returns:
             A new Condition instance.
         """
-        return Condition('', 'NOT', self)
+        return Condition("", "NOT", self)
 
 
 class Field:
-    """ A class for building query fields. """
+    """A class for building query fields."""
 
     def __init__(self, field_name: str):
         """
@@ -96,7 +96,7 @@ class Field:
         Returns:
             A new Condition instance.
         """
-        return Condition(self.field_name, '==', value)
+        return Condition(self.field_name, "==", value)
 
     def __ne__(self, value: Any):
         """
@@ -108,7 +108,7 @@ class Field:
         Returns:
             A new Condition instance.
         """
-        return Condition(self.field_name, '!=', value)
+        return Condition(self.field_name, "!=", value)
 
     def __gt__(self, value: Any):
         """
@@ -120,7 +120,7 @@ class Field:
         Returns:
             A new Condition instance.
         """
-        return Condition(self.field_name, '>', value)
+        return Condition(self.field_name, ">", value)
 
     def __ge__(self, value: Any):
         """
@@ -132,7 +132,7 @@ class Field:
         Returns:
             A new Condition instance.
         """
-        return Condition(self.field_name, '>=', value)
+        return Condition(self.field_name, ">=", value)
 
     def __lt__(self, value: Any):
         """
@@ -144,7 +144,7 @@ class Field:
         Returns:
             A new Condition instance.
         """
-        return Condition(self.field_name, '<', value)
+        return Condition(self.field_name, "<", value)
 
     def __le__(self, value: Any):
         """
@@ -156,7 +156,7 @@ class Field:
         Returns:
             A new Condition instance.
         """
-        return Condition(self.field_name, '<=', value)
+        return Condition(self.field_name, "<=", value)
 
     def __and__(self, other: Condition):
         """
@@ -170,10 +170,10 @@ class Field:
         """
         if isinstance(other, Field):
             # Combine two fields using logical AND (intersection)
-            return Field(f'{self.field_name} AND {other.field_name}')
+            return Field(f"{self.field_name} AND {other.field_name}")
         elif isinstance(other, Condition):
             # Combine field and condition using logical AND
-            return Condition('', 'AND', (self, other))
+            return Condition("", "AND", (self, other))
         else:
             raise TypeError(
                 f"Unsupported operand type(s) for &: {type(self)} and {type(other)}"
@@ -191,10 +191,10 @@ class Field:
         """
         if isinstance(other, Field):
             # Combine two fields using logical OR (union)
-            return Field(f'{self.field_name} OR {other.field_name}')
+            return Field(f"{self.field_name} OR {other.field_name}")
         elif isinstance(other, Condition):
             # Combine field and condition using logical OR
-            return Condition('', 'OR', (self, other))
+            return Condition("", "OR", (self, other))
         else:
             raise TypeError(
                 f"Unsupported operand type(s) for |: {type(self)} and {type(other)}"
@@ -210,7 +210,7 @@ class Field:
         Returns:
             A new Condition instance.
         """
-        return Condition(f'{self.field_name}[{key}]', None, None)
+        return Condition(f"{self.field_name}[{key}]", None, None)
 
     def fragment(self, value: Dict[str, Any]) -> Condition:
         """
@@ -222,11 +222,11 @@ class Field:
         Returns:
             A new Condition instance.
         """
-        return Condition(f'{self.field_name}', 'fragment', value)
+        return Condition(f"{self.field_name}", "fragment", value)
 
 
 class Query:
-    """ A class for building queries. """
+    """A class for building queries."""
 
     def __getattr__(self, field_name: str) -> Field:
         """
@@ -262,7 +262,7 @@ class Query:
         Returns:
             A new Condition instance.
         """
-        return Condition('', 'fragment', value)
+        return Condition("", "fragment", value)
 
     def __or__(self, other: Condition):
         """
@@ -275,7 +275,7 @@ class Query:
             A new Condition instance.
         """
         if isinstance(other, Condition):
-            return Condition('', 'OR', (self, other))
+            return Condition("", "OR", (self, other))
         else:
             raise TypeError(
                 f"Unsupported operand type(s) for |: {type(self)} and {type(other)}"
@@ -292,7 +292,7 @@ class Query:
             A new Condition instance.
         """
         if isinstance(other, Condition):
-            return Condition('', 'AND', (self, other))
+            return Condition("", "AND", (self, other))
         else:
             raise TypeError(
                 f"Unsupported operand type(s) for &: {type(self)} and {type(other)}"
@@ -307,10 +307,9 @@ def where(field_name: str) -> Field:
 
 
 class ShushaDB:
-    """ A simple, lightweight, persistent, document-oriented database.
-    """
+    """A simple, lightweight, persistent, document-oriented database."""
 
-    default_table_name = '_default'
+    default_table_name = "_default"
 
     def __init__(self, filename: str):
         """
@@ -326,9 +325,7 @@ class ShushaDB:
             tables_lock (threading.Lock): A lock for table operations.
         """
         self.filename = filename
-        self._tables = {
-            self.default_table_name: {}
-        }  # type: ignore[var-annotated]
+        self._tables = {self.default_table_name: {}}  # type: ignore[var-annotated]
         self.current_table = self.default_table_name
         self.transaction_in_progress = False
         self.transaction_buffer = []  # type: ignore[var-annotated]
@@ -355,16 +352,15 @@ class ShushaDB:
     # Magic Methods
     # Container Methods
     def __contains__(self, doc_id: str):
-        """ Return True if the database contains a document with the given ID.
-        """
+        """Return True if the database contains a document with the given ID."""
         return self.contains(doc_id)
 
     def __iter__(self):
-        """ Return an iterator over the documents in the database. """
+        """Return an iterator over the documents in the database."""
         return iter(self._tables[self.current_table].values())
 
     def __len__(self):
-        """ Return the number of documents in the database. """
+        """Return the number of documents in the database."""
         try:
             return len(self._tables[self.current_table])
         except Exception as e:
@@ -372,15 +368,15 @@ class ShushaDB:
             return 0
 
     def __repr__(self):
-        """ Return a string representation of the database. """
+        """Return a string representation of the database."""
         return f"MySmallDB({self.filename!r})"
 
     def __str__(self):
-        """ Return a string representation of the database. """
+        """Return a string representation of the database."""
         return f"MySmallDB({self.filename!r})"
 
     def __del__(self):
-        """ Close the database when the instance is deleted. """
+        """Close the database when the instance is deleted."""
         try:
             if not self.transaction_in_progress:
                 self.save()
@@ -388,7 +384,7 @@ class ShushaDB:
             print(f"Error saving data: {e}")
 
     # Transaction Management
-    def begin_transaction(self, isolation_level='read_committed'):
+    def begin_transaction(self, isolation_level="read_committed"):
         """
         Begins a transaction with the given isolation level.
 
@@ -407,10 +403,10 @@ class ShushaDB:
         self.transaction_in_progress = True
         self.transaction_buffer = []
 
-        if isolation_level == 'read_uncommitted':
+        if isolation_level == "read_uncommitted":
             # No additional actions needed for read_uncommitted
             pass
-        elif isolation_level == 'read_committed':
+        elif isolation_level == "read_committed":
             # Acquire a lock for read_committed isolation level
             self.lock.acquire()
         else:
@@ -423,11 +419,11 @@ class ShushaDB:
         if self.transaction_in_progress:
             try:
                 for operation, *args in self.transaction_buffer:
-                    if operation == 'insert':
+                    if operation == "insert":
                         self._commit_insert(*args)
-                    elif operation == 'update':
+                    elif operation == "update":
                         self._commit_update(*args)
-                    elif operation == 'remove':
+                    elif operation == "remove":
                         self._commit_remove(*args)
                 self._commit_save()
             except Exception as e:
@@ -458,7 +454,7 @@ class ShushaDB:
             self.transaction_buffer = []
 
     # Commit Methods
-    def _commit_insert(self, document: Dict, key='gid') -> str:
+    def _commit_insert(self, document: Dict, key="gid") -> str:
         """
         Commit the insert operation within a transaction.
 
@@ -504,8 +500,8 @@ class ShushaDB:
         """
         try:
             doc_ids_to_remove = [
-                doc_id for doc_id, document in self._tables[
-                    self.current_table].items()
+                doc_id
+                for doc_id, document in self._tables[self.current_table].items()
                 if self._evaluate_condition(document, query)
             ]
             for doc_id in doc_ids_to_remove:
@@ -521,7 +517,7 @@ class ShushaDB:
         """
         try:
             with shelve.open(self.filename, writeback=True) as db:
-                db['tables'] = self._tables
+                db["tables"] = self._tables
         except Exception as e:
             raise RuntimeError(f"Error committing save: {e}")
         finally:
@@ -535,7 +531,7 @@ class ShushaDB:
         """
         try:
             with shelve.open(self.filename, writeback=True) as db:
-                return db.get('tables', {})
+                return db.get("tables", {})
         except Exception as e:
             raise RuntimeError(f"Error loading tables from disk: {e}")
 
@@ -547,7 +543,7 @@ class ShushaDB:
         """
         return str(uuid.uuid4())
 
-    def get_doc_gid(self, document: Dict[str, Any], key='gid') -> str:
+    def get_doc_gid(self, document: Dict[str, Any], key="gid") -> str:
         """
         Get the document ID from the document or generate a new one.
 
@@ -564,7 +560,7 @@ class ShushaDB:
         else:
             return gid_value or self.generate_doc_id()
 
-    def insert(self, document: Dict[str, Any], key='gid') -> Optional[str]:
+    def insert(self, document: Dict[str, Any], key="gid") -> Optional[str]:
         """
         Insert a document into the current table.
 
@@ -585,8 +581,9 @@ class ShushaDB:
             print(f"Error inserting data: {e}")
             return None
 
-    def insert_multiple(self, documents: List[Dict[str,
-                                                   Any]]) -> Optional[List]:
+    def insert_multiple(
+        self, documents: List[Dict[str, Any]]
+    ) -> Optional[List]:
         """
         Insert multiple documents into the current table.
 
@@ -629,8 +626,8 @@ class ShushaDB:
     def remove(self, query: Condition) -> None:
         try:
             doc_ids_to_remove = [
-                doc_id for doc_id, document in self._tables[
-                    self.current_table].items()
+                doc_id
+                for doc_id, document in self._tables[self.current_table].items()
                 if self._evaluate_condition(document, query)
             ]
             for doc_id in doc_ids_to_remove:
@@ -674,7 +671,8 @@ class ShushaDB:
         """
         try:
             results = [
-                doc for doc in self._tables[self.current_table].values()
+                doc
+                for doc in self._tables[self.current_table].values()
                 if self._evaluate_condition(doc, condition)
             ]
             return results
@@ -700,8 +698,9 @@ class ShushaDB:
             print(f"Error during search: {e}")
             return []
 
-    def _evaluate_condition(self, document: Dict[str, Any],
-                            condition: Condition) -> bool:
+    def _evaluate_condition(
+        self, document: Dict[str, Any], condition: Condition
+    ) -> bool:
         """
         Evaluates a condition for a given document.
 
@@ -712,33 +711,36 @@ class ShushaDB:
         if not isinstance(condition, Condition):
             return False
 
-        if condition.operator == 'fragment':
+        if condition.operator == "fragment":
             return self._evaluate_fragment_condition(document, condition.value)
-        elif condition.operator == 'AND':
+        elif condition.operator == "AND":
             # Logical AND operation
             return all(
                 self._evaluate_condition(document, sub_condition)
-                for sub_condition in condition.value)
-        elif condition.operator == 'OR':
+                for sub_condition in condition.value
+            )
+        elif condition.operator == "OR":
             # Logical OR operation
             return any(
                 self._evaluate_condition(document, sub_condition)
-                for sub_condition in condition.value)
+                for sub_condition in condition.value
+            )
         else:
-            field_value = self._get_nested_field_value(document,
-                                                       condition.field)
+            field_value = self._get_nested_field_value(
+                document, condition.field
+            )
 
-            if condition.operator == '==':
+            if condition.operator == "==":
                 return field_value == condition.value
-            elif condition.operator == '!=':
+            elif condition.operator == "!=":
                 return field_value != condition.value
-            elif condition.operator == '>':
+            elif condition.operator == ">":
                 return field_value > condition.value
-            elif condition.operator == '>=':
+            elif condition.operator == ">=":
                 return field_value >= condition.value
-            elif condition.operator == '<':
+            elif condition.operator == "<":
                 return field_value < condition.value
-            elif condition.operator == '<=':
+            elif condition.operator == "<=":
                 return field_value <= condition.value
             elif condition.operator is None:
                 return bool(field_value)
@@ -746,8 +748,9 @@ class ShushaDB:
                 print(f"Unsupported operator: {condition.operator}")
                 return False
 
-    def _evaluate_fragment_condition(self, document: Dict[str, Any],
-                                     fragment: Dict[str, Any]) -> bool:
+    def _evaluate_fragment_condition(
+        self, document: Dict[str, Any], fragment: Dict[str, Any]
+    ) -> bool:
         """
         Evaluates a fragment condition for a given document.
 
@@ -772,8 +775,9 @@ class ShushaDB:
             print(f"Error evaluating fragment condition: {e}")
             return False
 
-    def _get_nested_field_value(self, document: Dict[str, Any],
-                                field_path: str) -> Any:
+    def _get_nested_field_value(
+        self, document: Dict[str, Any], field_path: str
+    ) -> Any:
         """
         Returns the value of a nested field.
 
@@ -792,17 +796,20 @@ class ShushaDB:
             if not fields:
                 return doc
             field = fields[0]
-            if '[' in field:
-                field, key = field.split('[')
-                key = key.rstrip(']')
+            if "[" in field:
+                field, key = field.split("[")
+                key = key.rstrip("]")
                 nested_value = doc.get(field, {}).get(key)
             else:
                 nested_value = doc.get(field)
-            return get_nested_value(nested_value,
-                                    fields[1:]) if nested_value else None
+            return (
+                get_nested_value(nested_value, fields[1:])
+                if nested_value
+                else None
+            )
 
         try:
-            fields = field_path.split('.')
+            fields = field_path.split(".")
             return get_nested_value(document, fields)
         except Exception as e:
             print(f"Error getting nested field value: {e}")
@@ -919,7 +926,7 @@ class ShushaDB:
         try:
             self.begin_transaction()
             with shelve.open(self.filename, writeback=True) as db:
-                self._tables = db.get('tables', {})
+                self._tables = db.get("tables", {})
             self.commit_transaction()
         except Exception as e:
             print(f"Error loading data: {e}")
@@ -954,6 +961,7 @@ class ShushaDB:
 # Errors
 class MySmallDBError(Exception):
     """Base class for exceptions in MySmallDB."""
+
     pass
 
 
@@ -975,34 +983,41 @@ class TransactionError(MySmallDBError):
 
 class TableManagementError(MySmallDBError):
     """Base class for table management errors."""
+
     pass
 
 
 class TableNotFoundError(TableManagementError):
     """Exception raised when attempting operations on a non-existent table."""
+
     pass
 
 
 class PersistenceError(MySmallDBError):
     """Base class for file I/O errors."""
+
     pass
 
 
 class SaveError(PersistenceError):
     """Exception raised for errors during data save."""
+
     pass
 
 
 class LoadError(PersistenceError):
     """Exception raised for errors during data load."""
+
     pass
 
 
 class DropTableError(TableManagementError):
     """Exception raised for errors during table dropping."""
+
     pass
 
 
 class DropAllTablesError(TableManagementError):
     """Exception raised for errors during dropping all tables."""
+
     pass
