@@ -6,7 +6,7 @@ from shusha.models.database import ShushaDB
 from shusha.models.logger import LoggerService
 from shusha.models.utilities import download_dir, format_size, format_speed
 
-logger = LoggerService(logger_name="ShushaAPI")
+logger = LoggerService(__name__)
 DEFAULT_DIR = download_dir()
 
 

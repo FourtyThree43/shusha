@@ -1,10 +1,18 @@
+"""
+This module contains the Client class.
+
+The Client class is used to interact with the aria2 daemon using XML-RPC.
+The Client class is a wrapper around the xmlrpc.client.ServerProxy class.
+"""
+
 import xmlrpc.client
 from pathlib import Path
+from typing import Any
 
 from shusha.models.daemon import Daemon
 from shusha.models.logger import LoggerService
 
-logger = LoggerService(logger_name="ShushaClient")
+logger = LoggerService(__name__)
 
 
 class XMLRPCClientException(Exception):
@@ -22,35 +30,82 @@ class XMLRPCClientException(Exception):
         self.errMsg = faultString
 
     def __str__(self):
+        """
+        Return a string representation of the XML-RPC Error, including the error code and message.
+        """
         return f"XML-RPC Error - Code: {self.errCode}, Message: {self.errMsg}"
 
     def __bool__(self):
+        """
+        Return the boolean value of the object.
+        """
         return False
 
 
 class Client:
+    """
+    A wrapper class for the XML-RPC client used to interact with the aria2 daemon
+    """
 
     def __init__(self, daemon: Daemon):
+        """
+        Initialize the class with a Daemon instance.
+
+        Args:
+            daemon (Daemon): The Daemon instance to be used.
+
+        Returns:
+            None
+        """
         # self.logger = logger(logger_name="ShushaClient")
         self.remote = daemon
         self.secret = None
         self.server_uri = f"http://{self.remote.host}:{self.remote.port}/rpc"
-        self.server = xmlrpc.client.ServerProxy(self.server_uri,
-                                                allow_none=True)
+        self.server = xmlrpc.client.ServerProxy(
+            self.server_uri, allow_none=True
+        )
 
     def __str__(self):
+        """
+        Return a string representation of the server URI.
+        """
         return f"{self.server_uri}"
 
     def __repr__(self):
+        """
+        Return a string representation of the Client object with the remote host and port.
+        """
         return f"Client(host='{self.remote.host}', port='{self.remote.port}')"
 
-    def _build_request_params(self, params=None):
+    def _build_request_params(self, params: list | None = None):
+        """
+        Build the request parameters for the XML-RPC server.
+
+        Args:
+            params: A list of parameters to be added to the request parameters.
+
+        Returns:
+            A list of parameters to be sent to the XML-RPC server.
+        """
         request_params = [self.secret] if self.secret else []
         if params:
             request_params.extend(params)
         return request_params
 
-    def _call_method(self, method, params=None):
+    def _call_method(self, method: str, params: list[Any] | None = None):
+        """
+        Call a method on the XML-RPC server.
+
+        Args:
+            method: The method to be called.
+            params: A list of parameters to be passed to the method.
+
+        Returns:
+            The result of the method call.
+
+        Raises:
+            XMLRPCClientException: If an XML-RPC error occurs.
+        """
         request_params = self._build_request_params(params)
         try:
             return getattr(self.server.aria2, method)(*request_params)
@@ -61,18 +116,48 @@ class Client:
             logger.log(f"Unexpected error: {e}", level="error")
             return None
 
-    def _handle_xmlrpc_error(self, xmlrpc_fault):
+    def _handle_xmlrpc_error(self, xmlrpc_fault: xmlrpc.client.Fault):
+        """
+        Handle XML-RPC errors.
+
+        Args:
+            xmlrpc_fault: An instance of the xmlrpc.client.Fault class.
+        """
         faultCode = xmlrpc_fault.faultCode
         faultString = xmlrpc_fault.faultString
-        logger.log(XMLRPCClientException(faultCode, faultString),
-                   level="error")
+        logger.log(XMLRPCClientException(faultCode, faultString), level="error")
 
-    def add_uri(self, uris, options=None, position=None):
+    def add_uri(
+        self,
+        uris: list[str],
+        options: dict[str, Any] | None = None,
+        position: int | None = None,
+    ) -> str | None:
+        """
+        Adds new HTTP(S)/FTP/SFTP/BitTorrent Magnet URI.
+
+        If you want to add BitTorrent Magnet URI, you must set "bt-enable-lpd"
+        option true. If you want to add BitTorrent Magnet URI as well as
+        BitTorrent metadata, you must also set "bt-enable-peer-exchange" option
+        true. BitTorrent Magnet URI does not contain the number of files and the
+        total file size. Therefore, if you add BitTorrent Magnet URI without
+        metadata, aria2 cannot perform any download progress sanity check. If you
+        need such features, please consider to use "add_torrent()" instead.
+
+        Args:
+            uris: List of URIs.
+            options: Additional options to be passed to the aria2c process.
+            position: The position in the queue where the download should be added.
+
+        Returns:
+            str: The GID of the newly added download.
+        """
         return self._call_method("addUri", [uris, options, position])
 
     def add_torrent(self, torrent, uris=None, options=None, position=None):
-        return self._call_method("addTorrent",
-                                 [torrent, uris, options, position])
+        return self._call_method(
+            "addTorrent", [torrent, uris, options, position]
+        )
 
     def add_metalink(self, metalink, options=None, position=None):
         return self._call_method("addMetalink", [metalink, options, position])
@@ -101,7 +186,7 @@ class Client:
     def unpause_all(self):
         return self._call_method("unpauseAll")
 
-    def tell_status(self, gid, keys=None):
+    def tell_status(self, gid: str, keys: list[str] | None = None):
         return self._call_method("tellStatus", [gid, keys])
 
     def get_uris(self, gid):
@@ -130,7 +215,8 @@ class Client:
 
     def change_uri(self, gid, file_index, del_uris, add_uris, position=None):
         return self._call_method(
-            "changeUri", [gid, file_index, del_uris, add_uris, position])
+            "changeUri", [gid, file_index, del_uris, add_uris, position]
+        )
 
     def get_option(self, gid):
         return self._call_method("getOption", [gid])

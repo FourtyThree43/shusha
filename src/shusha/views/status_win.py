@@ -12,7 +12,6 @@ Image.CUBIC = Image.BICUBIC  # ttkbootstrap uses an attribute Image.CUBIC which
 
 
 class DownloadMeter(ttk.Meter):
-
     def __init__(self, master, **kwargs):
         super().__init__(master=master, **kwargs)
         self.paused = ttk.BooleanVar(self, NO)
@@ -37,66 +36,70 @@ class DownloadMeter(ttk.Meter):
 
 
 class DownloadWindow(ttk.Toplevel):
-
     def __init__(self, api, **kwargs):
-        super().__init__(title="File Download",
-                         size=(720, 400),
-                         position=(50, 50),
-                         resizable=(NO, NO),
-                         **kwargs)
+        super().__init__(
+            title="File Download",
+            size=(720, 400),
+            position=(50, 50),
+            resizable=(NO, NO),
+            **kwargs,
+        )
         self.config(padx=15, pady=15)
         self.api = api
         self.download_gid = self.api.gid
 
         status_lf = ttk.Labelframe(self, text="File Download Status")
-        status_lf.pack(fill=ttk.BOTH,
-                       expand=NO,
-                       padx=5,
-                       ipady=30,
-                       anchor=ttk.N)
+        status_lf.pack(fill=ttk.BOTH, expand=NO, padx=5, ipady=30, anchor=ttk.N)
 
         self.stats_f = ttk.Frame(status_lf)
         self.stats_f.pack(side="left", expand=NO)
 
         meter_f = ttk.Frame(status_lf)
         meter_f.pack(side=ttk.RIGHT, fill=ttk.X, expand=YES)
-        self.meter = DownloadMeter(meter_f,
-                                   metersize=210,
-                                   padding=5,
-                                   amounttotal=100,
-                                   metertype="semi",
-                                   textright="%",
-                                   subtext="downloaded",
-                                   interactive=False,
-                                   stripethickness=5)
+        self.meter = DownloadMeter(
+            meter_f,
+            metersize=210,
+            padding=5,
+            amounttotal=100,
+            metertype="semi",
+            textright="%",
+            subtext="downloaded",
+            interactive=False,
+            stripethickness=5,
+        )
         self.meter.pack(side=ttk.RIGHT, fill=ttk.X, expand=YES)
 
         self.controls = ttk.Frame(self, borderwidth=1, padding=10)
         self.controls.pack(side=ttk.BOTTOM, fill=ttk.X)
 
-        self.start_btn = ttk.Button(self.controls,
-                                    text="Start",
-                                    command=self.start,
-                                    bootstyle=ttk.INFO)
+        self.start_btn = ttk.Button(
+            self.controls, text="Start", command=self.start, bootstyle=ttk.INFO
+        )
         self.start_btn.pack(side=ttk.LEFT, padx=5)
 
-        self.pause_btn = ttk.Button(self.controls,
-                                    text="Pause",
-                                    command=self.pause,
-                                    bootstyle=ttk.WARNING)
+        self.pause_btn = ttk.Button(
+            self.controls,
+            text="Pause",
+            command=self.pause,
+            bootstyle=ttk.WARNING,
+        )
         self.pause_btn.pack(side=ttk.LEFT, padx=5)
 
-        self.resume_btn = ttk.Button(self.controls,
-                                     text="Resume",
-                                     command=self.un_pause,
-                                     bootstyle=ttk.SUCCESS)
+        self.resume_btn = ttk.Button(
+            self.controls,
+            text="Resume",
+            command=self.un_pause,
+            bootstyle=ttk.SUCCESS,
+        )
         self.resume_btn.pack(side=ttk.LEFT, padx=5)
         self.resume_btn.state(["disabled"])
 
-        self.cancel_btn = ttk.Button(self.controls,
-                                     text="Cancel",
-                                     command=self.cancel,
-                                     bootstyle=ttk.DANGER)
+        self.cancel_btn = ttk.Button(
+            self.controls,
+            text="Cancel",
+            command=self.cancel,
+            bootstyle=ttk.DANGER,
+        )
         self.cancel_btn.pack(side=ttk.LEFT, padx=5)
 
         self.dtstats_var = ttk.StringVar(self, "")
@@ -105,8 +108,12 @@ class DownloadWindow(ttk.Toplevel):
 
     def update_stats_periodically(self):
         _keys = [
-            "status", "totalLength", "completedLength", "connections",
-            "downloadSpeed", "files"
+            "status",
+            "totalLength",
+            "completedLength",
+            "connections",
+            "downloadSpeed",
+            "files",
         ]
         if not self.download_gid:
             self.pause_btn.state(["disabled"])
@@ -147,7 +154,7 @@ class DownloadWindow(ttk.Toplevel):
         if not dstats:
             return {}
 
-        uri = dstats['files'][0]['uris'][0]['uri']
+        uri = dstats["files"][0]["uris"][0]["uri"]
         key_mapping = {
             "uri": "Link",
             "status": "Status",
@@ -157,8 +164,12 @@ class DownloadWindow(ttk.Toplevel):
             "connections": "Connections",
         }
         expected_keys = [
-            "Link", "Status", "Downloaded", "Total Size", "Transfer Rate",
-            "Connections"
+            "Link",
+            "Status",
+            "Downloaded",
+            "Total Size",
+            "Transfer Rate",
+            "Connections",
         ]
         modified_dstats = {
             f"{key_mapping.get(key, key)}": value
@@ -167,7 +178,8 @@ class DownloadWindow(ttk.Toplevel):
         modified_dstats["Link"] = uri
         filtered_dstats = {
             key: modified_dstats[key]
-            for key in expected_keys if key in modified_dstats
+            for key in expected_keys
+            if key in modified_dstats
         }
         return filtered_dstats
 
@@ -191,9 +203,9 @@ class DownloadWindow(ttk.Toplevel):
         self.meter.amountusedvar.set(int(progress_percentage))
 
         for key, value in modified_stats.items():
-            if key in ['Transfer Rate', 'Upload Speed']:
+            if key in ["Transfer Rate", "Upload Speed"]:
                 value = format_speed(float(value))
-            elif key in ['Downloaded', 'Total Size']:
+            elif key in ["Downloaded", "Total Size"]:
                 value = format_size(float(value))
 
             label_text = f"{key} : {value}"

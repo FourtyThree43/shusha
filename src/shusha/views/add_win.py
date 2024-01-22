@@ -3,13 +3,13 @@ import tkinter as tk
 from tkinter.filedialog import askdirectory
 
 import ttkbootstrap as ttk
-from models.utilities import download_dir
+
+from shusha.models.utilities import download_dir
 
 DEFAULT_DIR = download_dir()
 
 
 class AddWindow(ttk.Toplevel):
-
     def __init__(self, callback):
         super().__init__(callback)
         self.title("Add Download")
@@ -330,7 +330,7 @@ class AddWindow(ttk.Toplevel):
             entry_box.config(state=tk.DISABLED)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     root = ttk.Window(themename="darkly", position=(900, 100))
     app = AddWindow()
     root.mainloop()

@@ -2,12 +2,13 @@
 #
 # SPDX-License-Identifier: MIT
 
-from pathlib import Path
 import time
+from pathlib import Path
 
 import ttkbootstrap as ttk
-from models.logger import LoggerService
-from view.app import Aria2Gui
+
+from shusha.models.logger import LoggerService
+from shusha.views.app import Aria2Gui
 
 logger = LoggerService(__name__)
 OUTPUT_PATH = Path(__file__).parent

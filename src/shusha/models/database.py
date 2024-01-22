@@ -1,3 +1,13 @@
+"""
+This module contains the ShushaDB, Query, Field, and Condition classes.
+
+A simple, lightweight, persistent, document-oriented database.
+The database is stored in a shelve file on disk.
+
+The Query, Field, and Condition classes are used to build queries to search &
+filter data in the database.
+"""
+
 from __future__ import annotations
 
 import shelve

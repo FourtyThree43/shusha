@@ -1,8 +1,14 @@
+"""
+This module contains utility functions that are used to perform common tasks by
+other modules in the `shusha` package.
+"""
+
 import sys
 import textwrap
 from datetime import timedelta
 from importlib import metadata
 from pathlib import Path
+from typing import Any, Union
 
 if sys.version_info < (3, 11):
     import tomli as tomllib
@@ -75,7 +81,48 @@ def log_dir(appname: str) -> Path:
     return Path(user_log_dir(appname))
 
 
-def sizeof_fmt(num, delim=" ", suffix="B"):
+def bool_or_value(value: Any) -> Any:
+    """
+    Return `True` for `"true"`, `False` for `"false"`, original value otherwise.
+
+    Parameters:
+        value: Any kind of value.
+
+    Returns:
+        One of these values:
+            - `True` for `"true"`
+            - `False` for `"false"`
+            - Original value otherwise
+    """
+    if value == "true":
+        return True
+    if value == "false":
+        return False
+    return value
+
+
+def bool_to_str(value: Any) -> Any:
+    """
+    Return `"true"` for `True`, `"false"` for `False`, original value otherwise.
+
+    Parameters:
+        value: Any kind of value.
+
+    Returns:
+        - `"true"` for `True`
+        - `"false"` for `False`
+        - Original value otherwise
+    """
+    if value is True:
+        return "true"
+    if value is False:
+        return "false"
+    return value
+
+
+def sizeof_fmt(
+    num: Union[int, float], delim: str = " ", suffix: str = "B"
+) -> str:
     """Convert a number of bytes into a human readable format.
 
     Args:
@@ -86,14 +133,14 @@ def sizeof_fmt(num, delim=" ", suffix="B"):
     Returns:
         str: The human readable format.
     """
-    for unit in ("", "K", "M", "G", "T", "P", "E", "Z"):
+    for unit in ("", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi"):
         if abs(num) < 1024.0:
-            return f"{num:3.1f}{delim}{unit}{suffix}"
+            return f"{num:3.2f}{delim}{unit}{suffix}"
         num /= 1024.0
-    return f"{num:.1f}{delim}Yi{suffix}"
+    return f"{num:.2f}{delim}Yi{suffix}"
 
 
-def format_speed(speed):
+def format_speed(speed: Union[int, float]):
     """Format a number of bytes into a human readable format.
 
     Args:
@@ -105,7 +152,7 @@ def format_speed(speed):
     return sizeof_fmt(speed, suffix="B/s")
 
 
-def format_size(size):
+def format_size(size: Union[int, float]):
     """Format a number of bytes into a human readable format.
 
     Args:
@@ -143,14 +190,52 @@ def timedelta_fmt(value: timedelta, precision: int = 0) -> str:
             piece_fmt = f"{unit}{label}" if unit > 1 else f"{unit}{label[:-1]}"
             pieces.append(piece_fmt)
 
-    add_piece(value.days, " day ")
+    add_piece(value.days, "D:")
 
     hours, seconds = divmod(value.seconds, 3600)
     minutes, seconds = divmod(seconds, 60)
 
-    add_piece(hours, " Hour ")
-    add_piece(minutes, " Minute ")
-    add_piece(seconds, " Second ")
+    add_piece(hours, "H:")
+    add_piece(minutes, "M:")
+    add_piece(seconds, "S")
+
+    return "".join(pieces[:precision] if precision > 0 else pieces)
+
+
+def timedelta_fmt_v2(value: timedelta, precision: int = 0) -> str:
+    """
+    Format a timedelta into a human readable format.
+
+    Args:
+        value (timedelta): The timedelta.
+        precision (int, optional): The precision. Defaults to 0.
+
+            - `0` to display all units
+            - `1` to display the biggest unit only
+            - `2` to display the first two biggest units only
+            - `n` for the first N biggest units, etc.
+
+    Returns:
+        str: The human readable format.
+    """
+    pieces = []
+
+    def add_piece(unit: int, label_singular: str, label_plural: str):
+        """
+        Add a formatted piece to the pieces list.
+        """
+        if unit > 0:
+            label = label_singular if unit == 1 else label_plural
+            pieces.append(f"{unit}{label}")
+
+    add_piece(value.days, " day ", " days ")
+
+    hours, seconds = divmod(value.seconds, 3600)
+    minutes, seconds = divmod(seconds, 60)
+
+    add_piece(hours, " hour ", " hours ")
+    add_piece(minutes, " minute ", " minutes ")
+    add_piece(seconds, " second", " seconds")
 
     return "".join(pieces[:precision] if precision > 0 else pieces)
 
