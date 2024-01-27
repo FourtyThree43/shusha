@@ -2,10 +2,12 @@ import threading
 import time
 
 import ttkbootstrap as ttk
+from models.utilities import format_size, format_speed
 from PIL import Image
 from ttkbootstrap.constants import NO, YES
 
-from shusha.models.utilities import format_size, format_speed
+from shusha.controller.api import ShushaAPI as Api
+from shusha.models.structs_downloads import Download
 
 Image.CUBIC = Image.BICUBIC  # ttkbootstrap uses an attribute Image.CUBIC which
 # was replaced by Image.BICUBIC in Pillow v10.0.0
@@ -45,8 +47,8 @@ class DownloadWindow(ttk.Toplevel):
             **kwargs,
         )
         self.config(padx=15, pady=15)
-        self.api = api
-        self.download_gid = self.api.gid
+        self.api: Api = api
+        self.download_gid = None
 
         status_lf = ttk.Labelframe(self, text="File Download Status")
         status_lf.pack(fill=ttk.BOTH, expand=NO, padx=5, ipady=30, anchor=ttk.N)
@@ -106,15 +108,32 @@ class DownloadWindow(ttk.Toplevel):
 
         self.after(1000, self.update_stats_periodically)
 
+    def update_stats_frame(self, download: Download):
+        self.download_gid = download.gid
+
+        for widget in self.stats_f.winfo_children():
+            widget.destroy()
+
+        # Update the meter with the calculated percentage
+        self.meter.amountusedvar.set(int(download.progress))
+
+        dl_info = {
+            "File": download.name,
+            "Link": download.files[0].uris[0].get("uri"),
+            "Status": download.status,
+            "Downloaded": download.completed_length_string(),
+            "Total Size": download.total_length_string(),
+            "Transfer Rate": download.download_speed_string(),
+            "ETA": download.eta_string(),
+            "Connections": download.connections,
+        }
+
+        for key, value in dl_info.items():
+            label_text = f"{key} : {value}"
+            label = ttk.Label(self.stats_f, text=label_text, wraplength=300)
+            label.pack(side="top", anchor="w", padx=8, pady=2)
+
     def update_stats_periodically(self):
-        _keys = [
-            "status",
-            "totalLength",
-            "completedLength",
-            "connections",
-            "downloadSpeed",
-            "files",
-        ]
         if not self.download_gid:
             self.pause_btn.state(["disabled"])
             self.resume_btn.state(["disabled"])
@@ -122,17 +141,17 @@ class DownloadWindow(ttk.Toplevel):
             self.cancel_btn.configure(text="Close")
             return
 
-        st_struct = self.api.get_download_status(self.download_gid, keys=_keys)
+        st_struct = self.api.get_download(self.download_gid)
 
         self.update_stats_frame(st_struct)
 
         # Check if the download is complete
-        if st_struct.get("status") == "active":
+        if st_struct.is_active:
             self.pause_btn.state(["!disabled"])
             self.resume_btn.state(["disabled"])
             self.start_btn.state(["disabled"])
             self.cancel_btn.configure(text="Cancel")
-        if st_struct.get("status") == "error":
+        if st_struct.has_failed:
             self.pause_btn.state(["disabled"])
             self.resume_btn.state(["disabled"])
             self.start_btn.state(["!disabled"])
@@ -140,7 +159,7 @@ class DownloadWindow(ttk.Toplevel):
             self.cancel_btn.configure(text="Close")
             self.meter.configure(subtext="Download failed")
             self.meter.reset()
-        if st_struct.get("status") == "complete":
+        if st_struct.is_complete:
             self.pause_btn.state(["disabled"])
             self.resume_btn.state(["disabled"])
             self.start_btn.state(["!disabled"])
@@ -149,68 +168,6 @@ class DownloadWindow(ttk.Toplevel):
         else:
             # If not complete, continue updating periodically
             self.after(1000, self.update_stats_periodically)
-
-    def modify_stats_keys(self, dstats):
-        if not dstats:
-            return {}
-
-        uri = dstats["files"][0]["uris"][0]["uri"]
-        key_mapping = {
-            "uri": "Link",
-            "status": "Status",
-            "completedLength": "Downloaded",
-            "totalLength": "Total Size",
-            "downloadSpeed": "Transfer Rate",
-            "connections": "Connections",
-        }
-        expected_keys = [
-            "Link",
-            "Status",
-            "Downloaded",
-            "Total Size",
-            "Transfer Rate",
-            "Connections",
-        ]
-        modified_dstats = {
-            f"{key_mapping.get(key, key)}": value
-            for key, value in dstats.items()
-        }
-        modified_dstats["Link"] = uri
-        filtered_dstats = {
-            key: modified_dstats[key]
-            for key in expected_keys
-            if key in modified_dstats
-        }
-        return filtered_dstats
-
-    def update_stats_frame(self, dstats):
-        for widget in self.stats_f.winfo_children():
-            widget.destroy()
-
-        modified_stats = self.modify_stats_keys(dstats)
-
-        downloaded = float(modified_stats.get("Downloaded", 0))
-        total_size = float(modified_stats.get("Total Size", 1))
-        # Avoid division by zero and set total_size to 1 when it's 0
-
-        try:
-            progress_percentage = (downloaded / total_size) * 100
-        except ZeroDivisionError:
-            total_size = 1
-            progress_percentage = (downloaded / total_size) * 100
-
-        # Update the meter with the calculated percentage
-        self.meter.amountusedvar.set(int(progress_percentage))
-
-        for key, value in modified_stats.items():
-            if key in ["Transfer Rate", "Upload Speed"]:
-                value = format_speed(float(value))
-            elif key in ["Downloaded", "Total Size"]:
-                value = format_size(float(value))
-
-            label_text = f"{key} : {value}"
-            label = ttk.Label(self.stats_f, text=label_text, wraplength=300)
-            label.pack(side="top", anchor="w", padx=8, pady=8)
 
     def start(self):
         if self.download_gid:
@@ -221,11 +178,10 @@ class DownloadWindow(ttk.Toplevel):
                 self.pause_btn.state(["!disabled"])
                 self.resume_btn.state(["disabled"])
                 self.start_btn.state(["!disabled"])
+                # self.api.
                 return
 
             self.start_btn.state(["disabled"])
-            # self.download_gid = self.api.start_download(
-            #     "https://proof.ovh.net/files/10Mb.dat")
             self.update_stats_periodically()
             threading.Thread(target=self.meter.start).start()
         else:
@@ -240,13 +196,16 @@ class DownloadWindow(ttk.Toplevel):
 
     def un_pause(self):
         if self.download_gid:
-            self.api.un_pause(self.download_gid)
-            self.update_stats_periodically()
+            self.api.resume(self.download_gid)
+            self.update_stats_periodically_v2()
             self.resume_btn.state(["disabled"])
             self.pause_btn.state(["!disabled"])
 
     def cancel(self):
-        if self.cancel_btn.cget("text") == "Cancel":
+        if (
+            self.cancel_btn.cget("text") == "Cancel"
+            and self.download_gid is not None
+        ):
             self.api.remove(self.download_gid)
             self.meter.configure(subtext="downloaded")
             self.meter.reset()
@@ -254,6 +213,7 @@ class DownloadWindow(ttk.Toplevel):
             self.pause_btn.state(["disabled"])
             self.start_btn.state(["!disabled"])
             self.start_btn.configure(text="Start")
+            self.download_gid = None
         else:
             self.close_window()
 

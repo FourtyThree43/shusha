@@ -1,15 +1,17 @@
 import threading
 import tkinter as tk
 from pathlib import Path
+from typing import Any, Callable
 
 import ttkbootstrap as ttk
-from controller.api import Api
-from ttkbootstrap.tableview import Tableview
+from ttkbootstrap.tableview import TableRow, Tableview
 from ttkbootstrap.toast import ToastNotification
 from ttkbootstrap.tooltip import ToolTip
 
+from shusha.controller.api import ShushaAPI as Api
 from shusha.models.logger import LoggerService
-from shusha.models.utilities import format_speed
+from shusha.models.structs_downloads import Download
+from shusha.models.structs_stats import Stats
 from shusha.views.add_win import AddWindow
 from shusha.views.status_win import DownloadWindow
 
@@ -23,12 +25,23 @@ def relative_to_assets(path: str) -> Path:
 
 
 class Aria2Gui(ttk.Frame):
+    """
+    The main application window class.
+
+    :param master: The parent widget.
+    """
+
     def __init__(self, master):
+        """
+        Initializes the main application window and sets up various components and attributes.
+
+        :param master: The parent widget.
+        """
         super().__init__(master, padding=10)
         self.pack(fill=tk.BOTH, expand=tk.YES)
 
         self.api = Api()
-        self.api.start_server()
+        self.start_server()
         self.download_gid = None
 
         self.colors = ttk.Style().colors
@@ -58,9 +71,12 @@ class Aria2Gui(ttk.Frame):
         self.create_table_view()
         self.create_bottom_bar()
 
-        self.after(1000, self.stats)
+        self.after(1000, self.get_stats)
 
     def create_buttonbar(self):
+        """
+        Create and configure the button bar with various action buttons and their respective tooltips.
+        """
         # top buttonbar
         # header and labelframe buttonbar container
         self.buttonbar = ttk.Labelframe(self, text="Actions")
@@ -201,6 +217,9 @@ class Aria2Gui(ttk.Frame):
         )
 
     def create_table_view(self):
+        """
+        Creates and populates a table view with the specified columns and row data.
+        """
         self.table_lf = ttk.Labelframe(self, text="Downloads List")
         self.table_lf.pack(fill=tk.BOTH, expand=tk.YES, side=tk.TOP)
 
@@ -216,7 +235,20 @@ class Aria2Gui(ttk.Frame):
         ]
 
         _rowdata = []
+
+        # _downloads = self.api.get_downloads()
         # add items to download_list
+        # for download in downloads:
+        #     _rowdata.append((
+        #         download.name,
+        #         download.status,
+        #         download.total_length_string(),
+        #         download.progress_string(),
+        #         download.download_speed_string(),
+        #         download.eta_string(),
+        #         download.bitfield,
+        #         download.info_hash,
+        #     ))
 
         self.dt = Tableview(
             master=self.table_lf,
@@ -227,9 +259,13 @@ class Aria2Gui(ttk.Frame):
             bootstyle="warning",
             stripecolor=(self.colors.dark, None),
         )
+
         self.dt.pack(fill=tk.BOTH, expand=tk.YES, padx=10)
 
     def create_bottom_bar(self):
+        """
+        Create a bottom bar containing buttons and dropdowns for queue actions.
+        """
         # bottom buttonbar
         # header and labelframe buttonbar container
         self.bottom_bar = ttk.Labelframe(self, text="Queue Actions")
@@ -315,42 +351,13 @@ class Aria2Gui(ttk.Frame):
         self.stats_frame = tk.Frame(opts_row)
         self.stats_frame.pack(side=tk.RIGHT, padx=10, pady=10)
 
-    def modify_stats_keys(self, gstats):
-        # Mapping of keys to display names
-        key_mapping = {
-            "downloadSpeed": "Download Speed",
-            "numActive": "Active",
-            "numStopped": "Stopped",
-            "numStoppedTotal": "Total Stopped",
-            "numWaiting": "Waiting",
-            "uploadSpeed": "Upload Speed",
-        }
-
-        # Modify keys as needed
-        modified_gstats = {
-            f"{key_mapping.get(key, key)}": value
-            for key, value in gstats.items()
-        }
-        return modified_gstats
-
-    def update_stats_frame(self, gstats):
-        # gstats = self.api.get_stats()
-        modified_gstats = self.modify_stats_keys(gstats)
-
-        column_index = 0
-        for key, value in modified_gstats.items():
-            label = tk.Label(self.stats_frame, text=f"{key}:")
-            label.grid(row=0, column=column_index, sticky="w", padx=5)
-
-            if key in ["Download Speed", "Upload Speed"]:
-                value = format_speed(float(value))
-
-            value_label = tk.Label(self.stats_frame, text=value)
-            value_label.grid(row=1, column=column_index, sticky="e", padx=5)
-
-            column_index += 1
-
     def show_toast(self, message="This is a toast message"):
+        """
+        Show a toast notification with the given message.
+
+        :param message: The message to display in the toast notification (default is "This is a toast message")
+        :return: None
+        """
         toast = ToastNotification(
             title="ttkbootstrap toast message",
             message=message,
@@ -359,79 +366,217 @@ class Aria2Gui(ttk.Frame):
 
         toast.show_toast()
 
+    def _thread(self, target: Callable, *args: Any) -> None:
+        """
+        Helper method to run the target function in a separate thread.
+
+        :param target: (Callable) The function to be run in a separate thread.
+        :param args: (Any) The arguments for the target function.
+        :return: None
+        """
+        threading.Thread(target=target, args=args, daemon=True).start()
+
+    def stats_thread(self):
+        """
+        Method to perform the statistics and execute the stats_thread function.
+        """
+        try:
+            global_stats = self.api.get_stats()
+            self.update_stats_frame(global_stats)
+
+            self.after(1000, self.stats_thread)
+        except Exception as e:
+            self.log_error(f"Error in get_stats: {e}")
+
+    def get_stats(self):
+        """
+        Method to perform the statistics and execute the stats_thread function.
+        """
+        self._thread(self.stats_thread)
+
+    def update_stats_frame(self, global_stats: Stats):
+        """
+        Method to update the stats frame.
+
+        :param global_stats: (Stats) The Stats object to be updated.
+        """
+        stats_info = {
+            "Download Speed": global_stats.download_speed_string(),
+            "Active": global_stats.num_active,
+            "Waitting": global_stats.num_waiting,
+            "Stopped": global_stats.num_stopped,
+            "Total Stopped": global_stats.num_stopped_total,
+            "Upload Speed": global_stats.upload_speed_string(),
+        }
+
+        column_index = 0
+        for key, value in stats_info.items():
+            label = tk.Label(self.stats_frame, text=f"{key}:")
+            label.grid(row=0, column=column_index, sticky="w", padx=5)
+
+            value_label = tk.Label(self.stats_frame, text=value)
+            value_label.grid(row=1, column=column_index, sticky="e", padx=5)
+
+            column_index += 1
+
     def open_toplevel(self):
-        def handle_result(uris, path, options):
+        """
+        Method to open the AddWindow in a separate toplevel window.
+        """
+
+        def handle_result(uris: list[tk.StringVar], options: dict):
+            """
+            Callback function for the AddWindow.
+
+            :param uris: (list[tk.StringVar]) The list of URIs to be downloaded.
+            :param options: (dict) The options for the download.
+            :return: None
+            """
+
             for uri in uris:
-                logger.log(f"uri: {str(uri.get())}")
-                logger.log(f"path: {path}")
-                logger.log(f"options: {options}")
-
-                _gid = self.api.start_download(uri.get(), path, options)
-                _keys = [
-                    "status",
-                    "totalLength",
-                    "completedLength",
-                    "connections",
-                    "downloadSpeed",
-                    "files",
-                ]
-                _struct = self.api.get_download_status(gid=_gid, keys=_keys)
-
-                logger.log(f"Download GID: {_gid}")
-                logger.log(f"Download status: {_struct}")
-                download_window = DownloadWindow(api=self.api)
-                download_window.update_stats_frame(_struct)
+                # self._thread(self.download_thread, uri, options)
+                self.download_thread(uri, options)
 
         # create a new toplevel window
         AddWindow(callback=handle_result)
 
-    def download_thread(self, url):
+    def download_thread(self, uri, options: dict):
+        """
+        Method to start a download in a separate thread.
+
+        :param uri: (str) The URI to be downloaded.
+        :param options: (dict) The options for the download.
+        :return: None
+        """
         try:
-            gid = self.api.start_download(url)
-            self.download_gid = gid
-            msg = f"Download started with GID: {gid}"
-            self.show_toast(message=msg)
+            uris = []
+            uris.append(str(uri.get()))
+
+            download = self.api.add_uris(uris, options)
+
+            if download:
+                msg = f"Added Dowload: {download.name}"
+                self.show_toast(message=msg)
+
+                download_window = DownloadWindow(api=self.api)
+                download_window.update_stats_frame(download)
+
+                self.add_download_to_table(download)
+
         except Exception as e:
             self.log_error(f"Error starting download: {e}")
 
-    # def start_download(self):
-    #     logger.log("Starting download...")
-    #     url = "https://proof.ovh.net/files/10Mb.dat"
-    #     threading.Thread(target=self.download_thread, args=(url, )).start()
+    def add_download_to_table(self, download: Download):
+        """
+        Method to add a download to the table.
+
+        :param download: (Download) Download object to be added to the table.
+        """
+        if self.dt:
+            data = self.get_download_row_data(download)
+            _row = self.dt.insert_row(index="end", values=data)
+            self.dt.load_table_data()
+
+            if not download.is_complete and not download.has_failed:
+                self.after(1000, self.update_rows_periodically, download, _row)
+
+        else:
+            self.log_info("Tableview not found. Skipping update...")
+
+    def update_rows_periodically(self, download: Download, _row: TableRow):
+        """
+        Method to update the rows periodically.
+
+        :param download: (Download) The download object to be updated.
+        :param _row: (TableRow) The TableRow object to be updated.
+        """
+        if download.gid is None or download.is_complete or download.has_failed:
+            return
+        
+        download.update()
+        
+        new_data = self.get_download_row_data(download)
+        _row.configure(iid=_row.iid, values=new_data)
+        self.dt.load_table_data()
+
+        self.after(1000, self.update_rows_periodically, download, _row)
+
+    def get_download_row_data(self, download: Download):
+        """
+        Method to get the download row data.
+
+        :param download: (Download) The download object to be updated.
+        :return: (tuple) The tuple of values for the download row.
+        """
+        return [
+            download.name,
+            download.status,
+            download.total_length_string(),
+            download.progress_string(),
+            download.download_speed_string(),
+            download.eta_string(),
+            download.bitfield,
+            download.info_hash,
+        ]
 
     def pause_download(self):
+        """
+        Method to pause a download.
+        """
         if self.download_gid:
             logger.log("Stopping download...")
-            threading.Thread(
-                target=self.api.pause, args=(self.download_gid)
-            ).start()
+            self._thread(self.api.pause, self.download_gid)
 
     def stop_downloads(self):
+        """
+        Method to stop all downloads.
+        """
         logger.log("Stopping download...")
-        threading.Thread(target=self.api.pause_all, args=()).start()
+        self._thread(
+            self.api.pause_all,
+        )
 
-    def stats(self):
-        try:
-            gstats = self.api.get_stats()
+    def start_server(self):
+        """
+        Method to start the Aria2 server.
+        """
+        self._thread(
+            self.api.start_server,
+        )
 
-            if gstats:
-                self.update_stats_frame(gstats)
-
-                # Schedule the next update after 1 second
-                self.after(1000, self.stats)
-        except Exception as e:
-            self.log_error(f"Error in get_stats: {e}")
+    def stop_server(self):
+        """
+        Method to stop the Aria2 server.
+        """
+        self._thread(
+            self.api.stop_server,
+        )
 
     def cleanup(self):
+        """
+        Method to perform cleanup operations.
+        """
         logger.log("Performing cleanup...")
         if self.download_gid:
             self.stop_downloads()
 
-        self.api.save_session()
-        self.api.stop_server()
+        # self.api.save_session()
+        self.stop_server()
 
     def log_error(self, message):
         logger.log(message, level="error")
+
+    def log_warning(self, message):
+        logger.log(message, level="warning")
+
+    def log_debug(self, message):
+        logger.log(message, level="debug")
+
+    def log_info(self, message):
+        logger.log(message, level="info")
+
+    def log_critical(self, message):
+        logger.log(message, level="critical")
 
 
 if __name__ == "__main__":
