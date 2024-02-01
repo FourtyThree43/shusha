@@ -1,4 +1,4 @@
-from utilities import load_configuration  # , save_configuration
+from shusha.models.utilities import load_configuration  # , save_configuration
 
 
 class AppSettings:

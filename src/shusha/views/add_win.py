@@ -4,9 +4,24 @@ from tkinter.filedialog import askdirectory
 
 import ttkbootstrap as ttk
 
+from shusha.models.utilities import download_dir
+
+DEFAULT_DIR = download_dir()
+
+
+class CustomNotebook(ttk.Frame):
+    def __init__(self, master=None, **kwargs):
+        super().__init__(master, **kwargs)
+        self.notebook = ttk.Notebook(self)
+        self.notebook.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+
+    def add_page(self, page_name="New Page"):
+        new_page = ttk.Frame(self.notebook)
+        self.notebook.add(new_page, text=page_name)
+        return new_page
+
 
 class AddWindow(ttk.Toplevel):
-
     def __init__(self, callback):
         super().__init__(callback)
         self.title("Add Download")
@@ -20,13 +35,11 @@ class AddWindow(ttk.Toplevel):
         add_dl_notebook.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
         # application variables
-        _url = ""
-        _path = pathlib.Path().absolute().as_posix()
+        _path = DEFAULT_DIR
         _rename = ""
         _split = 8
 
-        self.url_var = ttk.StringVar(value=_url)
-        self.path_var = ttk.StringVar(value=_path)
+        self.path_var = ttk.StringVar(value=str(_path))
         self.checkbox_var = tk.BooleanVar(value=False)
         self.rename_var = ttk.StringVar(value=_rename)
         self.split_var = ttk.IntVar(value=_split)
@@ -35,12 +48,6 @@ class AddWindow(ttk.Toplevel):
         self.create_url_page(add_dl_notebook)
         self.create_torrent_page(add_dl_notebook)
         self.create_schedule_page(add_dl_notebook)
-
-    def parse_lines_to_stringvars(self):
-        content = self.urls.get("1.0", tk.END).strip()
-        lines = content.split("\n")
-        var_list = [ttk.StringVar(value=line) for line in lines]
-        return var_list
 
     def create_page_frames(self, notebook):
         """Create notebook pages"""
@@ -235,6 +242,7 @@ class AddWindow(ttk.Toplevel):
         # path row
         path_row = ttk.Frame(option_lf)
         path_row.pack(fill=tk.X, expand=tk.YES)
+
         path_lbl = ttk.Label(path_row, text="Save to:", width=8)
         path_lbl.pack(side=tk.LEFT, padx=(15, 0))
         path_ent = ttk.Entry(
@@ -293,27 +301,31 @@ class AddWindow(ttk.Toplevel):
         )
         add_btn.pack(side=tk.LEFT, padx=5)
 
-    def on_add_url(self):
-        """Callback for add url button"""
-        if self.url_var.get():
-            print(f"add url: {self.url_var.get()}")
-
-    def on_add_torrent(self):
-        """Callback for add torrent button"""
-        print("add torrent")
-
     def on_browse(self):
         """Callback for directory browse"""
         path = askdirectory(title="Browse directory")
         if path:
             self.path_var.set(path)
 
+    def parse_lines_to_stringvars(self):
+        content = self.urls.get("1.0", tk.END).strip()
+        if content:
+            lines = content.split("\n")
+            var_list = [ttk.StringVar(value=line) for line in lines]
+            return var_list
+
     def submit(self):
         """Callback for submit button"""
         uris = self.parse_lines_to_stringvars()
         dpath = pathlib.Path(self.path_var.get())
+        split = self.split_var.get()
+        rename = self.rename_var.get()
 
-        self.callback(uris, dpath)
+        opts = {"dir": str(dpath), "split": split, "out": rename}
+
+        if uris:
+            self.callback(uris, opts)
+
         self.destroy()
 
     def on_checkbox_click(self, checkbox_var, entry_box):
@@ -323,7 +335,7 @@ class AddWindow(ttk.Toplevel):
             entry_box.config(state=tk.DISABLED)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     root = ttk.Window(themename="darkly", position=(900, 100))
     app = AddWindow()
     root.mainloop()

@@ -7,9 +7,10 @@ import sys
 
 if __package__ is None and not hasattr(sys, 'frozen'):
     # direct call of __main__.py
-    import os.path
-    path = os.path.realpath(os.path.abspath(__file__))
-    sys.path.insert(0, os.path.dirname(os.path.dirname(path)))
+    from pathlib import Path
+
+    script_path = Path(__file__).resolve()
+    sys.path.insert(0, str(script_path.parent.parent))
 
 from shusha import ShushaDM
 

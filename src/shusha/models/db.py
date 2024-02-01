@@ -4,33 +4,64 @@ from contextlib import contextmanager
 from sqlite3 import Error
 from threading import Lock
 
-from logger import LoggerService
+from shusha.models.logger import LoggerService
 
 DB_FILE = "shusha.db"
 
 
 class StructsDB:
+    """Database for storing download information."""
+
     TABLE_DOWNLOAD = "downloads_t"
     TABLE_FILES = "files_t"
     TABLE_BITTORRENT = "bittorrent_t"
     TABLE_QUEUE = "queue_t"
 
     DOWNLOAD_COLUMNS = [
-        "gid", "status", "totalLength", "completedLength", "uploadLength",
-        "bitfield", "downloadSpeed", "uploadSpeed", "infoHash", "numSeeders",
-        "seeder", "pieceLength", "numPieces", "connections", "errorCode",
-        "errorMessage", "followedBy", "following", "belongsTo", "dir",
-        "verifiedLength", "verifyIntegrityPending", "timestamp"
+        "gid",
+        "status",
+        "totalLength",
+        "completedLength",
+        "uploadLength",
+        "bitfield",
+        "downloadSpeed",
+        "uploadSpeed",
+        "infoHash",
+        "numSeeders",
+        "seeder",
+        "pieceLength",
+        "numPieces",
+        "connections",
+        "errorCode",
+        "errorMessage",
+        "followedBy",
+        "following",
+        "belongsTo",
+        "dir",
+        "verifiedLength",
+        "verifyIntegrityPending",
+        "timestamp",
     ]
 
     FILES_COLUMNS = [
-        "id", "file_index", "path", "length", "completed_length", "selected",
-        "uris", "download_id"
+        "id",
+        "file_index",
+        "path",
+        "length",
+        "completed_length",
+        "selected",
+        "uris",
+        "download_id",
     ]
 
     BITTORRENT_COLUMNS = [
-        "id", "announce_list", "comment", "creation_date", "mode", "info_name",
-        "download_id"
+        "id",
+        "announce_list",
+        "comment",
+        "creation_date",
+        "mode",
+        "info_name",
+        "download_id",
     ]
 
     def __init__(self, db_path=DB_FILE):
@@ -56,11 +87,21 @@ class StructsDB:
             except Error as e:
                 # Rollback transaction on error
                 self.connection.rollback()
-                self.logger.log(f"Error during transaction: {e}",
-                                level="error")
+                self.logger.log(f"Error during transaction: {e}", level="error")
                 raise e
 
     def _execute_query(self, cursor, query, value=None):
+        """
+        Execute a query.
+
+        Args:
+            cursor: Cursor object.
+            query: Query to execute.
+            value: Value to pass to the query.
+
+        Returns:
+            None
+        """
         try:
             if value:
                 cursor.execute(query, value)
@@ -70,6 +111,17 @@ class StructsDB:
             self.logger.log(f"Error executing query: {e}", level="error")
 
     def _execute_query_and_fetchall(self, cursor, query, params=None):
+        """
+        Execute a query and fetch all results.
+
+        Args:
+            cursor: Cursor object.
+            query: Query to execute.
+            params: Parameters to pass to the query.
+
+        Returns:
+            List of results.
+        """
         try:
             if params:
                 cursor.execute(query, params)
@@ -81,6 +133,17 @@ class StructsDB:
             return []
 
     def _execute_query_and_fetchone(self, cursor, query, params=None):
+        """
+        Execute a query and fetch one result.
+
+        Args:
+            cursor: Cursor object.
+            query: Query to execute.
+            params: Parameters to pass to the query.
+
+        Returns:
+            One result.
+        """
         try:
             if params:
                 cursor.execute(query, params)
@@ -92,6 +155,9 @@ class StructsDB:
             return None
 
     def create_tables(self):
+        """
+        Create tables if they do not exist.
+        """
         with self.connection:
             cursor = self.connection.cursor()
 
@@ -185,8 +251,10 @@ class StructsDB:
             "verifyIntegrityPending",
         ]
         values = [gid] + [
-            info.get(column, 0) if column != "followedBy" else json.dumps(
-                info.get("followedBy", [])) for column in columns[1:]
+            info.get(column, 0)
+            if column != "followedBy"
+            else json.dumps(info.get("followedBy", []))
+            for column in columns[1:]
         ]
         placeholders = ", ".join(["?" for _ in columns])
 
@@ -210,8 +278,10 @@ class StructsDB:
             "download_id",
         ]
         values = [
-            file_info.get(column, 0) if column != "uris" else json.dumps(
-                file_info.get("uris", [])) for column in columns[:-1]
+            file_info.get(column, 0)
+            if column != "uris"
+            else json.dumps(file_info.get("uris", []))
+            for column in columns[:-1]
         ] + [gid]
 
         query = f"""INSERT INTO files_t ({', '.join(columns)})
@@ -249,11 +319,15 @@ class StructsDB:
         self._execute_query(cursor, query, values)
 
     def update_table(self, table_name, set_values, where_column, where_value):
+        """
+        Update a table with given values.
+        """
         with self.database_transaction() as conn:
             cursor = conn.cursor()
 
             set_columns = ", ".join(
-                [f"{column} = ?" for column, _ in set_values.items()])
+                [f"{column} = ?" for column, _ in set_values.items()]
+            )
             query = f"UPDATE {table_name} SET {set_columns} WHERE {where_column} = ?"
 
             values = list(set_values.values()) + [where_value]
@@ -286,9 +360,15 @@ class StructsDB:
         return result_dicts
 
     def to_dict(self, results, columns):
+        """
+        Convert a list of results into a list of dictionaries using given columns.
+        """
         return self._as_dicts_list(results, columns)
 
     def get_all_downloads(self):
+        """
+        Get all download status from the 'downloads' table.
+        """
         with self.connection:
             cursor = self.connection.cursor()
 
@@ -320,9 +400,13 @@ class StructsDB:
                 WHERE gid = ?
             """
 
-            return self._execute_query_and_fetchone(cursor, query, (gid, ))
+            return self._execute_query_and_fetchone(cursor, query, (gid,))
 
     def get_files_info(self, gid):
+        """
+        Get files information linked to a download from the 'files_t' table
+        based on 'gid'.
+        """
         with self.connection:
             cursor = self.connection.cursor()
 
@@ -333,9 +417,12 @@ class StructsDB:
                 WHERE download_id = ?
             """
 
-            return self._execute_query_and_fetchall(cursor, query, (gid, ))
+            return self._execute_query_and_fetchall(cursor, query, (gid,))
 
     def get_bittorrent_info(self, gid):
+        """
+        Get BitTorrent information linked to a download from the 'bittorrent_t'
+        """
         with self.connection:
             cursor = self.connection.cursor()
 
@@ -346,7 +433,7 @@ class StructsDB:
                 WHERE download_id = ?
             """
 
-            return self._execute_query_and_fetchall(cursor, query, (gid, ))
+            return self._execute_query_and_fetchall(cursor, query, (gid,))
 
     def reset_database(self):
         """
@@ -363,8 +450,9 @@ class StructsDB:
         Update download status in the 'downloads' table based on 'gid'.
         """
         where_column = "gid"
-        self.update_table(StructsDB.TABLE_DOWNLOAD, info_updates, where_column,
-                          gid)
+        self.update_table(
+            StructsDB.TABLE_DOWNLOAD, info_updates, where_column, gid
+        )
 
     def close_connection(self):
         """Close the database connection if it is open."""
@@ -373,8 +461,9 @@ class StructsDB:
                 self.connection.close()
                 self.logger.log("Database connection closed.")
             except Error as e:
-                self.logger.log(f"Error closing database connection: {e}",
-                                level="error")
+                self.logger.log(
+                    f"Error closing database connection: {e}", level="error"
+                )
 
 
 # Example usage:
@@ -385,65 +474,38 @@ if __name__ == "__main__":
 
     # Example: Storing download information
     download_info = {
-        "gid":
-        "1089b05edsas3d829",
-        "status":
-        "complete",
-        "totalLength":
-        "34896138",
-        "completedLength":
-        "34896138",
-        "uploadLength":
-        "0",
-        "bitfield":
-        "ffff80",
-        "downloadSpeed":
-        "0",
-        "uploadSpeed":
-        "0",
-        "infoHash":
-        "",
-        "numSeeders":
-        "0",
-        "seeder":
-        "0",
-        "pieceLength":
-        "2097152",
-        "numPieces":
-        "17",
-        "connections":
-        "0",
-        "errorCode":
-        "0",
-        "errorMessage":
-        "",
+        "gid": "1089b05edsas3d829",
+        "status": "complete",
+        "totalLength": "34896138",
+        "completedLength": "34896138",
+        "uploadLength": "0",
+        "bitfield": "ffff80",
+        "downloadSpeed": "0",
+        "uploadSpeed": "0",
+        "infoHash": "",
+        "numSeeders": "0",
+        "seeder": "0",
+        "pieceLength": "2097152",
+        "numPieces": "17",
+        "connections": "0",
+        "errorCode": "0",
+        "errorMessage": "",
         "followedBy": [],
-        "following":
-        "",
-        "belongsTo":
-        "",
-        "dir":
-        "/downloads",
-        "verifiedLength":
-        "0",
-        "verifyIntegrityPending":
-        "0",
-        'files': [{
-            'index':
-            '1',
-            'length':
-            '34896138',
-            'completedLength':
-            '34896138',
-            'path':
-            '/downloads/file',
-            'selected':
-            'true',
-            'uris': [{
-                'status': 'used',
-                'uri': 'http://example.org/file'
-            }]
-        }],
+        "following": "",
+        "belongsTo": "",
+        "dir": "/downloads",
+        "verifiedLength": "0",
+        "verifyIntegrityPending": "0",
+        "files": [
+            {
+                "index": "1",
+                "length": "34896138",
+                "completedLength": "34896138",
+                "path": "/downloads/file",
+                "selected": "true",
+                "uris": [{"status": "used", "uri": "http://example.org/file"}],
+            }
+        ],
     }
 
     db.store_download_info(download_info["gid"], download_info)

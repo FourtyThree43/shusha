@@ -1,22 +1,263 @@
+"""
+This module contains utility functions that are used to perform common tasks by
+other modules in the `shusha` package.
+"""
+
 import sys
 import textwrap
+from datetime import timedelta
 from importlib import metadata
 from pathlib import Path
+from typing import Any, Union
 
 if sys.version_info < (3, 11):
     import tomli as tomllib
 else:
     import tomllib
 
-from platformdirs import user_config_dir, user_downloads_dir
+from platformdirs import (
+    user_cache_dir,
+    user_config_dir,
+    user_data_dir,
+    user_downloads_dir,
+    user_log_dir,
+)
 
 
-def sizeof_fmt(num, delim=" ", suffix="B"):
-    for unit in ("", "K", "M", "G", "T", "P", "E", "Z"):
+def download_dir() -> Path:
+    """Return the default download directory.
+
+    Returns:
+        The default download directory.
+    """
+    return Path(user_downloads_dir())
+
+
+def config_dir(appname: str) -> Path:
+    """Return the default user configuration directory.
+
+    Args:
+        appname (str): The name of the application.
+
+    Returns:
+        The default user configuration directory.
+    """
+    return Path(user_config_dir(appname))
+
+
+def data_dir(appname: str) -> Path:
+    """Return the default user data directory.
+
+    Args:
+        appname (str): The name of the application.
+
+    Returns:
+        The default user data directory.
+    """
+    return Path(user_data_dir(appname))
+
+
+def cache_dir(appname: str) -> Path:
+    """Return the default user cache directory.
+
+    Args:
+        appname (str): The name of the application.
+
+    Returns:
+        The default user cache directory.
+    """
+    return Path(user_cache_dir(appname))
+
+
+def log_dir(appname: str) -> Path:
+    """Return the default user log directory.
+
+    Args:
+        appname (str): The name of the application.
+
+    Returns:
+        The default user log directory.
+    """
+    return Path(user_log_dir(appname))
+
+
+def bool_or_value(value: Any) -> Any:
+    """
+    Return `True` for `"true"`, `False` for `"false"`, original value otherwise.
+
+    Parameters:
+        value: Any kind of value.
+
+    Returns:
+        One of these values:
+            - `True` for `"true"`
+            - `False` for `"false"`
+            - Original value otherwise
+    """
+    if value == "true":
+        return True
+    if value == "false":
+        return False
+    return value
+
+
+def bool_to_str(value: Any) -> Any:
+    """
+    Return `"true"` for `True`, `"false"` for `False`, original value otherwise.
+
+    Parameters:
+        value: Any kind of value.
+
+    Returns:
+        - `"true"` for `True`
+        - `"false"` for `False`
+        - Original value otherwise
+    """
+    if value is True:
+        return "true"
+    if value is False:
+        return "false"
+    return value
+
+
+def sizeof_fmt(
+    num: Union[int, float], delim: str = " ", suffix: str = "B"
+) -> str:
+    """Convert a number of bytes into a human readable format.
+
+    Args:
+        num (int): The number of bytes.
+        delim (str, optional): The delimiter. Defaults to " ".
+        suffix (str, optional): The suffix. Defaults to "B".
+
+    Returns:
+        str: The human readable format.
+    """
+    for unit in ("", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi"):
         if abs(num) < 1024.0:
-            return f"{num:3.1f}{delim}{unit}{suffix}"
+            return f"{num:3.2f}{delim}{unit}{suffix}"
         num /= 1024.0
-    return f"{num:.1f}{delim}Yi{suffix}"
+    return f"{num:.2f}{delim}Yi{suffix}"
+
+
+def format_speed(speed: Union[int, float]):
+    """Format a number of bytes into a human readable format.
+
+    Args:
+        speed (int): The number of bytes.
+
+    Returns:
+        str: The human readable format.
+    """
+    return sizeof_fmt(speed, suffix="B/s")
+
+
+def format_size(size: Union[int, float]):
+    """Format a number of bytes into a human readable format.
+
+    Args:
+        size (int): The number of bytes.
+
+    Returns:
+        str: The human readable format.
+    """
+    return sizeof_fmt(size, suffix="B")
+
+
+def timedelta_fmt(value: timedelta, precision: int = 0) -> str:
+    """
+    Format a timedelta into a human readable format.
+
+    Args:
+        value (timedelta): The timedelta.
+        precision (int, optional): The precision. Defaults to 0.
+
+            - `0` to display all units
+            - `1` to display the biggest unit only
+            - `2` to display the first two biggest units only
+            - `n` for the first N biggest units, etc.
+
+    Returns:
+        str: The human readable format.
+    """
+    pieces = []
+
+    def add_piece(unit: int, label: str):
+        """
+        Add a formatted piece to the pieces list.
+        """
+        if unit > 0:
+            piece_fmt = f"{unit}{label}" if unit > 1 else f"{unit}{label[:-1]}"
+            pieces.append(piece_fmt)
+
+    add_piece(value.days, "D:")
+
+    hours, seconds = divmod(value.seconds, 3600)
+    minutes, seconds = divmod(seconds, 60)
+
+    add_piece(hours, "H:")
+    add_piece(minutes, "M:")
+    add_piece(seconds, "S")
+
+    return "".join(pieces[:precision] if precision > 0 else pieces)
+
+
+def timedelta_fmt_v2(value: timedelta, precision: int = 0) -> str:
+    """
+    Format a timedelta into a human readable format.
+
+    Args:
+        value (timedelta): The timedelta.
+        precision (int, optional): The precision. Defaults to 0.
+
+            - `0` to display all units
+            - `1` to display the biggest unit only
+            - `2` to display the first two biggest units only
+            - `n` for the first N biggest units, etc.
+
+    Returns:
+        str: The human readable format.
+    """
+    pieces = []
+
+    def add_piece(unit: int, label_singular: str, label_plural: str):
+        """
+        Add a formatted piece to the pieces list.
+        """
+        if unit > 0:
+            label = label_singular if unit == 1 else label_plural
+            pieces.append(f"{unit}{label}")
+
+    add_piece(value.days, " day ", " days ")
+
+    hours, seconds = divmod(value.seconds, 3600)
+    minutes, seconds = divmod(seconds, 60)
+
+    add_piece(hours, " hour ", " hours ")
+    add_piece(minutes, " minute ", " minutes ")
+    add_piece(seconds, " second", " seconds")
+
+    return "".join(pieces[:precision] if precision > 0 else pieces)
+
+
+def format_eta(eta: timedelta, precision: int = 0) -> str:
+    """Format a number of seconds into a human readable format.
+
+    Args:
+        eta (int): The number of seconds.
+        precision (int, optional): The precision. Defaults to 0.
+
+            - `0` to display all units
+            - `1` to display the biggest unit only
+            - `2` to display the first two biggest units only
+            - `n` for the first N biggest units, etc.
+
+    Returns:
+        str: The human readable format.
+    """
+    if eta == timedelta.max:
+        return "-"
+    return timedelta_fmt(eta, precision=precision)
 
 
 def get_version() -> str:
