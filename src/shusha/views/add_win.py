@@ -9,7 +9,9 @@ from shusha.models.utilities import download_dir
 DEFAULT_DIR = download_dir()
 
 
+# Comment to test neogit
 class CustomNotebook(ttk.Frame):
+
     def __init__(self, master=None, **kwargs):
         super().__init__(master, **kwargs)
         self.notebook = ttk.Notebook(self)
@@ -22,6 +24,7 @@ class CustomNotebook(ttk.Frame):
 
 
 class AddWindow(ttk.Toplevel):
+
     def __init__(self, callback):
         super().__init__(callback)
         self.title("Add Download")
