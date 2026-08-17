@@ -13,7 +13,7 @@ from __future__ import annotations
 import shelve
 import threading
 import uuid
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 from shusha.models.logger import LoggerService
 from shusha.models.utilities import data_dir
@@ -27,7 +27,7 @@ DEFAULT_DB_PATH = DEFAULT_DB_DIR / DEFAULT_DB_FILENAME
 class Condition:
     """A class for building query conditions to filter data in a query."""
 
-    def __init__(self, field_name: str, operator: Optional[str], value: Any):
+    def __init__(self, field_name: str, operator: str | None, value: Any):
         """
         Initialize a Condition instance.
 
@@ -96,7 +96,7 @@ class Field:
         """
         self.field_name = field_name
 
-    def __eq__(self, value: Any):
+    def __eq__(self, value: object):
         """
         Build an equality condition.
 
@@ -108,7 +108,7 @@ class Field:
         """
         return Condition(self.field_name, "==", value)
 
-    def __ne__(self, value: Any):
+    def __ne__(self, value: object):
         """
         Build a non-equality condition.
 
@@ -222,7 +222,7 @@ class Field:
         """
         return Condition(f"{self.field_name}[{key}]", None, None)
 
-    def fragment(self, value: Dict[str, Any]) -> Condition:
+    def fragment(self, value: dict[str, Any]) -> Condition:
         """
         Build a fragment condition.
 
@@ -262,7 +262,7 @@ class Query:
         """
         return Field(field_name)
 
-    def fragment(self, value: Dict[str, Any]) -> Condition:
+    def fragment(self, value: dict[str, Any]) -> Condition:
         """
         Build a fragment condition.
 
@@ -438,7 +438,7 @@ class ShushaDB:
                 self._commit_save()
             except Exception as e:
                 self.rollback_transaction()
-                raise TransactionError(f"Error committing transaction: {e}")
+                raise TransactionError(f"Error committing transaction: {e}") from e
             finally:
                 self._reset_transaction()
 
@@ -464,7 +464,7 @@ class ShushaDB:
             self.transaction_buffer = []
 
     # Commit Methods
-    def _commit_insert(self, document: Dict, key="gid") -> str:
+    def _commit_insert(self, document: dict, key="gid") -> str:
         """
         Commit the insert operation within a transaction.
 
@@ -479,9 +479,9 @@ class ShushaDB:
                 self._commit_save()
             return doc_id
         except Exception as e:
-            raise InsertionError(f"Error committing insert: {e}")
+            raise InsertionError(f"Error committing insert: {e}") from e
 
-    def _commit_update(self, new_data: Dict, query: Condition) -> None:
+    def _commit_update(self, new_data: dict, query: Condition) -> None:
         """
         Commit the update operation within a transaction.
 
@@ -499,7 +499,7 @@ class ShushaDB:
             if not self.transaction_in_progress:
                 self._commit_save()
         except Exception as e:
-            raise UpdateError(f"Error committing update: {e}")
+            raise UpdateError(f"Error committing update: {e}") from e
 
     def _commit_remove(self, query: Condition) -> None:
         """
@@ -519,7 +519,7 @@ class ShushaDB:
             if not self.transaction_in_progress:
                 self._commit_save()
         except Exception as e:
-            raise RemovalError(f"Error committing remove: {e}")
+            raise RemovalError(f"Error committing remove: {e}") from e
 
     def _commit_save(self):
         """
@@ -529,7 +529,7 @@ class ShushaDB:
             with shelve.open(self.filename, writeback=True) as db:
                 db["tables"] = self._tables
         except Exception as e:
-            raise RuntimeError(f"Error committing save: {e}")
+            raise RuntimeError(f"Error committing save: {e}") from e
         finally:
             if self.transaction_in_progress:
                 # Release lock after saving changes for read_committed isolation
@@ -543,7 +543,7 @@ class ShushaDB:
             with shelve.open(self.filename, writeback=True) as db:
                 return db.get("tables", {})
         except Exception as e:
-            raise RuntimeError(f"Error loading tables from disk: {e}")
+            raise RuntimeError(f"Error loading tables from disk: {e}") from e
 
     # Transactional Operations
     # Document Manipulation
@@ -553,7 +553,7 @@ class ShushaDB:
         """
         return str(uuid.uuid4())
 
-    def get_doc_gid(self, document: Dict[str, Any], key="gid") -> str:
+    def get_doc_gid(self, document: dict[str, Any], key="gid") -> str:
         """
         Get the document ID from the document or generate a new one.
 
@@ -570,7 +570,7 @@ class ShushaDB:
         else:
             return gid_value or self.generate_doc_id()
 
-    def insert(self, document: Dict[str, Any], key="gid") -> Optional[str]:
+    def insert(self, document: dict[str, Any], key="gid") -> str | None:
         """
         Insert a document into the current table.
 
@@ -591,9 +591,7 @@ class ShushaDB:
             print(f"Error inserting data: {e}")
             return None
 
-    def insert_multiple(
-        self, documents: List[Dict[str, Any]]
-    ) -> Optional[List]:
+    def insert_multiple(self, documents: list[dict[str, Any]]) -> list | None:
         """
         Insert multiple documents into the current table.
 
@@ -613,7 +611,7 @@ class ShushaDB:
             print(f"Error inserting multiple documents: {e}")
             return None
 
-    def retrieve(self, doc_id: Union[str, None]) -> Optional[Dict[str, Any]]:
+    def retrieve(self, doc_id: str | None) -> dict[str, Any] | None:
         try:
             return self._tables[self.current_table].get(doc_id, None)
         except Exception as e:
@@ -647,12 +645,19 @@ class ShushaDB:
         except Exception as e:
             print(f"Error removing data: {e}")
 
-    def all(self) -> List[Dict[str, Any]]:
+    def all(self) -> list[dict[str, Any]]:
         try:
             return list(self._tables[self.current_table].values())
         except Exception as e:
             print(f"Error retrieving all data: {e}")
             return []
+
+    def purge(self) -> None:
+        """Purge (clear) all documents from the current table."""
+        with self.tables_lock:
+            self._tables[self.current_table] = {}
+            if not self.transaction_in_progress:
+                self._commit_save()
 
     # Search and Query and Field Handling
     # Query and Condition Building
@@ -709,7 +714,7 @@ class ShushaDB:
             return []
 
     def _evaluate_condition(
-        self, document: Dict[str, Any], condition: Condition
+        self, document: dict[str, Any], condition: Condition
     ) -> bool:
         """
         Evaluates a condition for a given document.
@@ -736,9 +741,7 @@ class ShushaDB:
                 for sub_condition in condition.value
             )
         else:
-            field_value = self._get_nested_field_value(
-                document, condition.field
-            )
+            field_value = self._get_nested_field_value(document, condition.field)
 
             if condition.operator == "==":
                 return field_value == condition.value
@@ -759,7 +762,7 @@ class ShushaDB:
                 return False
 
     def _evaluate_fragment_condition(
-        self, document: Dict[str, Any], fragment: Dict[str, Any]
+        self, document: dict[str, Any], fragment: dict[str, Any]
     ) -> bool:
         """
         Evaluates a fragment condition for a given document.
@@ -785,9 +788,7 @@ class ShushaDB:
             print(f"Error evaluating fragment condition: {e}")
             return False
 
-    def _get_nested_field_value(
-        self, document: Dict[str, Any], field_path: str
-    ) -> Any:
+    def _get_nested_field_value(self, document: dict[str, Any], field_path: str) -> Any:
         """
         Returns the value of a nested field.
 
@@ -799,7 +800,7 @@ class ShushaDB:
             The value of the field.
         """
 
-        def get_nested_value(doc: Dict[str, Any], fields: List[str]) -> Any:
+        def get_nested_value(doc: dict[str, Any], fields: list[str]) -> Any:
             """
             Recursively get the value of a nested field.
             """
@@ -812,11 +813,7 @@ class ShushaDB:
                 nested_value = doc.get(field, {}).get(key)
             else:
                 nested_value = doc.get(field)
-            return (
-                get_nested_value(nested_value, fields[1:])
-                if nested_value
-                else None
-            )
+            return get_nested_value(nested_value, fields[1:]) if nested_value else None
 
         try:
             fields = field_path.split(".")
@@ -972,8 +969,6 @@ class ShushaDB:
 class MySmallDBError(Exception):
     """Base class for exceptions in MySmallDB."""
 
-    pass
-
 
 class InsertionError(MySmallDBError):
     """Exception raised for errors related to data insertion."""
@@ -994,40 +989,26 @@ class TransactionError(MySmallDBError):
 class TableManagementError(MySmallDBError):
     """Base class for table management errors."""
 
-    pass
-
 
 class TableNotFoundError(TableManagementError):
     """Exception raised when attempting operations on a non-existent table."""
-
-    pass
 
 
 class PersistenceError(MySmallDBError):
     """Base class for file I/O errors."""
 
-    pass
-
 
 class SaveError(PersistenceError):
     """Exception raised for errors during data save."""
-
-    pass
 
 
 class LoadError(PersistenceError):
     """Exception raised for errors during data load."""
 
-    pass
-
 
 class DropTableError(TableManagementError):
     """Exception raised for errors during table dropping."""
 
-    pass
-
 
 class DropAllTablesError(TableManagementError):
     """Exception raised for errors during dropping all tables."""
-
-    pass

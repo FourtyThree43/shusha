@@ -29,15 +29,14 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from models.utilities import (
+from shusha.models.client import XMLRPCClientException
+from shusha.models.logger import LoggerService
+from shusha.models.utilities import (
     bool_or_value,
     format_eta,
     format_size,
     format_speed,
 )
-
-from shusha.models.client import XMLRPCClientException
-from shusha.models.logger import LoggerService
 
 if TYPE_CHECKING:
     from shusha.controller.api import ShushaAPI as Api
@@ -59,7 +58,7 @@ class BitTorrent:
         self._struct = struct or {}
 
     def __str__(self):
-        return self.info["name"]
+        return (self.info or {}).get("name", "")
 
     @property
     def announce_list(self) -> list[list[str]] | None:
@@ -96,9 +95,7 @@ class BitTorrent:
         Returns:
             The creation date.
         """
-        return datetime.fromtimestamp(
-            self._struct["creationDate"], tz=timezone.utc
-        )
+        return datetime.fromtimestamp(self._struct["creationDate"], tz=timezone.utc)
 
     @property
     def mode(self) -> str | None:
@@ -187,7 +184,7 @@ class File:
         """
         return int(self._struct["length"])
 
-    def length_string(self, human_readable: bool = True) -> str:  # noqa: FBT001,FBT002
+    def length_string(self, human_readable: bool = True) -> str:
         """
         Return the length as string.
 
@@ -526,7 +523,7 @@ class Download:
         """
         return int(self._struct["totalLength"])
 
-    def total_length_string(self, human_readable: bool = True) -> str:  # noqa: FBT001,FBT002
+    def total_length_string(self, human_readable: bool = True) -> str:
         """
         Return the total length as string.
 
@@ -550,7 +547,7 @@ class Download:
         """
         return int(self._struct["completedLength"])
 
-    def completed_length_string(self, human_readable: bool = True) -> str:  # noqa: FBT001,FBT002
+    def completed_length_string(self, human_readable: bool = True) -> str:
         """
         Return the completed length as string.
 
@@ -574,7 +571,7 @@ class Download:
         """
         return int(self._struct["uploadLength"])
 
-    def upload_length_string(self, human_readable: bool = True) -> str:  # noqa: FBT001,FBT002
+    def upload_length_string(self, human_readable: bool = True) -> str:
         """
         Return the upload length as string.
 
@@ -614,7 +611,7 @@ class Download:
         """
         return int(self._struct["downloadSpeed"])
 
-    def download_speed_string(self, human_readable: bool = True) -> str:  # noqa: FBT001,FBT002
+    def download_speed_string(self, human_readable: bool = True) -> str:
         """
         Return the download speed as string.
 
@@ -638,7 +635,7 @@ class Download:
         """
         return int(self._struct["uploadSpeed"])
 
-    def upload_speed_string(self, human_readable: bool = True) -> str:  # noqa: FBT001,FBT002
+    def upload_speed_string(self, human_readable: bool = True) -> str:
         """
         Return the upload speed as string.
 
@@ -698,7 +695,7 @@ class Download:
         """
         return int(self._struct["pieceLength"])
 
-    def piece_length_string(self, human_readable: bool = True) -> str:  # noqa: FBT001,FBT002
+    def piece_length_string(self, human_readable: bool = True) -> str:
         """
         Return the piece length as string.
 
@@ -783,14 +780,15 @@ class Download:
             result = []
             for gid in self.followed_by_ids:
                 try:
-                    result.append(self.api.get_download(gid))
+                    dl = self.api.get_download(gid)
+                    if dl:
+                        result.append(dl)
                 except XMLRPCClientException as error:
                     logger.log(
-                        f"Can't find download with GID {gid}, try to update download {self.gid} ({id(self)}",  # noqa: E501
+                        f"Can't find download with GID {gid}, try to update download {self.gid} ({id(self)}",
                         level="warning",
                     )
                     logger.log(str(error), level="warning")
-                    result.append(None)         
             self._followed_by = result
         return self._followed_by
 
@@ -822,7 +820,7 @@ class Download:
                     self._following = self.api.get_download(following_id)
                 except XMLRPCClientException as error:
                     logger.log(
-                        f"Can't find download with GID {following_id}, try to update download {self.gid} ({id(self)}",  # noqa: E501
+                        f"Can't find download with GID {following_id}, try to update download {self.gid} ({id(self)}",
                         level="warning",
                     )
                     logger.log(str(error), level="warning")
@@ -859,7 +857,7 @@ class Download:
                     self._belongs_to = self.api.get_download(belongs_to_id)
                 except XMLRPCClientException as error:
                     logger.log(
-                        f"Can't find download with GID {belongs_to_id}, try to update download {self.gid} ({id(self)})",  # noqa: E501
+                        f"Can't find download with GID {belongs_to_id}, try to update download {self.gid} ({id(self)})",
                         level="warning",
                     )
                     logger.log(str(error), level="warning")
@@ -867,7 +865,7 @@ class Download:
         return self._belongs_to
 
     @property
-    def dir(self) -> Path:  # noqa: A003
+    def dir(self) -> Path:
         """
         Directory to save files.
 
@@ -888,9 +886,7 @@ class Download:
             The files of this download.
         """
         if not self._files:
-            self._files = [
-                File(struct) for struct in self._struct.get("files", [])
-            ]
+            self._files = [File(struct) for struct in self._struct.get("files", [])]
         return self._files
 
     @property
@@ -920,7 +916,7 @@ class Download:
         """
         return int(self._struct.get("verifiedLength", 0))
 
-    def verified_length_string(self, human_readable: bool = True) -> str:  # noqa: FBT001,FBT002
+    def verified_length_string(self, human_readable: bool = True) -> str:
         """Return the verified length as string.
 
         Parameters:
@@ -1074,7 +1070,7 @@ class Download:
         """
         return self.api.move_to_bottom(self)
 
-    def remove(self, force: bool = False, files: bool = False) -> bool:  # noqa: FBT001,FBT002
+    def remove(self, force: bool = False, files: bool = False) -> bool:
         """
         Remove the download from the queue (even if active).
 
@@ -1088,12 +1084,10 @@ class Download:
         Raises:
             ClientException: When removal failed.
         """
-        result = self.api.remove([self], force=force, files=files)[0]
-        if not result:
-            raise result  # type: ignore  # we know it's a ClientException
-        return True
+        result = self.api.remove(self.gid, force=force)
+        return bool(result)
 
-    def pause(self, force: bool = False) -> bool:  # noqa: FBT001,FBT002
+    def pause(self, force: bool = False) -> bool:
         """
         Pause the download.
 
@@ -1106,10 +1100,8 @@ class Download:
         Raises:
             ClientException: When pausing failed.
         """
-        result = self.api.pause([self], force=force)[0]
-        if not result:
-            raise result  # type: ignore  # we know it's a ClientException
-        return True
+        result = self.api.pause(self.gid, force=force)
+        return bool(result)
 
     def resume(self) -> bool:
         """
@@ -1121,10 +1113,8 @@ class Download:
         Raises:
             ClientException: When resuming failed.
         """
-        result = self.api.resume([self])[0]
-        if not result:
-            raise result  # type: ignore  # we know it's a ClientException
-        return True
+        result = self.api.resume(self.gid)
+        return bool(result)
 
     def purge(self) -> bool:
         """
@@ -1135,7 +1125,7 @@ class Download:
         """
         return self.api.client.remove_download_result(self.gid) == "OK"
 
-    def move_files(self, to_directory: str | Path, force: bool = False) -> bool:  # noqa: FBT001,FBT002
+    def move_files(self, to_directory: str | Path, force: bool = False) -> bool:
         """
         Move downloaded files to another directory.
 
@@ -1148,7 +1138,7 @@ class Download:
         """
         return self.api.move_files([self], to_directory, force)[0]
 
-    def copy_files(self, to_directory: str | Path, force: bool = False) -> bool:  # noqa: FBT001,FBT002
+    def copy_files(self, to_directory: str | Path, force: bool = False) -> bool:
         """
         Copy downloaded files to another directory.
 

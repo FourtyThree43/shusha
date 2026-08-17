@@ -1,12 +1,11 @@
 import threading
 import tkinter as tk
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 import ttkbootstrap as ttk
-from ttkbootstrap.tableview import TableRow, Tableview
-from ttkbootstrap.toast import ToastNotification
-from ttkbootstrap.tooltip import ToolTip
+from ttkbootstrap import TableRow, Tableview, ToastNotification, ToolTip
 
 from shusha.controller.api import ShushaAPI as Api
 from shusha.models.logger import LoggerService
@@ -97,7 +96,7 @@ class Aria2Gui(ttk.Frame):
         ToolTip(
             add_btn,
             text="Add new download",
-            bootstyle=(ttk.WARNING, ttk.INVERSE),
+            bootstyle="warning",
         )
 
         start_btn = ttk.Button(
@@ -112,7 +111,7 @@ class Aria2Gui(ttk.Frame):
         ToolTip(
             start_btn,
             text="Start downloads",
-            bootstyle=(ttk.WARNING, ttk.INVERSE),
+            bootstyle="warning",
         )
 
         pause_btn = ttk.Button(
@@ -127,7 +126,7 @@ class Aria2Gui(ttk.Frame):
         ToolTip(
             pause_btn,
             text="Pause downloads",
-            bootstyle=(ttk.WARNING, ttk.INVERSE),
+            bootstyle="warning",
         )
 
         refresh_btn = ttk.Button(
@@ -142,7 +141,7 @@ class Aria2Gui(ttk.Frame):
         ToolTip(
             refresh_btn,
             text="Refresh downloads list",
-            bootstyle=(ttk.WARNING, ttk.INVERSE),
+            bootstyle="warning",
         )
 
         mvup_btn = ttk.Button(
@@ -157,7 +156,7 @@ class Aria2Gui(ttk.Frame):
         ToolTip(
             mvup_btn,
             text="Move download up",
-            bootstyle=(ttk.WARNING, ttk.INVERSE),
+            bootstyle="warning",
         )
 
         mvdown_btn = ttk.Button(
@@ -172,7 +171,7 @@ class Aria2Gui(ttk.Frame):
         ToolTip(
             mvdown_btn,
             text="Move download down",
-            bootstyle=(ttk.WARNING, ttk.INVERSE),
+            bootstyle="warning",
         )
 
         rem_btn = ttk.Button(
@@ -187,7 +186,7 @@ class Aria2Gui(ttk.Frame):
         ToolTip(
             rem_btn,
             text="Remove downloads",
-            bootstyle=(ttk.DANGER, ttk.INVERSE),
+            bootstyle="danger",
         )
 
         sett_btn = ttk.Button(
@@ -199,9 +198,7 @@ class Aria2Gui(ttk.Frame):
             bootstyle="outline-dark",
         )
         sett_btn.pack(side=tk.RIGHT, padx=(0, 1), pady=1)
-        ToolTip(
-            sett_btn, text="Open settings", bootstyle=(ttk.WARNING, ttk.INVERSE)
-        )
+        ToolTip(sett_btn, text="Open settings", bootstyle="warning")
 
         logs_btn = ttk.Button(
             master=opts_row,
@@ -212,9 +209,7 @@ class Aria2Gui(ttk.Frame):
             bootstyle="outline-dark",
         )
         logs_btn.pack(side=tk.RIGHT, padx=(0, 1), pady=1)
-        ToolTip(
-            logs_btn, text="Open logs", bootstyle=(ttk.WARNING, ttk.INVERSE)
-        )
+        ToolTip(logs_btn, text="Open logs", bootstyle="warning")
 
     def create_table_view(self):
         """
@@ -285,11 +280,11 @@ class Aria2Gui(ttk.Frame):
         ]
 
         category = ttk.Combobox(master=opts_row, values=_categories, width=12)
-        category.pack(side=ttk.LEFT, padx=10, pady=1)
+        category.pack(side=tk.LEFT, padx=10, pady=1)
         ToolTip(
             category,
             text="Select category",
-            bootstyle=(ttk.WARNING, ttk.INVERSE),
+            bootstyle="warning",
         )
 
         start_btn = ttk.Button(
@@ -300,10 +295,8 @@ class Aria2Gui(ttk.Frame):
             width=8,
             bootstyle="outline-dark",
         )
-        start_btn.pack(side=ttk.LEFT, padx=(1, 0), pady=1)
-        ToolTip(
-            start_btn, text="Start queue", bootstyle=(ttk.WARNING, ttk.INVERSE)
-        )
+        start_btn.pack(side=tk.LEFT, padx=(1, 0), pady=1)
+        ToolTip(start_btn, text="Start queue", bootstyle="warning")
 
         pause_btn = ttk.Button(
             master=opts_row,
@@ -313,10 +306,8 @@ class Aria2Gui(ttk.Frame):
             width=8,
             bootstyle="outline-dark",
         )
-        pause_btn.pack(side=ttk.LEFT, padx=(1, 0), pady=1)
-        ToolTip(
-            pause_btn, text="Pause queue", bootstyle=(ttk.WARNING, ttk.INVERSE)
-        )
+        pause_btn.pack(side=tk.LEFT, padx=(1, 0), pady=1)
+        ToolTip(pause_btn, text="Pause queue", bootstyle="warning")
 
         refresh_btn = ttk.Button(
             master=opts_row,
@@ -326,11 +317,11 @@ class Aria2Gui(ttk.Frame):
             width=8,
             bootstyle="outline-dark",
         )
-        refresh_btn.pack(side=ttk.LEFT, padx=(1, 0), pady=1)
+        refresh_btn.pack(side=tk.LEFT, padx=(1, 0), pady=1)
         ToolTip(
             refresh_btn,
             text="Clear queue list",
-            bootstyle=(ttk.DANGER, ttk.INVERSE),
+            bootstyle="danger",
         )
 
         sett_btn = ttk.Button(
@@ -345,7 +336,7 @@ class Aria2Gui(ttk.Frame):
         ToolTip(
             sett_btn,
             text="Open queue settings",
-            bootstyle=(ttk.WARNING, ttk.INVERSE),
+            bootstyle="warning",
         )
 
         self.stats_frame = tk.Frame(opts_row)
@@ -409,15 +400,12 @@ class Aria2Gui(ttk.Frame):
             "Upload Speed": global_stats.upload_speed_string(),
         }
 
-        column_index = 0
-        for key, value in stats_info.items():
+        for column_index, (key, value) in enumerate(stats_info.items()):
             label = tk.Label(self.stats_frame, text=f"{key}:")
             label.grid(row=0, column=column_index, sticky="w", padx=5)
 
             value_label = tk.Label(self.stats_frame, text=value)
             value_label.grid(row=1, column=column_index, sticky="e", padx=5)
-
-            column_index += 1
 
     def open_toplevel(self):
         """
@@ -492,9 +480,9 @@ class Aria2Gui(ttk.Frame):
         """
         if download.gid is None or download.is_complete or download.has_failed:
             return
-        
+
         download.update()
-        
+
         new_data = self.get_download_row_data(download)
         _row.configure(iid=_row.iid, values=new_data)
         self.dt.load_table_data()

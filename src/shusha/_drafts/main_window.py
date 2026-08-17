@@ -1,11 +1,11 @@
 import tkinter as tk
 from tkinter import ttk
-from gui.status_window import StatusWindow
+
 from Aria2Client import Aria2Client
+from gui.status_window import StatusWindow
 
 
 class MainWindow:
-
     def __init__(self, master):
         self.master = master
         self.master.title("Shusha")
@@ -20,11 +20,19 @@ class MainWindow:
 
         self.output_label = ttk.Label(master, text="Output Path:")
         self.output_entry = ttk.Entry(master, width=50)
-        self.output_entry.insert(0, self.downloader.download_config.get("output_path", ""))
-        self.output_button = ttk.Button(master, text="Browse", command=self.browse_output_path)
+        self.output_entry.insert(
+            0, self.downloader.download_config.get("output_path", "")
+        )
+        self.output_button = ttk.Button(
+            master, text="Browse", command=self.browse_output_path
+        )
 
-        self.download_button = ttk.Button(master, text="Download", command=self.download)
-        self.status_button = ttk.Button(master, text="Show Status", command=self.show_status)
+        self.download_button = ttk.Button(
+            master, text="Download", command=self.download
+        )
+        self.status_button = ttk.Button(
+            master, text="Show Status", command=self.show_status
+        )
 
         # Layout
         self.url_label.grid(row=0, column=0, sticky=tk.W, pady=5)
@@ -36,7 +44,9 @@ class MainWindow:
         self.status_button.grid(row=3, column=0, columnspan=3, pady=10)
 
     def browse_output_path(self):
-        output_path = tk.filedialog.asksaveasfilename(defaultextension=".txt", filetypes=[("All Files", "*.*")])
+        output_path = tk.filedialog.asksaveasfilename(
+            defaultextension=".txt", filetypes=[("All Files", "*.*")]
+        )
         if output_path:
             self.output_entry.delete(0, tk.END)
             self.output_entry.insert(0, output_path)
@@ -50,7 +60,9 @@ class MainWindow:
             # Add status messages or update GUI as needed
 
     def show_status(self):
-        status_window = StatusWindow(self.master, self.downloader, 'your_gid')  # Replace 'your_gid' with the actual GID
+        status_window = StatusWindow(
+            self.master, self.downloader, "your_gid"
+        )  # Replace 'your_gid' with the actual GID
 
 
 if __name__ == "__main__":

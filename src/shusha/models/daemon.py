@@ -6,6 +6,7 @@ The class provides methods to start, stop, and restart the Aria2 server.
 """
 
 import platform
+import shutil
 import subprocess
 import time
 from pathlib import Path
@@ -43,7 +44,12 @@ class Daemon:
         :param timeout: (int) The timeout for the connection. Default is DEFAULT_TIMEOUT.
         :return: None
         """
-        self.aria2d = aria2d or BIN_PATH
+        if aria2d is not None:
+            self.aria2d = aria2d
+        elif platform.system() == "Windows" and BIN_PATH.exists():
+            self.aria2d = BIN_PATH
+        else:
+            self.aria2d = shutil.which("aria2c") or "aria2c"
         self.host = host
         self.port = port
         self.timeout = timeout
@@ -103,10 +109,11 @@ class Daemon:
         base_command = [str(self.aria2d)]
 
         if CONF_PATH.exists():
-            command = base_command + ["--conf-path=" + str(CONF_PATH)]
+            command = [*base_command, f"--conf-path={CONF_PATH}"]
         else:
             # Use default configuration
-            command = base_command + [
+            command = [
+                *base_command,
                 "--enable-rpc",
                 "--rpc-listen-all",
                 f"--rpc-listen-port={self.port}",
@@ -185,5 +192,4 @@ class Daemon:
             time.sleep(3)
         except Exception as e:
             logger.log(f"Error stopping Aria2 server: {e}", level="error")
-        finally:
-            return self.start_server()
+        return self.start_server()

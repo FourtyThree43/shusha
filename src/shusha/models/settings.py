@@ -2,9 +2,9 @@ from shusha.models.utilities import load_configuration  # , save_configuration
 
 
 class AppSettings:
-
     def __init__(self):
         self.config_dict = load_configuration()
+        self.config_dict.setdefault("USER", {})
 
     def get_aria2_config(self):
         return self.config_dict.get("USER", {}).get("aria2", {})

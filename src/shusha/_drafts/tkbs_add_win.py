@@ -6,7 +6,6 @@ import ttkbootstrap as ttk
 
 
 class AddWindow(ttk.Toplevel):
-
     def __init__(self, master):
         super().__init__(master)
         self.title("Add Download")
@@ -284,7 +283,7 @@ class AddWindow(ttk.Toplevel):
             self.path_var.set(path)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     root = ttk.Window(themename="darkly", position=(900, 100))
     app = AddWindow(root)
     root.mainloop()

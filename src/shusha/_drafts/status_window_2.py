@@ -1,14 +1,13 @@
-import tkinter as tk
-from tkinter import ttk
+import logging
 import threading
 import time
-import logging
+import tkinter as tk
+from tkinter import ttk
 
 logging.basicConfig(level=logging.INFO)
 
 
 class StatusWindow:
-
     def __init__(self, master, aria2_client, gid):
         self.master = master
         self.aria2_client = aria2_client
@@ -33,9 +32,9 @@ class StatusWindow:
         self.status_label.pack(padx=10, pady=10)
 
         # Create a button to close the window
-        close_button = ttk.Button(self.master,
-                                  text="Close",
-                                  command=self.master.destroy)
+        close_button = ttk.Button(
+            self.master, text="Close", command=self.master.destroy
+        )
         close_button.pack(pady=10)
 
     def status_thread(self):
@@ -49,9 +48,11 @@ class StatusWindow:
 
                 status = self.aria2_client.tell_status(self.gid)
                 if status:
-                    self.status_label.config(text=f"Status: {status}",
-                                             wraplength=200,
-                                             justify=tk.LEFT)
+                    self.status_label.config(
+                        text=f"Status: {status}",
+                        wraplength=200,
+                        justify=tk.LEFT,
+                    )
                 else:
                     self.status_label.config(text="Download not found")
                     break  # Break the loop if the download is not found

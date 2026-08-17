@@ -24,16 +24,17 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from copy import deepcopy
-from typing import TYPE_CHECKING, Callable, Union
+from typing import TYPE_CHECKING, Any
 
-from models.utilities import bool_or_value, bool_to_str
+from shusha.models.utilities import bool_or_value, bool_to_str
 
 if TYPE_CHECKING:
     from shusha.controller.api import ShushaAPI as Api
     from shusha.models.structs_downloads import Download
 
-OptionType = Union[str, int, bool, float, None]
+OptionType = str | int | bool | float | None
 
 
 class Options:
@@ -51,9 +52,7 @@ class Options:
     "max-concurrent-downloads" is used like `options.max_concurrent_downloads = 5`.
     """
 
-    def __init__(
-        self, api: Api, struct: dict, download: Download | None = None
-    ):
+    def __init__(self, api: Api, struct: dict, download: Download | None = None):
         """Initialize the object.
 
         Parameters:
@@ -83,7 +82,7 @@ class Options:
         """
         return deepcopy(self._struct)
 
-    def get(self, item: str, class_: Callable | None = None) -> OptionType:
+    def get(self, item: str, class_: Callable | None = None) -> Any:
         """Get the value of an option given its name.
 
         Parameters:
@@ -98,7 +97,7 @@ class Options:
             return class_(value)
         return value
 
-    def set(self, key: str, value: str | float | bool | list[str]) -> bool:  # noqa: A003 (shadowing set)
+    def set(self, key: str, value: str | float | bool | list[str]) -> bool:
         """Set the value of an option given its name.
 
         Parameters:
@@ -120,7 +119,7 @@ class Options:
 
     # Basic Options
     @property
-    def dir(self) -> str:  # noqa: A003
+    def dir(self) -> str:
         """Return the `dir` option value.
 
         The directory to store the downloaded file.
@@ -131,7 +130,7 @@ class Options:
         return self.get("dir")  # type: ignore[return-value]
 
     @dir.setter
-    def dir(self, value: str) -> None:  # noqa: A003
+    def dir(self, value: str) -> None:
         self.set("dir", value)
 
     @property

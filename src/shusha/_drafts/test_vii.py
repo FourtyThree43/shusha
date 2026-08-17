@@ -1,5 +1,5 @@
-from tkinter import ttk
 import tkinter as tk
+from tkinter import ttk
 
 root = tk.Tk()
 root.geometry("750x450")

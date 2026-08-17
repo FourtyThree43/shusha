@@ -60,9 +60,7 @@ class Client:
         self.remote = daemon
         self.secret = None
         self.server_uri = f"http://{self.remote.host}:{self.remote.port}/rpc"
-        self.server = xmlrpc.client.ServerProxy(
-            self.server_uri, allow_none=True
-        )
+        self.server = xmlrpc.client.ServerProxy(self.server_uri, allow_none=True)
 
     def __str__(self):
         """
@@ -150,17 +148,19 @@ class Client:
 
         Returns:
             str: The GID of the newly added download.
-        """     
+        """
         return self._call_method("addUri", [uris, options, position])
 
     def add_torrent(self, torrent, uris=None, options=None, position=None):
-        torrent = xmlrpc.client.Binary(open(torrent, "rb").read())
-        return self._call_method(
-            "addTorrent", [torrent, uris, options, position]
-        )
+        with open(torrent, "rb") as f:
+            torrent_bin = xmlrpc.client.Binary(f.read())
+        return self._call_method("addTorrent", [torrent_bin, uris, options, position])
 
     def add_metalink(self, metalink, options=None, position=None):
         return self._call_method("addMetalink", [metalink, options, position])
+
+    def add_magnet(self, magnet_uri: str, options=None, position: int | None = None):
+        return self.add_uri([magnet_uri], options=options, position=position)
 
     def remove(self, gid: str):
         """

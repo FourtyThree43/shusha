@@ -1,9 +1,8 @@
-from tkinter import ttk
 import tkinter as tk
+from tkinter import ttk
 
 
 class App(tk.Tk):
-
     def __init__(self):
         super().__init__()
         self.title("Tkinter Notebook Example")
@@ -32,9 +31,7 @@ class App(tk.Tk):
         self.label3 = ttk.Label(self.tab3, text="This is Tab Three")
         self.label3.pack(padx=10, pady=10)
 
-        self.button = ttk.Button(self.tab3,
-                                 text="Click Me",
-                                 command=self.click_me)
+        self.button = ttk.Button(self.tab3, text="Click Me", command=self.click_me)
         self.button.pack(padx=10, pady=10)
 
     def click_me(self):

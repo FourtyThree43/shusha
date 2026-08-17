@@ -101,7 +101,7 @@ class AddWindow(ttk.Toplevel):
                 self.checkbox_var,
                 self.rename_ent1,
             ),
-            bootstyle=ttk.WARNING,
+            bootstyle="warning",
         )
         checkbox.pack(side=tk.LEFT, padx=(15, 0))
 
@@ -110,7 +110,7 @@ class AddWindow(ttk.Toplevel):
         self.rename_ent1 = ttk.Entry(
             rename_row,
             textvariable=self.rename_var,
-            bootstyle=ttk.WARNING,
+            bootstyle="warning",
         )
         self.rename_ent1.pack(side=tk.LEFT, fill=tk.X, expand=tk.YES, padx=5)
 
@@ -122,7 +122,7 @@ class AddWindow(ttk.Toplevel):
             from_=1,
             to=64,
             width=3,
-            bootstyle=ttk.WARNING,
+            bootstyle="warning",
         )
         splits_spinbox.pack(side=tk.LEFT, padx=(0, 15))
 
@@ -134,7 +134,7 @@ class AddWindow(ttk.Toplevel):
         path_ent = ttk.Entry(
             path_row,
             textvariable=self.path_var,
-            bootstyle=ttk.WARNING,
+            bootstyle="warning",
         )
         path_ent.pack(side=tk.LEFT, fill=tk.X, expand=tk.YES, padx=5)
 
@@ -143,7 +143,7 @@ class AddWindow(ttk.Toplevel):
             text="Browse",
             command=self.on_browse,
             width=8,
-            bootstyle=ttk.WARNING,
+            bootstyle="warning",
         )
         browse_btn.pack(side=tk.LEFT, padx=5)
 
@@ -156,7 +156,7 @@ class AddWindow(ttk.Toplevel):
             text="Submit",
             command=lambda: self.submit(),
             width=8,
-            bootstyle=ttk.SUCCESS,
+            bootstyle="success",
         )
         submit_btn.pack(side=tk.RIGHT, padx=5)
 
@@ -165,7 +165,7 @@ class AddWindow(ttk.Toplevel):
             text="Cancel",
             command=lambda: self.destroy(),
             width=8,
-            bootstyle=ttk.DANGER,
+            bootstyle="danger",
         )
         cancel_btn.pack(side=tk.RIGHT, padx=5)
 
@@ -180,7 +180,7 @@ class AddWindow(ttk.Toplevel):
         torrent_lbl.pack(side=tk.LEFT, padx=(15, 0))
         torrent_ent = ttk.Entry(
             torrent_row,
-            bootstyle=ttk.WARNING,
+            bootstyle="warning",
         )
         torrent_ent.configure(state="readonly")
         torrent_ent.pack(
@@ -213,7 +213,7 @@ class AddWindow(ttk.Toplevel):
                 self.checkbox_var,
                 self.rename_ent,
             ),
-            bootstyle=ttk.WARNING,
+            bootstyle="warning",
         )
         checkbox.pack(side=tk.LEFT, padx=(15, 0))
 
@@ -222,7 +222,7 @@ class AddWindow(ttk.Toplevel):
         self.rename_ent = ttk.Entry(
             rename_row,
             textvariable=self.rename_var,
-            bootstyle=ttk.WARNING,
+            bootstyle="warning",
         )
         self.rename_ent.pack(side=tk.LEFT, fill=tk.X, expand=tk.YES, padx=5)
         self.rename_ent.configure(state=tk.DISABLED)
@@ -235,7 +235,7 @@ class AddWindow(ttk.Toplevel):
             from_=1,
             to=64,
             width=3,
-            bootstyle=ttk.WARNING,
+            bootstyle="warning",
         )
         splits_spinbox.pack(side=tk.LEFT, padx=(0, 15))
 
@@ -248,7 +248,7 @@ class AddWindow(ttk.Toplevel):
         path_ent = ttk.Entry(
             path_row,
             textvariable=self.path_var,
-            bootstyle=ttk.WARNING,
+            bootstyle="warning",
         )
         path_ent.pack(side=tk.LEFT, fill=tk.X, expand=tk.YES, padx=5)
 
@@ -257,7 +257,7 @@ class AddWindow(ttk.Toplevel):
             text="Browse",
             command=self.on_browse,
             width=8,
-            bootstyle=ttk.WARNING,
+            bootstyle="warning",
         )
         browse_btn.pack(side=tk.LEFT, padx=5)
 
@@ -270,7 +270,7 @@ class AddWindow(ttk.Toplevel):
             text="Submit",
             command=lambda: self.submit(),
             width=8,
-            bootstyle=ttk.SUCCESS,
+            bootstyle="success",
         )
         submit_btn.pack(side=tk.RIGHT, padx=5)
 
@@ -279,7 +279,7 @@ class AddWindow(ttk.Toplevel):
             text="Cancel",
             command=lambda: self.destroy(),
             width=8,
-            bootstyle=ttk.DANGER,
+            bootstyle="danger",
         )
         cancel_btn.pack(side=tk.RIGHT, padx=5)
 
@@ -337,5 +337,5 @@ class AddWindow(ttk.Toplevel):
 
 if __name__ == "__main__":
     root = ttk.Window(themename="darkly", position=(900, 100))
-    app = AddWindow()
+    app = AddWindow(callback=lambda u, o: None)
     root.mainloop()

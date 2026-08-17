@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 
+
 class StatusWindow:
     def __init__(self, master, downloader, gid):
         self.master = master
@@ -13,7 +14,9 @@ class StatusWindow:
     def create_widgets(self):
         self.status_label = ttk.Label(self.master, text="Download Status:")
         self.status_display = ttk.Label(self.master, textvariable=self.status_var)
-        self.refresh_button = ttk.Button(self.master, text="Refresh", command=self.refresh_status)
+        self.refresh_button = ttk.Button(
+            self.master, text="Refresh", command=self.refresh_status
+        )
 
         self.status_label.grid(row=0, column=0, pady=10)
         self.status_display.grid(row=1, column=0, pady=10)

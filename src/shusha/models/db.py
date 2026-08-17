@@ -3,6 +3,7 @@ import sqlite3
 from contextlib import contextmanager
 from sqlite3 import Error
 from threading import Lock
+from typing import ClassVar
 
 from shusha.models.logger import LoggerService
 
@@ -17,7 +18,7 @@ class StructsDB:
     TABLE_BITTORRENT = "bittorrent_t"
     TABLE_QUEUE = "queue_t"
 
-    DOWNLOAD_COLUMNS = [
+    DOWNLOAD_COLUMNS: ClassVar[list[str]] = [
         "gid",
         "status",
         "totalLength",
@@ -43,7 +44,7 @@ class StructsDB:
         "timestamp",
     ]
 
-    FILES_COLUMNS = [
+    FILES_COLUMNS: ClassVar[list[str]] = [
         "id",
         "file_index",
         "path",
@@ -54,7 +55,7 @@ class StructsDB:
         "download_id",
     ]
 
-    BITTORRENT_COLUMNS = [
+    BITTORRENT_COLUMNS: ClassVar[list[str]] = [
         "id",
         "announce_list",
         "comment",
@@ -258,7 +259,7 @@ class StructsDB:
         ]
         placeholders = ", ".join(["?" for _ in columns])
 
-        query = f"""INSERT INTO {StructsDB.TABLE_DOWNLOAD} ({', '.join(columns)})
+        query = f"""INSERT INTO {StructsDB.TABLE_DOWNLOAD} ({", ".join(columns)})
                     VALUES ({placeholders})
                  """
 
@@ -284,8 +285,8 @@ class StructsDB:
             for column in columns[:-1]
         ] + [gid]
 
-        query = f"""INSERT INTO files_t ({', '.join(columns)})
-                    VALUES ({', '.join(['?' for _ in columns])})
+        query = f"""INSERT INTO files_t ({", ".join(columns)})
+                    VALUES ({", ".join(["?" for _ in columns])})
                  """
 
         self._execute_query(cursor, query, values)
@@ -312,8 +313,8 @@ class StructsDB:
             gid,
         ]
 
-        query = f"""INSERT INTO bittorrent_t ({', '.join(columns)})
-                    VALUES ({', '.join(['?' for _ in columns])})
+        query = f"""INSERT INTO bittorrent_t ({", ".join(columns)})
+                    VALUES ({", ".join(["?" for _ in columns])})
                  """
 
         self._execute_query(cursor, query, values)
@@ -330,7 +331,7 @@ class StructsDB:
             )
             query = f"UPDATE {table_name} SET {set_columns} WHERE {where_column} = ?"
 
-            values = list(set_values.values()) + [where_value]
+            values = [*set_values.values(), where_value]
             self._execute_query(cursor, query, values)
 
     def store_download_info(self, gid, info):
@@ -356,7 +357,7 @@ class StructsDB:
         """
         result_dicts = []
         for result in results:
-            result_dicts.append(dict(zip(columns, result)))
+            result_dicts.append(dict(zip(columns, result, strict=False)))
         return result_dicts
 
     def to_dict(self, results, columns):
@@ -441,18 +442,16 @@ class StructsDB:
         """
         with self.database_transaction() as conn:
             cursor = conn.cursor()
-            self._execute_query(cursor, "DELETE FROM downloads")
-            self._execute_query(cursor, "DELETE FROM files_t")
-            self._execute_query(cursor, "DELETE FROM bittorrent_t")
+            self._execute_query(cursor, f"DELETE FROM {StructsDB.TABLE_DOWNLOAD}")
+            self._execute_query(cursor, f"DELETE FROM {StructsDB.TABLE_FILES}")
+            self._execute_query(cursor, f"DELETE FROM {StructsDB.TABLE_BITTORRENT}")
 
     def update_download(self, gid, info_updates: dict):
         """
         Update download status in the 'downloads' table based on 'gid'.
         """
         where_column = "gid"
-        self.update_table(
-            StructsDB.TABLE_DOWNLOAD, info_updates, where_column, gid
-        )
+        self.update_table(StructsDB.TABLE_DOWNLOAD, info_updates, where_column, gid)
 
     def close_connection(self):
         """Close the database connection if it is open."""

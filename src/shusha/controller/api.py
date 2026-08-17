@@ -8,22 +8,22 @@ manage downloads.
 The Aria2 XML-RPC Client API documentation can be found at:
 https://aria2.github.io/manual/en/html/aria2c.html#rpc-interface
 """
+
 from __future__ import annotations
 
 import shutil
 from pathlib import Path
-from typing import List, Optional, Union
 
-from models.client import Client, XMLRPCClientException
-from models.daemon import Daemon
-from models.database import ShushaDB
-from models.logger import LoggerService
-from models.structs_downloads import Download
-from models.structs_options import Options
-from models.structs_stats import Stats
+from shusha.models.client import Client, XMLRPCClientException
+from shusha.models.daemon import Daemon
+from shusha.models.database import ShushaDB
+from shusha.models.logger import LoggerService
+from shusha.models.structs_downloads import Download
+from shusha.models.structs_options import Options
+from shusha.models.structs_stats import Stats
 
-OptionsType = Union[Options, dict]
-OperationResult = Union[bool, XMLRPCClientException]
+OptionsType = Options | dict
+OperationResult = bool | XMLRPCClientException
 
 logger = LoggerService(logger_name="ShushaAPI")
 
@@ -36,9 +36,9 @@ class ShushaAPI:
 
     def __init__(
         self,
-        daemon: Optional[Daemon] = None,
-        client: Optional[Client] = None,
-        db: Optional[ShushaDB] = None,
+        daemon: Daemon | None = None,
+        client: Client | None = None,
+        db: ShushaDB | None = None,
     ):
         self.remote = daemon or Daemon()
         self.client = client or Client(self.remote)
@@ -70,7 +70,7 @@ class ShushaAPI:
 
         return download
 
-    def get_downloads(self, gids: list[str] | None = None) -> List[Download]:
+    def get_downloads(self, gids: list[str] | None = None) -> list[Download]:
         """Get all downloads from the database.
 
         Returns:
@@ -98,9 +98,9 @@ class ShushaAPI:
     def add(
         self,
         uri: list[str],
-        options: Optional[OptionsType] = None,
-        position: Optional[int] = None,
-    ) -> List[Download]:
+        options: OptionsType | None = None,
+        position: int | None = None,
+    ) -> list[Download]:
         """Add a download.
 
         Parameters:
@@ -131,8 +131,12 @@ class ShushaAPI:
 
         return new_downloads
 
-    def add_uris(self, uris: list[str], options: OptionsType | None = None, 
-                position: int | None = None) -> Download | None:
+    def add_uris(
+        self,
+        uris: list[str],
+        options: OptionsType | None = None,
+        position: int | None = None,
+    ) -> Download | None:
         """
         Add a download with a URL (or more).
 
@@ -162,12 +166,13 @@ class ShushaAPI:
                 return None
         except XMLRPCClientException as e:
             logger.log(f"Error adding URI: {e}", level="error")
+
     def add_magnet(
         self,
         magnet: str,
-        options: Optional[OptionsType] = None,
-        position: Optional[int] = None,
-    ) -> List[Download]:
+        options: OptionsType | None = None,
+        position: int | None = None,
+    ) -> list[Download]:
         """Add a magnet link.
 
         Parameters:
@@ -193,9 +198,9 @@ class ShushaAPI:
     def add_torrent(
         self,
         torrent: str,
-        options: Optional[OptionsType] = None,
-        position: Optional[int] = None,
-    ) -> List[Download]:
+        options: OptionsType | None = None,
+        position: int | None = None,
+    ) -> list[Download]:
         """Add a torrent.
 
         Parameters:
@@ -211,7 +216,9 @@ class ShushaAPI:
         try:
             gid = self.client.add_torrent(torrent, options, position)
             logger.log(f"Torrent added with GID: {gid}")
-            new_downloads.append(self.get_download(gid) if gid else [])
+            dl = self.get_download(gid)
+            if dl:
+                new_downloads.append(dl)
 
         except XMLRPCClientException as e:
             logger.log(f"Error adding torrent: {e}", level="error")
@@ -221,7 +228,7 @@ class ShushaAPI:
     def retry_downloads(
         self,
         downloads: list[Download],
-        clean: bool = False,  # noqa: FBT001,FBT002
+        clean: bool = False,
     ) -> list[OperationResult]:
         """Resume failed downloads from where they left off with new GIDs.
 
@@ -254,7 +261,7 @@ class ShushaAPI:
 
         return result
 
-    def remove(self, gid: str, force: bool = False) -> List[Download]:
+    def remove(self, gid: str, force: bool = False) -> list[Download]:
         """Remove a download.
 
         Parameters:
@@ -267,7 +274,10 @@ class ShushaAPI:
         removed_downloads = []
 
         try:
-            self.client.force_remove if force else self.client.remove
+            if force:
+                self.client.force_remove(gid)
+            else:
+                self.client.remove(gid)
 
             logger.log(f"Download removed with GID: {gid}")
             removed_downloads.append(self.get_download(gid))
@@ -277,7 +287,7 @@ class ShushaAPI:
 
         return removed_downloads
 
-    def pause(self, gid: str, force: bool = False) -> List[Download]:
+    def pause(self, gid: str, force: bool = False) -> list[Download]:
         """Pause a download.
 
         Parameters:
@@ -299,7 +309,7 @@ class ShushaAPI:
 
         return paused_downloads
 
-    def pause_all(self) -> List[Download]:
+    def pause_all(self) -> list[Download]:
         """Pause all downloads.
 
         Returns:
@@ -317,7 +327,7 @@ class ShushaAPI:
 
         return paused_downloads
 
-    def resume(self, gid: str) -> List[Download]:
+    def resume(self, gid: str) -> list[Download]:
         """Resume a download.
 
         Parameters:
@@ -338,7 +348,7 @@ class ShushaAPI:
 
         return resumed_downloads
 
-    def resume_all(self) -> List[Download]:
+    def resume_all(self) -> list[Download]:
         """Resume all downloads.
 
         Returns:
@@ -431,7 +441,7 @@ class ShushaAPI:
         """
         return self.client.change_position(download.gid, 0, "POS_END")
 
-    def purge(self) -> List[Download]:
+    def purge(self) -> list[Download]:
         """Purge completed and removed downloads from the database.
 
         Returns:
@@ -449,9 +459,7 @@ class ShushaAPI:
 
         return purged_downloads
 
-    def download_status(
-        self, gid: str, keys: list[str] | None = None
-    ) -> Download:
+    def download_status(self, gid: str, keys: list[str] | None = None) -> Download:
         """Get a struct of the download status.
 
         Args:
@@ -467,9 +475,7 @@ class ShushaAPI:
             status = self.client.tell_status(gid, keys)
             if status is None:
                 status = {}
-                logger.log(
-                    f"Download not found with GID: {gid}", level="warning"
-                )
+                logger.log(f"Download not found with GID: {gid}", level="warning")
 
             struct = status
 
@@ -478,7 +484,7 @@ class ShushaAPI:
 
         return Download(self, struct=struct)
 
-    def active_downloads(self) -> List[Download]:
+    def active_downloads(self) -> list[Download]:
         """Get all active downloads.
 
         Returns:
@@ -491,15 +497,13 @@ class ShushaAPI:
 
             if active:
                 # logger.log(f"Active downloads retrieved: {active}")
-                active_downloads.extend(
-                    [Download(self, struct) for struct in active]
-                )
+                active_downloads.extend([Download(self, struct) for struct in active])
         except XMLRPCClientException as e:
             logger.log(f"Error getting active downloads: {e}", level="error")
 
         return active_downloads
 
-    def waiting_downloads(self) -> List[Download]:
+    def waiting_downloads(self) -> list[Download]:
         """Get all waiting downloads.
 
         Returns:
@@ -512,15 +516,13 @@ class ShushaAPI:
 
             if waiting:
                 # logger.log(f"Waiting downloads retrieved: {waiting}")
-                waiting_downloads.extend(
-                    [Download(self, struct) for struct in waiting]
-                )
+                waiting_downloads.extend([Download(self, struct) for struct in waiting])
         except XMLRPCClientException as e:
             logger.log(f"Error getting waiting downloads: {e}", level="error")
 
         return waiting_downloads
 
-    def stopped_downloads(self) -> List[Download]:
+    def stopped_downloads(self) -> list[Download]:
         """Get all stopped downloads.
 
         Returns:
@@ -533,9 +535,7 @@ class ShushaAPI:
 
             if stopped:
                 # logger.log(f"Stopped downloads retrieved: {stopped}")
-                stopped_downloads.extend(
-                    [Download(self, struct) for struct in stopped]
-                )
+                stopped_downloads.extend([Download(self, struct) for struct in stopped])
         except XMLRPCClientException as e:
             logger.log(f"Error getting stopped downloads: {e}", level="error")
 
@@ -620,7 +620,7 @@ class ShushaAPI:
     @staticmethod
     def remove_files(
         downloads: list[Download],
-        force: bool = False,  # noqa: FBT001,FBT002
+        force: bool = False,
     ) -> list[bool]:
         """Remove downloaded files.
 
@@ -665,7 +665,7 @@ class ShushaAPI:
     def move_files(
         downloads: list[Download],
         to_directory: str | Path,
-        force: bool = False,  # noqa: FBT001,FBT002
+        force: bool = False,
     ) -> list[bool]:
         """Move downloaded files to another directory.
 
@@ -697,7 +697,7 @@ class ShushaAPI:
     def copy_files(
         downloads: list[Download],
         to_directory: str | Path,
-        force: bool = False,  # noqa: FBT001,FBT002
+        force: bool = False,
     ) -> list[bool]:
         """Copy downloaded files to another directory.
 
@@ -720,9 +720,7 @@ class ShushaAPI:
             if download.is_complete or force:
                 for path in download.root_files_paths:
                     if path.is_dir():
-                        shutil.copytree(
-                            str(path), str(to_directory / path.name)
-                        )
+                        shutil.copytree(str(path), str(to_directory / path.name))
                     elif path.is_file():
                         shutil.copy(str(path), str(to_directory))
 

@@ -54,7 +54,17 @@ def main(argv: list[str] | None = None):
         position=(10, 140),
     )
 
-    app.iconbitmap(str(ICON_PATH))
+    try:
+        app.iconbitmap(str(ICON_PATH))
+    except Exception:
+        icon_png = OUTPUT_PATH / "resources" / "assets" / "icons8-bittorrent-new-64.png"
+        if icon_png.exists():
+            try:
+                img = ttk.PhotoImage(file=str(icon_png))
+                app.iconphoto(True, img)
+            except Exception:
+                pass
+
     my_app_instance = Aria2Gui(app)
     app.wm_protocol("WM_DELETE_WINDOW", on_close)
     app.mainloop()

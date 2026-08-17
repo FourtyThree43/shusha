@@ -1,17 +1,16 @@
-from pathlib import Path
 import tkinter as tk
+from pathlib import Path
 from tkinter import ttk
-from tkinter import filedialog
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path("gui/assets/")
+
 
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
 
 class App:
-
     def __init__(self, root):
         self.master = root
         self.master.geometry("540x540+664+580")  # “wm geometry... wxh+x+y”)
@@ -66,13 +65,13 @@ class App:
         # Add sub-items to Edit menu
         edit_menu.add_command(label="Add URL", command=self.add_url)
         edit_menu.add_command(label="Add Torrent", command=self.add_torrent)
-        edit_menu.add_command(label="Refresh Task List",
-                              command=self.refresh_task_list)
+        edit_menu.add_command(label="Refresh Task List", command=self.refresh_task_list)
         edit_menu.add_separator()
         edit_menu.add_command(label="Resume All Task", command=self.resume_all)
         edit_menu.add_command(label="Pause All Task", command=self.pause_all)
-        edit_menu.add_command(label="Purge Task Record",
-                              command=self.purge_task_records)
+        edit_menu.add_command(
+            label="Purge Task Record", command=self.purge_task_records
+        )
 
         # Add sub-items to View menu
         view_menu.add_checkbutton(label="Category")
@@ -118,46 +117,55 @@ class App:
 
         # Load images
         add_url_icon = tk.PhotoImage(
-            file=relative_to_assets("add-url-icon.png")).subsample(15, 15)
+            file=relative_to_assets("add-url-icon.png")
+        ).subsample(15, 15)
         add_torrent_icon = tk.PhotoImage(
-            file=relative_to_assets("magnetic-icon.png")).subsample(15, 15)
+            file=relative_to_assets("magnetic-icon.png")
+        ).subsample(15, 15)
         refresh_icon = tk.PhotoImage(
-            file=relative_to_assets("task-sync-icon.png")).subsample(15, 15)
+            file=relative_to_assets("task-sync-icon.png")
+        ).subsample(15, 15)
         resume_all_icon = tk.PhotoImage(
-            file=relative_to_assets("bt-DL4.png")).subsample(15, 15)
-        pause_all_icon = tk.PhotoImage(
-            file=relative_to_assets("bt-DL5.png")).subsample(15, 15)
+            file=relative_to_assets("bt-DL4.png")
+        ).subsample(15, 15)
+        pause_all_icon = tk.PhotoImage(file=relative_to_assets("bt-DL5.png")).subsample(
+            15, 15
+        )
         purge_records_icon = tk.PhotoImage(
-            file=relative_to_assets("remove-files-icon.png")).subsample(
-                15, 15)
+            file=relative_to_assets("remove-files-icon.png")
+        ).subsample(15, 15)
         self.start_all_icon = tk.PhotoImage(
-            file=relative_to_assets("bt-tON.png")).subsample(15, 15)
+            file=relative_to_assets("bt-tON.png")
+        ).subsample(15, 15)
         self.stop_all_icon = tk.PhotoImage(
-            file=relative_to_assets("bt-tOFF.png")).subsample(15, 15)
+            file=relative_to_assets("bt-tOFF.png")
+        ).subsample(15, 15)
 
         # Create buttons with images
-        add_url_button = ttk.Button(task_actions_bar,
-                                    image=add_url_icon,
-                                    command=self.add_url)
-        add_torrent_button = ttk.Button(task_actions_bar,
-                                        image=add_torrent_icon,
-                                        command=self.add_torrent)
-        refresh_button = ttk.Button(task_actions_bar,
-                                    image=refresh_icon,
-                                    command=self.refresh_task_list)
-        resume_all_button = ttk.Button(task_actions_bar,
-                                       image=resume_all_icon,
-                                       command=self.resume_all)
-        pause_all_button = ttk.Button(task_actions_bar,
-                                      image=pause_all_icon,
-                                      command=self.pause_all)
-        purge_records_button = ttk.Button(task_actions_bar,
-                                          image=purge_records_icon,
-                                          command=self.purge_task_records)
+        add_url_button = ttk.Button(
+            task_actions_bar, image=add_url_icon, command=self.add_url
+        )
+        add_torrent_button = ttk.Button(
+            task_actions_bar, image=add_torrent_icon, command=self.add_torrent
+        )
+        refresh_button = ttk.Button(
+            task_actions_bar, image=refresh_icon, command=self.refresh_task_list
+        )
+        resume_all_button = ttk.Button(
+            task_actions_bar, image=resume_all_icon, command=self.resume_all
+        )
+        pause_all_button = ttk.Button(
+            task_actions_bar, image=pause_all_icon, command=self.pause_all
+        )
+        purge_records_button = ttk.Button(
+            task_actions_bar,
+            image=purge_records_icon,
+            command=self.purge_task_records,
+        )
 
-        self.start_all_button = ttk.Button(task_actions_bar,
-                                           image=self.start_all_icon,
-                                           command=self.start_all)
+        self.start_all_button = ttk.Button(
+            task_actions_bar, image=self.start_all_icon, command=self.start_all
+        )
 
         # Attach icons to buttons
         add_url_button.image = add_url_icon
@@ -209,29 +217,18 @@ class App:
 
     def create_left_panel(self):
         left_pane = ttk.Panedwindow(self.mainframe, orient=tk.VERTICAL)
-        left_pane.grid(column=0,
-                       row=2,
-                       sticky=tk.EW,
-                       padx=0,
-                       pady=0,
-                       columnspan=1)
+        left_pane.grid(column=0, row=2, sticky=tk.EW, padx=0, pady=0, columnspan=1)
 
         # Treeview for Categories
-        categories_tree = ttk.Treeview(left_pane,
-                                       columns=("Categories"),
-                                       show="headings")
+        categories_tree = ttk.Treeview(
+            left_pane, columns=("Categories"), show="headings"
+        )
         categories_tree.heading("Categories", text="Categories")
         categories_tree.insert("", "end", text="All", values=["All"])
         categories_tree.insert("", "end", text="Active", values=["Active"])
         categories_tree.insert("", "end", text="Inactive", values=["Inactive"])
-        categories_tree.insert("",
-                               "end",
-                               text="Completed",
-                               values=["Completed"])
-        categories_tree.insert("",
-                               "end",
-                               text="Downloading",
-                               values=["Downloading"])
+        categories_tree.insert("", "end", text="Completed", values=["Completed"])
+        categories_tree.insert("", "end", text="Downloading", values=["Downloading"])
         categories_tree.insert("", "end", text="Paused", values=["Paused"])
         categories_tree.insert("", "end", text="Queued", values=["Queued"])
         categories_tree.insert("", "end", text="Seeding", values=["Seeding"])
@@ -241,18 +238,13 @@ class App:
 
     def create_center_panel(self):
         center_pane = ttk.Panedwindow(self.mainframe, orient=tk.VERTICAL)
-        center_pane.grid(column=1,
-                         row=2,
-                         sticky=tk.NSEW,
-                         padx=5,
-                         pady=5,
-                         columnspan=2)
+        center_pane.grid(column=1, row=2, sticky=tk.NSEW, padx=5, pady=5, columnspan=2)
 
         # Treeview for Download List
         _columns = ("GID", "Status", "Progress", "Action")
-        download_list_tree = ttk.Treeview(center_pane,
-                                          columns=_columns,
-                                          show="headings")
+        download_list_tree = ttk.Treeview(
+            center_pane, columns=_columns, show="headings"
+        )
         download_list_tree.heading("GID", text="GID")
         download_list_tree.heading("Status", text="Status")
         download_list_tree.heading("Progress", text="Progress")
@@ -260,28 +252,34 @@ class App:
         center_pane.add(download_list_tree)
 
         # Add a vertical scrollbar
-        scrollbar = ttk.Scrollbar(self.mainframe,
-                                  orient="vertical",
-                                  command=download_list_tree.yview)
+        scrollbar = ttk.Scrollbar(
+            self.mainframe, orient="vertical", command=download_list_tree.yview
+        )
         download_list_tree.configure(yscrollcommand=scrollbar.set)
         scrollbar.grid(column=5, row=2, sticky=tk.NS)
 
         # Add a horizontal scrollbar
-        scrollbar = ttk.Scrollbar(self.mainframe,
-                                  orient="horizontal",
-                                  command=download_list_tree.xview)
+        scrollbar = ttk.Scrollbar(
+            self.mainframe,
+            orient="horizontal",
+            command=download_list_tree.xview,
+        )
         download_list_tree.configure(xscrollcommand=scrollbar.set)
         scrollbar.grid(column=1, row=3, sticky=tk.EW, columnspan=4)
 
         # add sample values to the center_panel
         for i in range(21):
-            download_list_tree.insert("",
-                                      "end",
-                                      text="Sample",
-                                      values=[
-                                          f"Lorem_a{i}", f"Lorem_b{i}",
-                                          f"Lorem_c{i}", f"Lorem_d{i}"
-                                      ])
+            download_list_tree.insert(
+                "",
+                "end",
+                text="Sample",
+                values=[
+                    f"Lorem_a{i}",
+                    f"Lorem_b{i}",
+                    f"Lorem_c{i}",
+                    f"Lorem_d{i}",
+                ],
+            )
 
     def create_right_panel(self):
         # ... (implement your right panel here)
@@ -294,28 +292,35 @@ class App:
         #  Load images & Resize the image
         #  speed_limit button icons
         self.low_speed_limit_icon = tk.PhotoImage(
-            file=relative_to_assets("bt-sp1.png")).subsample(15, 15)
+            file=relative_to_assets("bt-sp1.png")
+        ).subsample(15, 15)
         self.medium_speed_limit_icon = tk.PhotoImage(
-            file=relative_to_assets("bt-sp2.png")).subsample(15, 15)
+            file=relative_to_assets("bt-sp2.png")
+        ).subsample(15, 15)
         self.high_speed_limit_icon = tk.PhotoImage(
-            file=relative_to_assets("bt-sp3.png")).subsample(15, 15)
+            file=relative_to_assets("bt-sp3.png")
+        ).subsample(15, 15)
         # sample status_info button icons
         self.status_info1_icon = tk.PhotoImage(
-            file=relative_to_assets("bt-1.png")).subsample(15, 15)
+            file=relative_to_assets("bt-1.png")
+        ).subsample(15, 15)
         self.status_info2_icon = tk.PhotoImage(
-            file=relative_to_assets("bt-2.png")).subsample(15, 15)
+            file=relative_to_assets("bt-2.png")
+        ).subsample(15, 15)
         self.status_info3_icon = tk.PhotoImage(
-            file=relative_to_assets("bt-3.png")).subsample(15, 15)
+            file=relative_to_assets("bt-3.png")
+        ).subsample(15, 15)
         self.status_info4_icon = tk.PhotoImage(
-            file=relative_to_assets("bt-4.png")).subsample(15, 15)
+            file=relative_to_assets("bt-4.png")
+        ).subsample(15, 15)
         self.status_info5_icon = tk.PhotoImage(
-            file=relative_to_assets("bt-5.png")).subsample(15, 15)
+            file=relative_to_assets("bt-5.png")
+        ).subsample(15, 15)
 
         # sample status elements Row 0
-        progress_bar = ttk.Progressbar(satus_bar,
-                                       orient=tk.HORIZONTAL,
-                                       mode='indeterminate',
-                                       length=100)
+        progress_bar = ttk.Progressbar(
+            satus_bar, orient=tk.HORIZONTAL, mode="indeterminate", length=100
+        )
         dl_speed = ttk.Label(satus_bar, text="0.00 KiB/s" + " ↓")
         ul_speed = ttk.Label(satus_bar, text="0.00 KiB/s" + " ↑")
         time_remaining = ttk.Label(satus_bar, text="00:00:00")
@@ -326,10 +331,13 @@ class App:
         self.speed_limit_button = ttk.Button(
             satus_bar,
             image=self.medium_speed_limit_icon,
-            command=self.change_speed_limit)
-        self.status_info_button = ttk.Button(satus_bar,
-                                             image=self.status_info1_icon,
-                                             command=self.change_status_info)
+            command=self.change_speed_limit,
+        )
+        self.status_info_button = ttk.Button(
+            satus_bar,
+            image=self.status_info1_icon,
+            command=self.change_status_info,
+        )
 
         # sample status labels Row 1
         status_label = ttk.Label(satus_bar, text="Status: ")

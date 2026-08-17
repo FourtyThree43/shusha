@@ -3,17 +3,16 @@ This module contains utility functions that are used to perform common tasks by
 other modules in the `shusha` package.
 """
 
-import sys
 import textwrap
 from datetime import timedelta
 from importlib import metadata
 from pathlib import Path
-from typing import Any, Union
+from typing import Any
 
-if sys.version_info < (3, 11):
-    import tomli as tomllib
-else:
-    import tomllib
+try:
+    import tomllib  # ty: ignore[unresolved-import]
+except ModuleNotFoundError:
+    import tomli as tomllib  # ty: ignore[unresolved-import]
 
 from platformdirs import (
     user_cache_dir,
@@ -120,9 +119,7 @@ def bool_to_str(value: Any) -> Any:
     return value
 
 
-def sizeof_fmt(
-    num: Union[int, float], delim: str = " ", suffix: str = "B"
-) -> str:
+def sizeof_fmt(num: float, delim: str = " ", suffix: str = "B") -> str:
     """Convert a number of bytes into a human readable format.
 
     Args:
@@ -140,7 +137,7 @@ def sizeof_fmt(
     return f"{num:.2f}{delim}Yi{suffix}"
 
 
-def format_speed(speed: Union[int, float]):
+def format_speed(speed: float):
     """Format a number of bytes into a human readable format.
 
     Args:
@@ -152,7 +149,7 @@ def format_speed(speed: Union[int, float]):
     return sizeof_fmt(speed, suffix="B/s")
 
 
-def format_size(size: Union[int, float]):
+def format_size(size: float):
     """Format a number of bytes into a human readable format.
 
     Args:

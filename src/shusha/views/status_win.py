@@ -1,25 +1,24 @@
 import threading
 import time
+import tkinter as tk
 
 import ttkbootstrap as ttk
-from models.utilities import format_size, format_speed
 from PIL import Image
-from ttkbootstrap.constants import NO, YES
 
 from shusha.controller.api import ShushaAPI as Api
 from shusha.models.structs_downloads import Download
 
-Image.CUBIC = Image.BICUBIC  # ttkbootstrap uses an attribute Image.CUBIC which
-# was replaced by Image.BICUBIC in Pillow v10.0.0
+if not hasattr(Image, "CUBIC"):
+    Image.CUBIC = getattr(Image, "BICUBIC", getattr(Image.Resampling, "BICUBIC", 3))  # ty: ignore[unresolved-attribute]
 
 
 class DownloadMeter(ttk.Meter):
     def __init__(self, master, **kwargs):
         super().__init__(master=master, **kwargs)
-        self.paused = ttk.BooleanVar(self, NO)
+        self.paused = ttk.BooleanVar(self, False)
 
     def start(self):
-        self.paused.set(NO)
+        self.paused.set(False)
         while self.amountusedvar.get() <= self.amounttotalvar.get():
             if self.paused.get():
                 break
@@ -31,7 +30,7 @@ class DownloadMeter(ttk.Meter):
             self.master.update_idletasks()
 
     def pause(self):
-        self.paused.set(YES)
+        self.paused.set(True)
 
     def reset(self):
         self.amountusedvar.set(0)
@@ -43,7 +42,7 @@ class DownloadWindow(ttk.Toplevel):
             title="File Download",
             size=(720, 400),
             position=(50, 50),
-            resizable=(NO, NO),
+            resizable=(False, False),
             **kwargs,
         )
         self.config(padx=15, pady=15)
@@ -51,13 +50,13 @@ class DownloadWindow(ttk.Toplevel):
         self.download_gid = None
 
         status_lf = ttk.Labelframe(self, text="File Download Status")
-        status_lf.pack(fill=ttk.BOTH, expand=NO, padx=5, ipady=30, anchor=ttk.N)
+        status_lf.pack(fill=tk.BOTH, expand=False, padx=5, ipady=30, anchor=tk.N)
 
         self.stats_f = ttk.Frame(status_lf)
-        self.stats_f.pack(side="left", expand=NO)
+        self.stats_f.pack(side="left", expand=False)
 
         meter_f = ttk.Frame(status_lf)
-        meter_f.pack(side=ttk.RIGHT, fill=ttk.X, expand=YES)
+        meter_f.pack(side=tk.RIGHT, fill=tk.X, expand=True)
         self.meter = DownloadMeter(
             meter_f,
             metersize=210,
@@ -69,40 +68,40 @@ class DownloadWindow(ttk.Toplevel):
             interactive=False,
             stripethickness=5,
         )
-        self.meter.pack(side=ttk.RIGHT, fill=ttk.X, expand=YES)
+        self.meter.pack(side=tk.RIGHT, fill=tk.X, expand=True)
 
         self.controls = ttk.Frame(self, borderwidth=1, padding=10)
-        self.controls.pack(side=ttk.BOTTOM, fill=ttk.X)
+        self.controls.pack(side=tk.BOTTOM, fill=tk.X)
 
         self.start_btn = ttk.Button(
-            self.controls, text="Start", command=self.start, bootstyle=ttk.INFO
+            self.controls, text="Start", command=self.start, bootstyle="info"
         )
-        self.start_btn.pack(side=ttk.LEFT, padx=5)
+        self.start_btn.pack(side=tk.LEFT, padx=5)
 
         self.pause_btn = ttk.Button(
             self.controls,
             text="Pause",
             command=self.pause,
-            bootstyle=ttk.WARNING,
+            bootstyle="warning",
         )
-        self.pause_btn.pack(side=ttk.LEFT, padx=5)
+        self.pause_btn.pack(side=tk.LEFT, padx=5)
 
         self.resume_btn = ttk.Button(
             self.controls,
             text="Resume",
             command=self.un_pause,
-            bootstyle=ttk.SUCCESS,
+            bootstyle="success",
         )
-        self.resume_btn.pack(side=ttk.LEFT, padx=5)
+        self.resume_btn.pack(side=tk.LEFT, padx=5)
         self.resume_btn.state(["disabled"])
 
         self.cancel_btn = ttk.Button(
             self.controls,
             text="Cancel",
             command=self.cancel,
-            bootstyle=ttk.DANGER,
+            bootstyle="danger",
         )
-        self.cancel_btn.pack(side=ttk.LEFT, padx=5)
+        self.cancel_btn.pack(side=tk.LEFT, padx=5)
 
         self.dtstats_var = ttk.StringVar(self, "")
 
@@ -197,15 +196,12 @@ class DownloadWindow(ttk.Toplevel):
     def un_pause(self):
         if self.download_gid:
             self.api.resume(self.download_gid)
-            self.update_stats_periodically_v2()
+            self.update_stats_periodically()
             self.resume_btn.state(["disabled"])
             self.pause_btn.state(["!disabled"])
 
     def cancel(self):
-        if (
-            self.cancel_btn.cget("text") == "Cancel"
-            and self.download_gid is not None
-        ):
+        if self.cancel_btn.cget("text") == "Cancel" and self.download_gid is not None:
             self.api.remove(self.download_gid)
             self.meter.configure(subtext="downloaded")
             self.meter.reset()

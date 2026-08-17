@@ -48,7 +48,7 @@ class LoggerService:
         else:
             self.LOG_DIR.mkdir(parents=True, exist_ok=True)
 
-    def _setup_handlers(self, log_file_path: str):
+    def _setup_handlers(self, log_file_path: str | Path | None = None):
         """
         Set up the handlers for logging.
 
@@ -70,8 +70,7 @@ class LoggerService:
         file_handler.setLevel(logging.DEBUG)
 
         # Create formatter
-        formatter = logging.Formatter(fmt=self.LOG_FORMAT,
-                                      datefmt=self.LOG_DATE_FORMAT)
+        formatter = logging.Formatter(fmt=self.LOG_FORMAT, datefmt=self.LOG_DATE_FORMAT)
 
         # Add formatter to handlers
         console_handler.setFormatter(formatter)
@@ -102,8 +101,7 @@ class LoggerService:
         elif log_level == "CRITICAL":
             self.logger.critical(message)
         else:
-            self.logger.warning(
-                f"Invalid log level: {level}. Defaulting to 'info'.")
+            self.logger.warning(f"Invalid log level: {level}. Defaulting to 'info'.")
             self.logger.info(message)
 
 

@@ -1,6 +1,5 @@
 import logging
 import threading
-import time
 import tkinter as tk
 from tkinter import filedialog, ttk
 
@@ -10,7 +9,6 @@ logging.basicConfig(level=logging.INFO)
 
 
 class MainWindow:
-
     def __init__(self, master, aria2_client):
         self.master = master
         self.master.geometry("840x420+664+580")  # “wm geometry... wxh+x+y”)
@@ -40,24 +38,24 @@ class MainWindow:
         # Output Entry
         self.output_path = tk.StringVar()
         self.output_label = ttk.Label(mainframe, text="Output Path:")
-        self.output_entry = ttk.Entry(mainframe,
-                                      width=50,
-                                      textvariable=self.output_path)
+        self.output_entry = ttk.Entry(
+            mainframe, width=50, textvariable=self.output_path
+        )
         self.output_entry.insert(0, "C:/Users/username/Downloads")
 
         # Status
         self.status_label = ttk.Label(mainframe, text="")
 
         # Buttons
-        self.output_button = ttk.Button(mainframe,
-                                        text="Browse",
-                                        command=self.browse_output_path)
-        self.download_button = ttk.Button(mainframe,
-                                          text="Download",
-                                          command=self.start_download)
-        self.status_button = ttk.Button(mainframe,
-                                        text="Status",
-                                        command=self.show_status)
+        self.output_button = ttk.Button(
+            mainframe, text="Browse", command=self.browse_output_path
+        )
+        self.download_button = ttk.Button(
+            mainframe, text="Download", command=self.start_download
+        )
+        self.status_button = ttk.Button(
+            mainframe, text="Status", command=self.show_status
+        )
 
         # Layout
         self.menu()
@@ -73,9 +71,7 @@ class MainWindow:
 
         # Treeview widget to display download list
         columns = ("GID", "Status", "Progress", "Action")
-        self.download_tree = ttk.Treeview(mainframe,
-                                          columns=columns,
-                                          show="headings")
+        self.download_tree = ttk.Treeview(mainframe, columns=columns, show="headings")
 
         # Define column headings
         for col in columns:
@@ -85,17 +81,15 @@ class MainWindow:
         self.update_download_list()
 
         # Add a vertical scrollbar
-        scrollbar = ttk.Scrollbar(mainframe,
-                                  orient="vertical",
-                                  command=self.download_tree.yview)
+        scrollbar = ttk.Scrollbar(
+            mainframe, orient="vertical", command=self.download_tree.yview
+        )
         self.download_tree.configure(yscrollcommand=scrollbar.set)
 
         # Layout for the Treeview and scrollbar
-        self.download_tree.grid(row=4,
-                                column=0,
-                                columnspan=3,
-                                pady=10,
-                                sticky=(tk.W, tk.E))
+        self.download_tree.grid(
+            row=4, column=0, columnspan=3, pady=10, sticky=(tk.W, tk.E)
+        )
         scrollbar.grid(row=4, column=3, sticky=(tk.N, tk.S))
 
         # Padding for all child widgets of mainframe
@@ -127,8 +121,7 @@ class MainWindow:
 
         # Create a pull-down menu for Edit
         edit_menu = tk.Menu(menu_bar, tearoff=0)
-        edit_menu.add_command(label="Downloads List",
-                              command=self.open_downloads_list)
+        edit_menu.add_command(label="Downloads List", command=self.open_downloads_list)
         menu_bar.add_cascade(label="Edit", menu=edit_menu)
 
         # Create a pull-down menu for Help
@@ -148,8 +141,7 @@ class MainWindow:
         start_all_button = ttk.Button(task_actions_bar, text="Start All")
         pause_all_button = ttk.Button(task_actions_bar, text="Pause All")
         resume_all_button = ttk.Button(task_actions_bar, text="Resume All")
-        purge_completed_button = ttk.Button(task_actions_bar,
-                                            text="Purge Completed")
+        purge_completed_button = ttk.Button(task_actions_bar, text="Purge Completed")
 
         # Layout for task action buttons
         start_all_button.grid(row=0, column=0, padx=10, pady=5)
@@ -165,17 +157,16 @@ class MainWindow:
         output_path = filedialog.askdirectory()
         if output_path:
             self.downloader.change_global_option({"dir": str(output_path)})
-            self.status_label.config(
-                text=f"Download directory set to: {output_path}")
+            self.status_label.config(text=f"Download directory set to: {output_path}")
             self.output_entry.delete(0, tk.END)
             self.output_entry.insert(0, output_path)
 
     def start_download(self):
         url = self.url.get()
         if url:
-            threading.Thread(target=self.download_thread,
-                             args=(url, ),
-                             daemon=True).start()
+            threading.Thread(
+                target=self.download_thread, args=(url,), daemon=True
+            ).start()
 
     def download_thread(self, url):
         try:
@@ -188,17 +179,19 @@ class MainWindow:
         status = self.downloader.tell_active()
         if status:
             status_window = tk.Toplevel(self.master)
-            StatusWindow(master=status_window,
-                         aria2_client=self.downloader,
-                         gid=f"{status[0]['gid']}")
+            StatusWindow(
+                master=status_window,
+                aria2_client=self.downloader,
+                gid=f"{status[0]['gid']}",
+            )
 
     def status_update(self):
         try:
             status = self.downloader.tell_active()
             if status:
-                self.status_label.config(text=f"Active: {status}",
-                                         wraplength=200,
-                                         justify=tk.LEFT)
+                self.status_label.config(
+                    text=f"Active: {status}", wraplength=200, justify=tk.LEFT
+                )
             else:
                 self.status_label.config(text="No active downloads")
         except Exception as e:
@@ -210,8 +203,7 @@ class MainWindow:
     def open_downloads_list(self):
         # Open Downloads List Window
         downloads_list_window = tk.Toplevel(self.master)
-        DownloadsListWindow(master=downloads_list_window,
-                            aria2_client=self.downloader)
+        DownloadsListWindow(master=downloads_list_window, aria2_client=self.downloader)
 
     def update_download_list(self):
         # Update the download list in the Treeview widget

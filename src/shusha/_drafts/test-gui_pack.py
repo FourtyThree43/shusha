@@ -1,5 +1,5 @@
-from pathlib import Path
 import tkinter as tk
+from pathlib import Path
 from tkinter import ttk
 
 OUTPUT_PATH = Path(__file__).parent
@@ -11,7 +11,6 @@ def relative_to_assets(path: str) -> Path:
 
 
 class App:
-
     def __init__(self, root) -> None:
         self.master = root
 
@@ -110,59 +109,65 @@ class App:
         tp_frame.pack(fill=tk.X, expand=False)
 
         #  load Images
-        add_dl_icon = tk.PhotoImage(
-            file=relative_to_assets("bt-add.png")).subsample(10, 10)
+        add_dl_icon = tk.PhotoImage(file=relative_to_assets("bt-add.png")).subsample(
+            10, 10
+        )
         resume_dl_icon = tk.PhotoImage(
-            file=relative_to_assets("bt-play.png")).subsample(10, 10)
+            file=relative_to_assets("bt-play.png")
+        ).subsample(10, 10)
         pause_dl_icon = tk.PhotoImage(
-            file=relative_to_assets("bt-pause.png")).subsample(10, 10)
+            file=relative_to_assets("bt-pause.png")
+        ).subsample(10, 10)
         scheduler_icon = tk.PhotoImage(
-            file=relative_to_assets("bt-schedule.png")).subsample(10, 10)
-        queue_top_icon = tk.PhotoImage(
-            file=relative_to_assets("bt-top.png")).subsample(10, 10)
+            file=relative_to_assets("bt-schedule.png")
+        ).subsample(10, 10)
+        queue_top_icon = tk.PhotoImage(file=relative_to_assets("bt-top.png")).subsample(
+            10, 10
+        )
         queue_btm_icon = tk.PhotoImage(
-            file=relative_to_assets("bt-bottom.png")).subsample(10, 10)
+            file=relative_to_assets("bt-bottom.png")
+        ).subsample(10, 10)
         remove_dl_icon = tk.PhotoImage(
-            file=relative_to_assets("bt-remove.png")).subsample(10, 10)
+            file=relative_to_assets("bt-remove.png")
+        ).subsample(10, 10)
         purge_list_icon = tk.PhotoImage(
-            file=relative_to_assets("bt-clear.png")).subsample(10, 10)
+            file=relative_to_assets("bt-clear.png")
+        ).subsample(10, 10)
         refresh_icon = tk.PhotoImage(
-            file=relative_to_assets("bt-refresh.png")).subsample(10, 10)
+            file=relative_to_assets("bt-refresh.png")
+        ).subsample(10, 10)
         setting_icon = tk.PhotoImage(
-            file=relative_to_assets("bt-setting.png")).subsample(10, 10)
+            file=relative_to_assets("bt-setting.png")
+        ).subsample(10, 10)
 
         # Buttons
-        add_dl_button = ttk.Button(master=tp_frame,
-                                   text="Add",
-                                   image=add_dl_icon,
-                                   command=self.add_download)
-        resume_dl_button = ttk.Button(master=tp_frame,
-                                      text="Resume",
-                                      image=resume_dl_icon)
-        pause_dl_button = ttk.Button(master=tp_frame,
-                                     text="Pause",
-                                     image=pause_dl_icon)
-        scheduler_button = ttk.Button(master=tp_frame,
-                                      text="Scheduler",
-                                      image=scheduler_icon)
-        queue_top_button = ttk.Button(master=tp_frame,
-                                      text="Up",
-                                      image=queue_top_icon)
-        queue_btm_button = ttk.Button(master=tp_frame,
-                                      text="Down",
-                                      image=queue_btm_icon)
-        remove_dl_button = ttk.Button(master=tp_frame,
-                                      text="Remove",
-                                      image=remove_dl_icon)
-        purge_list_button = ttk.Button(master=tp_frame,
-                                       text="Clear",
-                                       image=purge_list_icon)
-        refresh_button = ttk.Button(master=tp_frame,
-                                    text="Refresh",
-                                    image=refresh_icon)
-        setting_button = ttk.Button(master=tp_frame,
-                                    text="Settings",
-                                    image=setting_icon)
+        add_dl_button = ttk.Button(
+            master=tp_frame,
+            text="Add",
+            image=add_dl_icon,
+            command=self.add_download,
+        )
+        resume_dl_button = ttk.Button(
+            master=tp_frame, text="Resume", image=resume_dl_icon
+        )
+        pause_dl_button = ttk.Button(master=tp_frame, text="Pause", image=pause_dl_icon)
+        scheduler_button = ttk.Button(
+            master=tp_frame, text="Scheduler", image=scheduler_icon
+        )
+        queue_top_button = ttk.Button(master=tp_frame, text="Up", image=queue_top_icon)
+        queue_btm_button = ttk.Button(
+            master=tp_frame, text="Down", image=queue_btm_icon
+        )
+        remove_dl_button = ttk.Button(
+            master=tp_frame, text="Remove", image=remove_dl_icon
+        )
+        purge_list_button = ttk.Button(
+            master=tp_frame, text="Clear", image=purge_list_icon
+        )
+        refresh_button = ttk.Button(master=tp_frame, text="Refresh", image=refresh_icon)
+        setting_button = ttk.Button(
+            master=tp_frame, text="Settings", image=setting_icon
+        )
 
         # Attach icons to buttons
         add_dl_button.image = add_dl_icon  # type: ignore[attr-defined]
@@ -192,19 +197,23 @@ class App:
         ct_frame = ttk.PanedWindow(self.master, orient=tk.HORIZONTAL)
         ct_frame.pack(fill=tk.BOTH, expand=True)
 
-        category_list = ttk.Treeview(master=ct_frame,
-                                     columns="Categories",
-                                     show="headings")
+        category_list = ttk.Treeview(
+            master=ct_frame, columns="Categories", show="headings"
+        )
         category_list.heading("Categories", text="Categories")
         ct_frame.add(category_list)
 
         _columns = [
-            "Filename", "Status", "Size", "Progress", "Speed", "ETA", "Date",
-            "Note"
+            "Filename",
+            "Status",
+            "Size",
+            "Progress",
+            "Speed",
+            "ETA",
+            "Date",
+            "Note",
         ]
-        download_list = ttk.Treeview(master=ct_frame,
-                                     columns=_columns,
-                                     show="headings")
+        download_list = ttk.Treeview(master=ct_frame, columns=_columns, show="headings")
         download_list.heading("Filename", text="Filename")
         download_list.heading("Status", text="Status")
         download_list.heading("Size", text="Size")
@@ -231,19 +240,24 @@ class App:
 
         # add items to download_list
         for i in range(1, 15):
-            download_list.insert(parent="",
-                                 index=tk.END,
-                                 values=[
-                                     f"Lorem Ipsum dolor sit amet {i}",
-                                     f"Downloading", f"690 MB", f"4.20%",
-                                     f"666.33 KB/s", f"20.13m",
-                                     f"Dec 24 08:36:59 2023"
-                                 ])
+            download_list.insert(
+                parent="",
+                index=tk.END,
+                values=[
+                    f"Lorem Ipsum dolor sit amet {i}",
+                    "Downloading",
+                    "690 MB",
+                    "4.20%",
+                    "666.33 KB/s",
+                    "20.13m",
+                    "Dec 24 08:36:59 2023",
+                ],
+            )
 
         # Scrollbars
-        download_scrollbar = ttk.Scrollbar(master=ct_frame,
-                                           orient=tk.VERTICAL,
-                                           command=download_list.yview)
+        download_scrollbar = ttk.Scrollbar(
+            master=ct_frame, orient=tk.VERTICAL, command=download_list.yview
+        )
         download_list.configure(yscrollcommand=download_scrollbar.set)
         download_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
@@ -267,9 +281,11 @@ class App:
 
         # Sample status icons
         sp_limit_icon = tk.PhotoImage(
-            file=relative_to_assets("bt-speed2.png")).subsample(10, 10)
-        status_icon_ok = tk.PhotoImage(
-            file=relative_to_assets("bt-1.png")).subsample(10, 10)
+            file=relative_to_assets("bt-speed2.png")
+        ).subsample(10, 10)
+        status_icon_ok = tk.PhotoImage(file=relative_to_assets("bt-1.png")).subsample(
+            10, 10
+        )
         # status_icon_online = tk.PhotoImage(
         #     file=relative_to_assets("bt-2.png")).subsample(10, 10)
         # status_icon_offline = tk.PhotoImage(
@@ -352,11 +368,7 @@ class App:
         save_to_entry.pack(fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5)
 
         save_to_button = ttk.Button(master=u_frame2, text="Browse")
-        save_to_button.pack(fill=tk.BOTH,
-                            side=tk.LEFT,
-                            padx=5,
-                            pady=5,
-                            ipady=5)
+        save_to_button.pack(fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5, ipady=5)
 
         url_add_button = ttk.Button(master=u_frame3, text="Add")
         url_add_button.pack(fill=tk.BOTH, side=tk.TOP, padx=5, pady=5, ipady=5)
@@ -375,11 +387,7 @@ class App:
         torrent_entry.insert(0, "Drag and drop torrent file here")
         torrent_entry.configure(state="readonly", justify="center")
         tor_open_button = ttk.Button(master=t_frame0, text="Open")
-        torrent_entry.pack(fill=tk.BOTH,
-                           side=tk.LEFT,
-                           padx=5,
-                           pady=5,
-                           ipady=20)
+        torrent_entry.pack(fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5, ipady=20)
         tor_open_button.pack(fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5)
 
         magnet_label = ttk.Label(master=t_frame1, text="Magnet:")
@@ -394,8 +402,7 @@ class App:
         s_frame1 = tk.Frame(master=schedule_page, height=10, bg="wheat4")
         s_frame1.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
-        sched_checkbox = ttk.Checkbutton(master=s_frame1,
-                                         text="Enable Schedule")
+        sched_checkbox = ttk.Checkbutton(master=s_frame1, text="Enable Schedule")
         sched_checkbox.pack(fill=tk.BOTH, side=tk.TOP, padx=5, pady=5)
 
         sched_m = ttk.Checkbutton(master=s_frame1, text="Monday")
@@ -415,11 +422,7 @@ class App:
         sched_su.pack(fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5)
 
         sched_button = ttk.Button(master=schedule_page, text="Add")
-        sched_button.pack(fill=tk.BOTH,
-                          side=tk.BOTTOM,
-                          padx=5,
-                          pady=5,
-                          ipady=5)
+        sched_button.pack(fill=tk.BOTH, side=tk.BOTTOM, padx=5, pady=5, ipady=5)
 
 
 if __name__ == "__main__":
