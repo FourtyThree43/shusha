@@ -23,6 +23,7 @@ from shusha.models.utilities import send_desktop_notification, user_log_dir
 from shusha.views.add_win import AddWindow
 from shusha.views.settings_win import SettingsWindow
 from shusha.views.status_win import DownloadWindow
+from shusha.views.torrent_win import TorrentFilesWindow
 
 logger = LoggerService(__name__)
 SCRIPT_PATH = Path(__file__).parent
@@ -263,6 +264,9 @@ class Aria2Gui(ttk.Frame):
         self.context_menu.add_command(
             label="Inspect Details", command=self.open_selected_details
         )
+        self.context_menu.add_command(
+            label="Select Files (Torrent)...", command=self.open_selective_files
+        )
 
     def show_context_menu(self, event):
         """Display context menu on right-click."""
@@ -430,15 +434,30 @@ class Aria2Gui(ttk.Frame):
         AddWindow(callback=handle_result)
 
     def download_thread(self, uri, options: dict):
-        """Start a download from URI in a separate thread."""
+        """Start a download from URI or torrent file in a separate thread."""
         try:
-            uris = [str(uri.get()) if hasattr(uri, "get") else str(uri)]
-            download = self.api.add_uris(uris, options)
+            uri_str = str(uri.get()) if hasattr(uri, "get") else str(uri)
+            uri_str = uri_str.strip()
+            if not uri_str:
+                return
 
-            if download:
-                msg = f"Added Download: {download.name}"
-                self.show_toast(message=msg)
-                self.add_download_to_table(download)
+            downloads: list[Download] = []
+            if uri_str.lower().endswith(".torrent") and Path(uri_str).is_file():
+                downloads = self.api.add_torrent(uri_str, options=options)
+            elif uri_str.lower().endswith(".metalink") and Path(uri_str).is_file():
+                downloads = self.api.add_metalink(uri_str, options=options)
+            else:
+                dl = self.api.add_uris([uri_str], options)
+                if dl:
+                    downloads = [dl]
+
+            for download in downloads:
+                if download:
+                    msg = f"Added Download: {download.name or download.gid}"
+                    self.show_toast(message=msg)
+                    self.add_download_to_table(download)
+
+            if downloads:
                 self.refresh_downloads_table()
 
         except Exception as e:
@@ -698,6 +717,19 @@ class Aria2Gui(ttk.Frame):
             dw.update_stats_frame(dl)
         else:
             DownloadWindow(api=self.api)
+
+    def open_selective_files(self):
+        """Open torrent files inspection and selective download window."""
+        dl = self.get_selected_download()
+        if dl:
+            TorrentFilesWindow(
+                master=self,
+                api=self.api,
+                download=dl,
+                on_applied=self.refresh_downloads_table,
+            )
+        else:
+            self.show_toast("No download selected")
 
     def open_settings_window(self):
         """Open the graphical SettingsWindow dialog."""

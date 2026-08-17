@@ -1,3 +1,4 @@
+import contextlib
 import tempfile
 import tkinter as tk
 import unittest
@@ -12,6 +13,14 @@ from shusha.views.settings_win import SettingsWindow
 
 
 class TestSettingsWindowAndConfig(unittest.TestCase):
+    def setUp(self):
+        with contextlib.suppress(Exception):
+            ttk.Style.instance = None
+
+    def tearDown(self):
+        with contextlib.suppress(Exception):
+            ttk.Style.instance = None
+
     def test_dump_toml(self):
         data = {
             "aria2": {

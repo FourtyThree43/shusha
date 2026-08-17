@@ -225,6 +225,33 @@ class ShushaAPI:
 
         return new_downloads
 
+    def add_metalink(
+        self,
+        metalink: str,
+        options: OptionsType | None = None,
+        position: int | None = None,
+    ) -> list[Download]:
+        """Add a metalink download."""
+        new_downloads = []
+
+        try:
+            gids = self.client.add_metalink(metalink, options, position)
+            logger.log(f"Metalink added: {gids}")
+            if isinstance(gids, list):
+                for gid in gids:
+                    dl = self.get_download(gid)
+                    if dl:
+                        new_downloads.append(dl)
+            elif gids:
+                dl = self.get_download(gids)
+                if dl:
+                    new_downloads.append(dl)
+
+        except XMLRPCClientException as e:
+            logger.log(f"Error adding metalink: {e}", level="error")
+
+        return new_downloads
+
     def retry_downloads(
         self,
         downloads: list[Download],

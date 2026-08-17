@@ -1,5 +1,6 @@
 import pathlib
 import tkinter as tk
+from tkinter import filedialog
 from tkinter.filedialog import askdirectory
 
 import ttkbootstrap as ttk
@@ -40,6 +41,7 @@ class AddWindow(ttk.Toplevel):
         _split = 8
 
         self.path_var = ttk.StringVar(value=str(_path))
+        self.torrent_file_var = ttk.StringVar(value="")
         self.checkbox_var = tk.BooleanVar(value=False)
         self.rename_var = ttk.StringVar(value=_rename)
         self.split_var = ttk.IntVar(value=_split)
@@ -174,74 +176,44 @@ class AddWindow(ttk.Toplevel):
         torrent_page = notebook.nametowidget(notebook.tabs()[1])
 
         torrent_row = ttk.Frame(torrent_page)
-        torrent_row.pack(fill=tk.X, expand=tk.YES)
+        torrent_row.pack(fill=tk.X, expand=tk.YES, pady=(10, 5))
 
-        torrent_lbl = ttk.Label(torrent_row, text="Torrent", width=8)
+        torrent_lbl = ttk.Label(torrent_row, text="Torrent File:", width=12)
         torrent_lbl.pack(side=tk.LEFT, padx=(15, 0))
-        torrent_ent = ttk.Entry(
+        self.torrent_ent = ttk.Entry(
             torrent_row,
+            textvariable=self.torrent_file_var,
             bootstyle="warning",
         )
-        torrent_ent.configure(state="readonly")
-        torrent_ent.pack(
+        self.torrent_ent.pack(
             side=tk.LEFT,
-            fill=tk.BOTH,
+            fill=tk.X,
             expand=tk.YES,
             padx=5,
-            pady=5,
-            ipady=30,
         )
 
+        browse_t_btn = ttk.Button(
+            torrent_row,
+            text="Browse...",
+            command=self.on_browse_torrent,
+            bootstyle="warning-outline",
+            width=10,
+        )
+        browse_t_btn.pack(side=tk.LEFT, padx=(0, 15))
+
         # header and labelframe option container
-        option_lf = ttk.Labelframe(torrent_page, text="File Download Options")
+        option_lf = ttk.Labelframe(torrent_page, text="Torrent Download Options")
         option_lf.pack(
             fill=tk.BOTH,
             expand=tk.YES,
             padx=5,
-            ipady=30,
+            ipady=10,
             anchor=tk.N,
         )
 
-        # rename row
-        rename_row = ttk.Frame(option_lf)
-        rename_row.pack(fill=tk.X, expand=tk.YES)
-
-        checkbox = ttk.Checkbutton(
-            rename_row,
-            variable=self.checkbox_var,
-            command=lambda: self.on_checkbox_click(
-                self.checkbox_var,
-                self.rename_ent,
-            ),
-            bootstyle="warning",
-        )
-        checkbox.pack(side=tk.LEFT, padx=(15, 0))
-
-        rename_lbl = ttk.Label(rename_row, text="Rename:", width=8)
-        rename_lbl.pack(side=tk.LEFT, padx=(15, 0))
-        self.rename_ent = ttk.Entry(
-            rename_row,
-            textvariable=self.rename_var,
-            bootstyle="warning",
-        )
-        self.rename_ent.pack(side=tk.LEFT, fill=tk.X, expand=tk.YES, padx=5)
-        self.rename_ent.configure(state=tk.DISABLED)
-
-        splits_lbl = ttk.Label(rename_row, text="Splits:", width=8)
-        splits_lbl.pack(side=tk.LEFT, padx=(15, 0))
-        splits_spinbox = ttk.Spinbox(
-            rename_row,
-            textvariable=self.split_var,
-            from_=1,
-            to=64,
-            width=3,
-            bootstyle="warning",
-        )
-        splits_spinbox.pack(side=tk.LEFT, padx=(0, 15))
-
         # path row
         path_row = ttk.Frame(option_lf)
-        path_row.pack(fill=tk.X, expand=tk.YES)
+        path_row.pack(fill=tk.X, expand=tk.YES, pady=5)
 
         path_lbl = ttk.Label(path_row, text="Save to:", width=8)
         path_lbl.pack(side=tk.LEFT, padx=(15, 0))
@@ -263,12 +235,12 @@ class AddWindow(ttk.Toplevel):
 
         # submit row
         submit_row = ttk.Frame(torrent_page)
-        submit_row.pack(fill=tk.X, expand=tk.YES, pady=(20, 0))
+        submit_row.pack(fill=tk.X, expand=tk.YES, pady=(10, 0))
 
         submit_btn = ttk.Button(
             master=submit_row,
             text="Submit",
-            command=lambda: self.submit(),
+            command=self.submit_torrent,
             width=8,
             bootstyle="success",
         )
@@ -277,7 +249,7 @@ class AddWindow(ttk.Toplevel):
         cancel_btn = ttk.Button(
             master=submit_row,
             text="Cancel",
-            command=lambda: self.destroy(),
+            command=self.destroy,
             width=8,
             bootstyle="danger",
         )
@@ -326,6 +298,29 @@ class AddWindow(ttk.Toplevel):
         if uris:
             self.callback(uris, opts)
 
+        self.destroy()
+
+    def on_browse_torrent(self):
+        """Callback to browse for .torrent and .metalink files."""
+        file_path = filedialog.askopenfilename(
+            title="Select Torrent or Metalink file",
+            filetypes=[
+                ("Torrent files", "*.torrent"),
+                ("Metalink files", "*.metalink"),
+                ("All files", "*.*"),
+            ],
+            parent=self,
+        )
+        if file_path:
+            self.torrent_file_var.set(file_path)
+
+    def submit_torrent(self):
+        """Callback to submit torrent file download."""
+        t_path = self.torrent_file_var.get().strip()
+        dpath = pathlib.Path(self.path_var.get())
+        opts = {"dir": str(dpath)}
+        if t_path:
+            self.callback([ttk.StringVar(value=t_path)], opts)
         self.destroy()
 
     def on_checkbox_click(self, checkbox_var, entry_box):

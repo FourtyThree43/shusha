@@ -1,10 +1,21 @@
+import contextlib
 import tkinter as tk
 import unittest
+
+import ttkbootstrap as ttk
 
 from shusha.views.app import relative_to_assets
 
 
 class TestGuiSmoke(unittest.TestCase):
+    def setUp(self):
+        with contextlib.suppress(Exception):
+            ttk.Style.instance = None
+
+    def tearDown(self):
+        with contextlib.suppress(Exception):
+            ttk.Style.instance = None
+
     def test_relative_to_assets(self):
         asset_path = relative_to_assets("icons8-add-64.png")
         self.assertTrue(str(asset_path).endswith("icons8-add-64.png"))
