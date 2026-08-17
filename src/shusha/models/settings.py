@@ -1,4 +1,4 @@
-from shusha.models.utilities import load_configuration  # , save_configuration
+from shusha.models.utilities import load_configuration, save_configuration
 
 
 class AppSettings:
@@ -20,22 +20,21 @@ class AppSettings:
 
     def set_download_dir(self, download_dir):
         self.config_dict["USER"]["download_dir"] = download_dir
-        # save_configuration(self.config_dict)
+        self.save_settings()
 
     def get_logs_dir(self):
         return self.config_dict.get("USER", {}).get("logs_dir", "")
 
     def set_logs_dir(self, logs_dir):
         self.config_dict["USER"]["logs_dir"] = logs_dir
-        # save_configuration(self.config_dict)
+        self.save_settings()
 
     def update_settings(self, settings_dict):
         self.config_dict["USER"].update(settings_dict)
-        # save_configuration(self.config_dict)
+        self.save_settings()
 
-    def save_settings(self):
-        # save_configuration(self.config_dict)
-        pass
+    def save_settings(self) -> bool:
+        return save_configuration(self.config_dict)
 
 
 if __name__ == "__main__":

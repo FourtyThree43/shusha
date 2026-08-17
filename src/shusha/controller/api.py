@@ -261,12 +261,15 @@ class ShushaAPI:
 
         return result
 
-    def remove(self, gid: str, force: bool = False) -> list[Download]:
+    def remove(
+        self, gid: str, force: bool = False, files: bool = False
+    ) -> list[Download]:
         """Remove a download.
 
         Parameters:
             gid: The GID of the download.
             force: True to force removal of the download.
+            files: True to delete associated files from disk.
 
         Returns:
             A list of Download objects representing the downloads removed.
@@ -274,18 +277,29 @@ class ShushaAPI:
         removed_downloads = []
 
         try:
+            download = self.get_download(gid)
             if force:
                 self.client.force_remove(gid)
             else:
                 self.client.remove(gid)
 
+            if files and download:
+                for file_obj in download.files:
+                    if file_obj.path and file_obj.path.exists():
+                        file_obj.path.unlink(missing_ok=True)
+
             logger.log(f"Download removed with GID: {gid}")
-            removed_downloads.append(self.get_download(gid))
+            if download:
+                removed_downloads.append(download)
 
         except XMLRPCClientException as e:
             logger.log(f"Error removing download: {e}", level="error")
 
         return removed_downloads
+
+    def unpause_all(self) -> list[Download]:
+        """Alias for resume_all."""
+        return self.resume_all()
 
     def pause(self, gid: str, force: bool = False) -> list[Download]:
         """Pause a download.

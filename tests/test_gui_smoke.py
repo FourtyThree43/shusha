@@ -42,6 +42,32 @@ class TestGuiSmoke(unittest.TestCase):
 
         root.destroy()
 
+    def test_aria2_gui_components(self):
+        try:
+            import ttkbootstrap as ttk
+
+            from shusha.views.app import Aria2Gui
+
+            root = ttk.Window(themename="darkly")
+            root.withdraw()
+        except Exception:
+            self.skipTest("No display available for Aria2Gui test")
+
+        app = Aria2Gui(root)
+        self.assertIsNotNone(app.dt)
+        self.assertIsNotNone(app.category_combo)
+        self.assertIn("Download Speed", app.stats_vars)
+
+        # Test category change
+        app.category_combo.set("Active")
+        app.on_category_changed()
+        self.assertEqual(app.active_category, "Active")
+
+        # Test context menu exists
+        self.assertIsNotNone(app.context_menu)
+
+        root.destroy()
+
 
 if __name__ == "__main__":
     unittest.main()

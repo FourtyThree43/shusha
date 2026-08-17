@@ -321,22 +321,61 @@ def load_configuration():
     return config_dict
 
 
-# def save_configuration(config_dict):
-#     """Save dict to TOML formatted string.
+def dump_toml(data: dict) -> str:
+    """Format dictionary into standard TOML string representation."""
+    lines: list[str] = []
+    for section, values in data.items():
+        if isinstance(values, dict):
+            lines.append(f"[{section}]")
+            for k, v in values.items():
+                if isinstance(v, bool):
+                    lines.append(f"{k} = {'true' if v else 'false'}")
+                elif isinstance(v, (int, float)):
+                    lines.append(f"{k} = {v}")
+                else:
+                    lines.append(f'{k} = "{v}"')
+            lines.append("")
+        else:
+            if isinstance(values, bool):
+                lines.append(f"{section} = {'true' if values else 'false'}")
+            elif isinstance(values, (int, float)):
+                lines.append(f"{section} = {values}")
+            else:
+                lines.append(f'{section} = "{values}"')
+    return "\n".join(lines)
 
-#     Args:
-#         config_dict (dict): The dict configuration.
-#     """
-#     config_file = Path(user_config_dir("shusha")) / "config.toml"
 
-#     new_config = config_dict.get("USER", {})
+def save_configuration(
+    config_dict: dict, config_path: str | Path | None = None
+) -> bool:
+    """Save dict configuration to TOML formatted file.
 
-#     try:
-#         config_file.parent.mkdir(parents=True, exist_ok=True)
-#         with config_file.open("w") as fd:
-#             fd.write(textwrap.dedent(new_config).lstrip("\n"))
-#     except Exception as error:
-#         print(f"Failed to save configuration file: {error}")
+    Args:
+        config_dict: The dict configuration.
+        config_path: Optional explicit configuration file path.
+
+    Returns:
+        bool: True if saved successfully, False otherwise.
+    """
+    if config_path is None:
+        config_file = Path(user_config_dir("shusha")) / "config.toml"
+    else:
+        config_file = Path(config_path)
+
+    new_config = config_dict.get("USER", config_dict)
+
+    try:
+        config_file.parent.mkdir(parents=True, exist_ok=True)
+        toml_content = (
+            dump_toml(new_config) if isinstance(new_config, dict) else str(new_config)
+        )
+        with config_file.open("w", encoding="utf-8") as fd:
+            fd.write(toml_content)
+        return True
+    except Exception as error:
+        print(f"Failed to save configuration file: {error}")
+        return False
+
 
 if __name__ == "__main__":
     print(get_version())
