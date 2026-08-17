@@ -1,118 +1,132 @@
-# Shusha
+# Shusha (Shusha-DM)
 
 ![Repo size](https://img.shields.io/github/repo-size/FourtyThree43/shusha)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
-![Repo language count](https://img.shields.io/github/languages/count/FourtyThree43/shusha?style=round-square)
-![Repo top language](https://img.shields.io/github/languages/top/FourtyThree43/shusha?style=round-square)
-![Commit activity](https://img.shields.io/github/commit-activity/m/FourtyThree43/shusha?style=round-square)
-![Latest commit](https://img.shields.io/github/last-commit/FourtyThree43/shusha?style=round-square)
+[![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
+![License](https://img.shields.io/badge/license-MIT-blue)
 
-Shusha is a download manager that wraps around [aria2](https://aria2.github.io/), a lightweight multi-protocol and multi-source command-line download utility. Shusha-DM uses RPC (Remote Procedure Call) to communicate with aria2 and control the download tasks. Shusha-DM also provides a graphical user interface (GUI) based on Tkinter, a Python module for creating cross-platform GUI applications.
+**Shusha** (*Swahili for "Download"*) is a fast, modern download manager that wraps around [aria2](https://aria2.github.io/), a high-performance multi-protocol and multi-source download utility. Shusha provides a graphical user interface (GUI) built with Tkinter and ttkbootstrap, coupled with a robust Model-View-Controller (MVC) engine and automatic local aria2 daemon lifecycle orchestration.
+
+---
 
 ## Features
 
-- Supports HTTP/HTTPS, FTP, SFTP, BitTorrent and Metalink protocols
-- Allows multiple connections and segmented downloading
-- Supports resume, pause, cancel and queue operations
-- Displays download progress, speed, size and ETA
-- Supports setting global and per-task options
-- Supports adding, removing and saving sessions
-- Provides a simple and user-friendly GUI with Tkinter widgets
+- **Multi-Protocol Power**: HTTP/HTTPS, FTP, SFTP, BitTorrent, and Metalink.
+- **Segmented Acceleration**: Multi-connection downloads with configurable chunk splitting.
+- **Queue & Task Control**: Pause, resume, retry, reorder, and remove download tasks.
+- **Live Metrics**: Real-time download/upload speed meters, progress bars, and ETA calculations.
+- **Integrated Daemon Supervision**: Automatic discovery, startup, health monitoring, and shutdown of local `aria2c` processes.
+- **Modern Packaging & Tooling**: Built with Astral `uv`, `ruff`, and `ty` type checking.
 
-## Installation
+---
 
-To install Shusha-DM, you need to have Python 3 and aria2 installed on your system. You can download Python 3 from [here](https://github.com/aria2/aria2) and aria2 from [here](https://linuxconfig.org/aria2-all-in-one-command-line-download-tool).
+## Quick Start
 
-To run Shusha-DM, you need to start aria2 in daemon mode with RPC enabled. You can do this by running the following command:
+### Prerequisites
+
+1. **Python 3.10+**
+2. **aria2** (`aria2c` binary installed on system PATH, e.g. via `apt install aria2`, `dnf install aria2`, or `brew install aria2`).
+3. **Tkinter** (`python3-tk` or `python3-tkinter`).
+4. **uv** package manager ([Install uv](https://docs.astral.sh/uv/getting-started/installation/)).
+
+### Installation & Execution
+
+Clone the repository and run using `uv`:
 
 ```bash
-aria2c --enable-rpc --rpc-listen-all=true --rpc-allow-origin-all
+# Clone the repository
+git clone https://github.com/FourtyThree43/shusha.git
+cd shusha
+
+# Sync virtual environment and dependencies
+uv sync
+
+# Launch Shusha GUI
+uv run shusha
+# Or launch as module:
+uv run python -m shusha
 ```
 
-Then, you can run Shusha-DM by running the main.py file:
+---
+
+## Development & Quality Assurance
+
+Shusha uses the Astral toolchain for blazing-fast development, linting, typechecking, and testing:
 
 ```bash
-python main.py
+# Run complete test suite with coverage report
+uv run pytest --cov=shusha --cov-report=term-missing
+
+# Lint codebase with Ruff
+uv run ruff check .
+
+# Check code formatting with Ruff
+uv run ruff format --check .
+
+# Run static type checking with ty
+uv run ty check
+
+# Build distribution wheel and sdist
+uv build
 ```
 
-## Usage
+---
 
-Shusha-DM has a simple and intuitive GUI that consists of three main parts:
-
-- The menu bar, which provides access to various commands and options
-- The task list, which shows the current download tasks and their status
-- The task details, which shows the detailed information and options for the selected task
-
-To add a new download task, you can use the File -> New Task menu or press Ctrl+N. A dialog window will pop up, where you can enter the URL, file name, save path and other options for the task. You can also drag and drop a URL or a torrent file to the task list to add a new task.
-
-To start, pause, resume or cancel a task, you can use the buttons on the toolbar or the right-click menu on the task list. You can also use the keyboard shortcuts: F5 to start, F6 to pause, F7 to resume and F8 to cancel.
-
-To change the global or per-task options, you can use the Options menu or the right-click menu on the task list. A dialog window will pop up, where you can modify the options such as max connections, download speed limit, proxy settings and so on.
-
-To save or load a session, you can use the File -> Save Session or File -> Load Session menu. A session is a file that contains the information of the current download tasks. You can use it to resume the tasks later or transfer them to another machine.
-
-To exit Shusha-DM, you can use the File -> Exit menu or press Alt+F4. You will be asked if you want to save the current session before exiting.
-
-## Project Structure
-
-* The Project Structure as per the Model-View-Controller (MVC) pattern of software architectural pattern:  
+## Architecture & Project Layout
 
 ```
 shusha
 ├── src
 │   └── shusha
-│       ├── __about__.py
 │       ├── __init__.py
-│       ├── __main__.py
-│       ├── models
-│       │   ├── __init__.py
-│       │   ├── client.py
-│       │   ├── daemon.py
-│       │   ├── db.py
-│       │   ├── download.py
-│       │   ├── logger.py
-│       │   ├── options.py
-│       │   ├── stats.py
-│       │   └── utility.py
-│       ├── view
-│       │   ├── __init__.py
-│       │   └── main_view.py
-│       ├── controller
-│       │  ├── __init__.py
-│       │  └── controller.py
-│       ├── resources
-│       │   ├── __init__.py
-│       │   ├── aria2c
-│       │   │   └── (aria2c-related resources)
-│       │   └── assets
-│       │       └── (icons, images, canvas, etc.)
-│       ├── shusha.ico
-│       └── ShushaDM.py
-├── tests
-│   └── __init__.py
-├── docs
-│   └── index.html
-├── LICENSE.txt
-├── README.md
-└── pyproject.toml
-
+│       ├── __main__.py          # CLI entry point (python -m shusha)
+│       ├── ShushaDM.py          # GUI application launcher
+│       ├── models               # Model Layer
+│       │   ├── client.py        # XML-RPC client for aria2
+│       │   ├── daemon.py        # Process supervision & daemon lifecycle
+│       │   ├── database.py      # Shelve-based NoSQL persistence
+│       │   ├── db.py            # SQLite relational task history
+│       │   ├── logger.py        # Rotating file & console logging service
+│       │   ├── settings.py      # TOML configuration manager
+│       │   ├── structs_downloads.py # Typed Download & BitTorrent models
+│       │   ├── structs_options.py   # Strongly typed aria2 option structs
+│       │   ├── structs_stats.py     # Download stats & speed models
+│       │   └── utilities.py     # Unit formatters & path resolution
+│       ├── views                # View Layer (Tkinter / ttkbootstrap)
+│       │   ├── app.py           # Main window with download table & toolbar
+│       │   ├── add_win.py       # Add URIs / Torrents modal dialog
+│       │   └── status_win.py    # Download status meter dialog
+│       ├── controller           # Controller Layer
+│       │   └── api.py           # ShushaAPI high-level orchestrator
+│       └── resources            # Assets, icons, and themes
+├── tests                        # Comprehensive Pytest suite
+│   ├── test_client.py
+│   ├── test_controller_api.py
+│   ├── test_daemon.py
+│   ├── test_database.py
+│   ├── test_db.py
+│   ├── test_gui_smoke.py
+│   ├── test_logger.py
+│   ├── test_query_syntax.py
+│   ├── test_security.py
+│   ├── test_settings.py
+│   ├── test_structs.py
+│   └── test_utilities.py
+├── .github/workflows/ci.yml     # Multi-platform GitHub Actions CI
+├── pyproject.toml               # PEP 621 / UV configuration
+└── README.md
 ```
+
+---
 
 ## License
 
 `shusha` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
 
+---
 
-# About Shusha
+## About Shusha
 
-Shusha is more than just a download manager. It is also a tribute to the rich and diverse culture of East Africa, where the project originated. The name Shusha comes from the Swahili word "shusha", which means "download". Swahili is a language spoken by millions of people in eastern Africa, especially along the coast. It is influenced by Arabic, Indian, and European languages, making it truly multicultural.
+Shusha (*Swahili for "download"*) was created to celebrate the beauty and vibrancy of East Africa while providing a powerful, reliable download manager for everyone.
 
-The developers of Shusha-DM are based in Kenya, a country in East Africa famed for its scenic landscapes and vast wildlife preserves. Kenya is home to Mount Kenya, the second tallest peak in Africa, and Lake Victoria, the second largest freshwater lake in the world. Kenya is also known for its diverse ethnic groups, vibrant music, and delicious cuisine.
-
-Shusha-DM aims to celebrate the beauty and diversity of East Africa by providing a fast, reliable, and user-friendly download manager that can handle any file from any source. Whether you want to download a song, a movie, a document, or a game, Shusha-DM can help you do it with ease and efficiency.
-
-We hope you enjoy using Shusha-DM as much as we enjoyed creating it. If you have any feedback, suggestions, or questions, please feel free to contact us. We would love to hear from you!
-
-Asante sana (Thank you very much)!
-
-The Shusha-DM Team
+*Asante sana! (Thank you very much!)*
