@@ -67,11 +67,15 @@ class DownloadManagerApp:
         return sidebar
 
     def create_d_tree_frame(self, parent):
-        d_tree_frame = ttk.Frame(parent, borderwidth=0, style="add.TFrame", width=400)
+        d_tree_frame = ttk.Frame(
+            parent, borderwidth=0, style="add.TFrame", width=400
+        )
 
         # Create and configure Treeview for download information
         dt_cols = ("#", "name", "size", "progress", "status", "down_speed")
-        d_tree = ttk.Treeview(d_tree_frame, columns=dt_cols, show="headings", height=10)
+        d_tree = ttk.Treeview(
+            d_tree_frame, columns=dt_cols, show="headings", height=10
+        )
 
         for c in dt_cols:
             d_tree.heading(c, text=c.replace("_", " ").title())

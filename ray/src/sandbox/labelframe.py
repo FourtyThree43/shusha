@@ -8,7 +8,9 @@ s = ttk.Style()
 s.theme_use("classic")
 s.configure("TButton", relief="raised")
 
-lframe = ttk.LabelFrame(text="Important controls", height=100, width=200, borderwidth=1)
+lframe = ttk.LabelFrame(
+    text="Important controls", height=100, width=200, borderwidth=1
+)
 panic = ttk.Button(lframe, text="PANIC!")
 relax = ttk.Button(lframe, text="Relax.")
 lframe.pack(expand=True, fill=tk.BOTH, padx=20, pady=20)

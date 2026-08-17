@@ -2,6 +2,7 @@
 # https://github.com/ParthJadhav/Tkinter-Designer
 
 from pathlib import Path
+
 # from tkinter import *
 # Explicit imports to satisfy Flake8
 from tkinter import Button, Canvas, PhotoImage, Tk, ttk
@@ -60,12 +61,13 @@ button_add = Button(
     relief="flat",
 )
 button_add.place(x=10.0, y=7.0, width=50.0, height=50.0)
-button_add_ballon = Tooltip(button_add,
-                            headertext="Add download",
-                            text="Add download")
+button_add_ballon = Tooltip(
+    button_add, headertext="Add download", text="Add download"
+)
 
 button_image_play = PhotoImage(
-    file=relative_to_assets("icons8-circled-play-64.png"))
+    file=relative_to_assets("icons8-circled-play-64.png")
+)
 button_play = Button(
     image=button_image_play,
     bg="#2A2E31",
@@ -75,12 +77,13 @@ button_play = Button(
     relief="flat",
 )
 button_play.place(x=65.0, y=7.0, width=50.0, height=50.0)
-button_play_ballon = Tooltip(button_play,
-                             headertext="Start download",
-                             text="Start download")
+button_play_ballon = Tooltip(
+    button_play, headertext="Start download", text="Start download"
+)
 
 button_image_pause = PhotoImage(
-    file=relative_to_assets("icons8-pause-button-64.png"))
+    file=relative_to_assets("icons8-pause-button-64.png")
+)
 button_pause = Button(
     image=button_image_pause,
     bg="#2A2E31",
@@ -90,9 +93,9 @@ button_pause = Button(
     relief="flat",
 )
 button_pause.place(x=120.0, y=7.0, width=50.0, height=50.0)
-button_pause_ballon = Tooltip(button_pause,
-                              headertext="Pause download",
-                              text="Pause download")
+button_pause_ballon = Tooltip(
+    button_pause, headertext="Pause download", text="Pause download"
+)
 
 button_image_up = PhotoImage(file=relative_to_assets("icons8-arrow-64.png"))
 button_up = Button(
@@ -104,12 +107,11 @@ button_up = Button(
     relief="flat",
 )
 button_up.place(x=175.0, y=7.0, width=50.0, height=50.0)
-button_up_ballon = Tooltip(button_up,
-                           headertext="Move up",
-                           text="Move item up")
+button_up_ballon = Tooltip(button_up, headertext="Move up", text="Move item up")
 
 button_image_down = PhotoImage(
-    file=relative_to_assets("icons8-scroll-down-64.png"))
+    file=relative_to_assets("icons8-scroll-down-64.png")
+)
 button_down = Button(
     image=button_image_down,
     bg="#2A2E31",
@@ -119,9 +121,9 @@ button_down = Button(
     relief="flat",
 )
 button_down.place(x=230.0, y=7.0, width=50.0, height=50.0)
-button_down_ballon = Tooltip(button_down,
-                             headertext="Move Down",
-                             text="Move item down")
+button_down_ballon = Tooltip(
+    button_down, headertext="Move Down", text="Move item down"
+)
 
 button_image_log = PhotoImage(file=relative_to_assets("icons8-log-64.png"))
 button_log = Button(
@@ -133,12 +135,11 @@ button_log = Button(
     relief="flat",
 )
 button_log.place(x=749.0, y=7.0, width=50.0, height=50.0)
-button_log_ballon = Tooltip(button_log,
-                            headertext="Logs",
-                            text="Open log view")
+button_log_ballon = Tooltip(button_log, headertext="Logs", text="Open log view")
 
 button_image_sett = PhotoImage(
-    file=relative_to_assets("icons8-slider_2-64.png"))
+    file=relative_to_assets("icons8-slider_2-64.png")
+)
 button_sett = Button(
     image=button_image_sett,
     bg="#2A2E31",
@@ -148,20 +149,28 @@ button_sett = Button(
     relief="flat",
 )
 button_sett.place(x=804.0, y=7.0, width=50.0, height=50.0)
-button_sett_ballon = Tooltip(button_sett,
-                             headertext="Settings",
-                             text="Open settings")
+button_sett_ballon = Tooltip(
+    button_sett, headertext="Settings", text="Open settings"
+)
 
 ###############################################################################
 # midde table
 ###############################################################################
 
 table_columns = [
-    "LicenseNumber", "CompanyName", "UserCount", "stretch", "email",
-    "password", "location"
+    "LicenseNumber",
+    "CompanyName",
+    "UserCount",
+    "stretch",
+    "email",
+    "password",
+    "location",
 ]
-rowdata = [('A123', 'IzzyCo', 12), ('A136', 'Kimdee Inc.', 45),
-           ('A158', 'Farmadding Co.', 36)]
+rowdata = [
+    ("A123", "IzzyCo", 12),
+    ("A136", "Kimdee Inc.", 45),
+    ("A158", "Farmadding Co.", 36),
+]
 
 table = Table(window, columns=table_columns, show="headings")
 
@@ -194,13 +203,16 @@ def handle_table_right_click(option, event=None):
 
 
 right_click_options = [
-    'Select All', 'Select None', 'Select Completed', 'Select Uncompleted'
+    "Select All",
+    "Select None",
+    "Select Completed",
+    "Select Uncompleted",
 ]
 table_right_click_menu = RightClickMenu(
     table,
     right_click_options,
-    callback=lambda option, event=None: handle_table_right_click(
-        option, event))
+    callback=lambda option, event=None: handle_table_right_click(option, event),
+)
 
 ###############################################################################
 # bottom panel
@@ -211,11 +223,12 @@ canvas.create_rectangle(0.0, 0.0, 864.0, 64.0, fill="#2A2E31", outline="")
 # entry_image_1 = PhotoImage(file=relative_to_assets("entry_1.png"))
 # entry_bg_1 = canvas.create_image(115.0, 573.5, image=entry_image_1)
 entry_1 = AutocompleteCombobox(window, completevalues=dir(window))
-entry_1.config(font=('Arial', 18, "bold"))
+entry_1.config(font=("Arial", 18, "bold"))
 entry_1.place(x=10.0, y=551.0, width=210.0, height=43.0)
 
 button_image_play2 = PhotoImage(
-    file=relative_to_assets("icons8-circled-play-64.png"))
+    file=relative_to_assets("icons8-circled-play-64.png")
+)
 button_play2 = Button(
     image=button_image_play2,
     bg="#2A2E31",
@@ -225,12 +238,13 @@ button_play2 = Button(
     relief="flat",
 )
 button_play2.place(x=230.0, y=548.0, width=50.0, height=50.0)
-button_play2_ballon = Tooltip(button_play2,
-                              headertext="Start Queue",
-                              text="Start current queue downloads")
+button_play2_ballon = Tooltip(
+    button_play2, headertext="Start Queue", text="Start current queue downloads"
+)
 
 button_image_pause2 = PhotoImage(
-    file=relative_to_assets("icons8-pause-button-64.png"))
+    file=relative_to_assets("icons8-pause-button-64.png")
+)
 button_pause2 = Button(
     image=button_image_pause2,
     bg="#2A2E31",
@@ -241,12 +255,11 @@ button_pause2 = Button(
     text="pause queue",
 )
 button_pause2.place(x=285.0, y=548.0, width=50.0, height=50.0)
-button_pause2_ballon = Tooltip(button_pause2,
-                               headertext="Pause Queue",
-                               text="Pause the current queue")
+button_pause2_ballon = Tooltip(
+    button_pause2, headertext="Pause Queue", text="Pause the current queue"
+)
 
-button_image_sett2 = PhotoImage(
-    file=relative_to_assets("icons8-slider-64.png"))
+button_image_sett2 = PhotoImage(file=relative_to_assets("icons8-slider-64.png"))
 button_sett2 = Button(
     image=button_image_sett2,
     bg="#2A2E31",
@@ -256,8 +269,8 @@ button_sett2 = Button(
     relief="flat",
 )
 button_sett2.place(x=340.0, y=548.0, width=50.0, height=50.0)
-button_sett2_ballon = Tooltip(button_sett2,
-                              headertext="Queue settings",
-                              text="Open queue settings")
+button_sett2_ballon = Tooltip(
+    button_sett2, headertext="Queue settings", text="Open queue settings"
+)
 
 window.mainloop()

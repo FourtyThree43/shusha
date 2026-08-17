@@ -1,6 +1,6 @@
+from pathlib import Path
 from tkinter import *
 from tkinter.ttk import *
-from pathlib import Path
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path("../src/gui/assets")
@@ -23,7 +23,9 @@ class App:
         #     self.root.columnconfigure(j, weight=1)
         self.root.iconbitmap("../src/gui/assets/internet_download_symbol.ico")
         self.root.configure(
-            background="wheat", highlightbackground="wheat", highlightcolor="black"
+            background="wheat",
+            highlightbackground="wheat",
+            highlightcolor="black",
         )
         self.root.title("Download Manager")
 
@@ -68,7 +70,9 @@ class App:
         # Add sub-items to Edit menu
         edit_menu.add_command(label="Add URL", command=self.add_url)
         edit_menu.add_command(label="Add Torrent", command=self.add_torrent)
-        edit_menu.add_command(label="Refresh Task List", command=self.refresh_task_list)
+        edit_menu.add_command(
+            label="Refresh Task List", command=self.refresh_task_list
+        )
         edit_menu.add_separator()
         edit_menu.add_command(label="Resume All Task", command=self.resume_all)
         edit_menu.add_command(label="Pause All Task", command=self.pause_all)
@@ -128,12 +132,12 @@ class App:
         refresh_icon = PhotoImage(
             file=relative_to_assets("task-sync-icon.png")
         ).subsample(15, 15)
-        resume_all_icon = PhotoImage(file=relative_to_assets("bt-DL4.png")).subsample(
-            15, 15
-        )
-        pause_all_icon = PhotoImage(file=relative_to_assets("bt-DL5.png")).subsample(
-            15, 15
-        )
+        resume_all_icon = PhotoImage(
+            file=relative_to_assets("bt-DL4.png")
+        ).subsample(15, 15)
+        pause_all_icon = PhotoImage(
+            file=relative_to_assets("bt-DL5.png")
+        ).subsample(15, 15)
         purge_records_icon = PhotoImage(
             file=relative_to_assets("remove-files-icon.png")
         ).subsample(15, 15)
@@ -161,7 +165,9 @@ class App:
             task_actions_bar, image=pause_all_icon, command=self.pause_all
         )
         purge_records_button = Button(
-            task_actions_bar, image=purge_records_icon, command=self.purge_task_records
+            task_actions_bar,
+            image=purge_records_icon,
+            command=self.purge_task_records,
         )
 
         self.start_all_button = Button(
@@ -221,13 +227,19 @@ class App:
         left_pane.grid(column=0, row=2, sticky=EW, padx=0, pady=0, columnspan=1)
 
         # Treeview for Categories
-        categories_tree = Treeview(left_pane, columns=("Categories"), show="headings")
+        categories_tree = Treeview(
+            left_pane, columns=("Categories"), show="headings"
+        )
         categories_tree.heading("Categories", text="Categories")
         categories_tree.insert("", "end", text="All", values=["All"])
         categories_tree.insert("", "end", text="Active", values=["Active"])
         categories_tree.insert("", "end", text="Inactive", values=["Inactive"])
-        categories_tree.insert("", "end", text="Completed", values=["Completed"])
-        categories_tree.insert("", "end", text="Downloading", values=["Downloading"])
+        categories_tree.insert(
+            "", "end", text="Completed", values=["Completed"]
+        )
+        categories_tree.insert(
+            "", "end", text="Downloading", values=["Downloading"]
+        )
         categories_tree.insert("", "end", text="Paused", values=["Paused"])
         categories_tree.insert("", "end", text="Queued", values=["Queued"])
         categories_tree.insert("", "end", text="Seeding", values=["Seeding"])
@@ -237,11 +249,15 @@ class App:
 
     def create_center_panel(self, frame):
         center_pane = Panedwindow(frame, orient=VERTICAL)
-        center_pane.grid(column=1, row=2, sticky=NSEW, padx=5, pady=5, columnspan=2)
+        center_pane.grid(
+            column=1, row=2, sticky=NSEW, padx=5, pady=5, columnspan=2
+        )
 
         # Treeview for Download List
         _columns = ("GID", "Status", "Progress", "Action")
-        download_list_tree = Treeview(center_pane, columns=_columns, show="headings")
+        download_list_tree = Treeview(
+            center_pane, columns=_columns, show="headings"
+        )
         download_list_tree.heading("GID", text="GID")
         download_list_tree.heading("Status", text="Status")
         download_list_tree.heading("Progress", text="Progress")
@@ -257,7 +273,9 @@ class App:
 
         # Add a horizontal scrollbar
         scrollbar = Scrollbar(
-            self.mainframe, orient="horizontal", command=download_list_tree.xview
+            self.mainframe,
+            orient="horizontal",
+            command=download_list_tree.xview,
         )
         download_list_tree.configure(xscrollcommand=scrollbar.set)
         scrollbar.grid(column=1, row=3, sticky=EW, columnspan=4)
@@ -268,7 +286,12 @@ class App:
                 "",
                 "end",
                 text="Sample",
-                values=[f"Lorem_a{i}", f"Lorem_b{i}", f"Lorem_c{i}", f"Lorem_d{i}"],
+                values=[
+                    f"Lorem_a{i}",
+                    f"Lorem_b{i}",
+                    f"Lorem_c{i}",
+                    f"Lorem_d{i}",
+                ],
             )
 
     def create_right_panel(self):
@@ -324,7 +347,9 @@ class App:
             command=self.change_speed_limit,
         )
         self.status_info_button = Button(
-            satus_bar, image=self.status_info1_icon, command=self.change_status_info
+            satus_bar,
+            image=self.status_info1_icon,
+            command=self.change_status_info,
         )
 
         # sample status labels Row 1

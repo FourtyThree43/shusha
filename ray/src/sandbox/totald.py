@@ -24,7 +24,14 @@ passwd_label = Label(sign_in, text="Enter password:")
 passwd_field = Entry(sign_in, textvariable=passwd, show="*")
 login_button = Button(sign_in, text="Log in", command=login)
 
-elements = (sign_in, name_label, name_field, passwd_label, passwd_field, login_button)
+elements = (
+    sign_in,
+    name_label,
+    name_field,
+    passwd_label,
+    passwd_field,
+    login_button,
+)
 for elem in elements:
     elem.pack(fill=BOTH, padx=5, pady=5)
 

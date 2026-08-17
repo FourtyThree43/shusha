@@ -2,6 +2,7 @@
 """
 Module
 """
+
 from tkinter import *
 from tkinter import ttk
 
@@ -21,7 +22,9 @@ add_downloads = ttk.Frame(notebook)
 
 ## downloads tab frames
 sidebar = ttk.Frame(downloads, borderwidth=0, width=200)
-d_tree_frame = ttk.Frame(downloads, borderwidth=0, style="add.TFrame", width=400)
+d_tree_frame = ttk.Frame(
+    downloads, borderwidth=0, style="add.TFrame", width=400
+)
 
 ### sidebar treeview
 side_tree = ttk.Treeview(sidebar)
@@ -46,8 +49,12 @@ d_tree.column("#", width=50)
 # print("#0:", d_tree.column("#0"))
 
 ## Add scrollbar
-dt_hscrollbar = ttk.Scrollbar(d_tree_frame, orient=HORIZONTAL, command=d_tree.xview)
-dt_vscrollbar = ttk.Scrollbar(d_tree_frame, orient=VERTICAL, command=d_tree.yview)
+dt_hscrollbar = ttk.Scrollbar(
+    d_tree_frame, orient=HORIZONTAL, command=d_tree.xview
+)
+dt_vscrollbar = ttk.Scrollbar(
+    d_tree_frame, orient=VERTICAL, command=d_tree.yview
+)
 d_tree.configure(xscrollcommand=dt_hscrollbar.set)
 d_tree.configure(yscrollcommand=dt_vscrollbar.set)
 

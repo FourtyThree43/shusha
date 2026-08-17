@@ -1,7 +1,7 @@
 """
-    AwesomeTkinter, a new tkinter widgets design using custom styles and images
+AwesomeTkinter, a new tkinter widgets design using custom styles and images
 
-    :copyright: (c) 2020-2021 by Mahmoud Elshahat.
+:copyright: (c) 2020-2021 by Mahmoud Elshahat.
 
 """
 
@@ -11,16 +11,18 @@ import tkinter as tk
 class RightClickMenu(tk.Menu):
     """Context menu or right click menu popup"""
 
-    def __init__(self,
-                 parent,
-                 menu_items,
-                 callback=None,
-                 bg='white',
-                 fg='black',
-                 abg='blue',
-                 afg='white',
-                 bind_left_click=False,
-                 bind_right_click=True):
+    def __init__(
+        self,
+        parent,
+        menu_items,
+        callback=None,
+        bg="white",
+        fg="black",
+        abg="blue",
+        afg="white",
+        bind_left_click=False,
+        bind_right_click=True,
+    ):
         """initialize
         Args:
             parent: tkinter widget to show this menu when right clicked
@@ -48,21 +50,24 @@ class RightClickMenu(tk.Menu):
         self.callback = callback
 
         # initialize super
-        tk.Menu.__init__(self,
-                         parent,
-                         tearoff=0,
-                         bg=bg,
-                         fg=fg,
-                         activebackground=abg,
-                         activeforeground=afg)
+        tk.Menu.__init__(
+            self,
+            parent,
+            tearoff=0,
+            bg=bg,
+            fg=fg,
+            activebackground=abg,
+            activeforeground=afg,
+        )
 
         for option in menu_items:
-            if option == '---':
+            if option == "---":
                 self.add_separator()
             else:
                 self.add_command(
-                    label=f' {option}',
-                    command=lambda x=option: self.context_menu_handler(x))
+                    label=f" {option}",
+                    command=lambda x=option: self.context_menu_handler(x),
+                )
 
         self.parent = parent
 
@@ -75,7 +80,7 @@ class RightClickMenu(tk.Menu):
         def onrelease(event):
             # diable mouse release action if no mouse press
             if not self.pressflag:
-                return 'break'
+                return "break"
             else:
                 self.pressflag = False
 
@@ -86,12 +91,12 @@ class RightClickMenu(tk.Menu):
             trigger_buttons += [2, 3]
 
         for i in trigger_buttons:
-            if i == 1 and parent.winfo_class() == 'Button':
-                parent['command'] = self.popup
+            if i == 1 and parent.winfo_class() == "Button":
+                parent["command"] = self.popup
                 continue
-            parent.bind(f"<Button-{i}>", self.popup, add='+')
-            self.bind(f'<{i}>', onpress, add='+')
-            self.bind(f'<ButtonRelease-{i}>', onrelease, add='+')
+            parent.bind(f"<Button-{i}>", self.popup, add="+")
+            self.bind(f"<{i}>", onpress, add="+")
+            self.bind(f"<ButtonRelease-{i}>", onrelease, add="+")
 
     def popup(self, event=None):
         """show right click menu"""

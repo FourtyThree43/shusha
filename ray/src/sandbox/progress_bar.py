@@ -1,7 +1,6 @@
-from tkinter import ttk
 import tkinter as tk
+from tkinter import ttk
 from tkinter.messagebox import showinfo
-
 
 # root window
 root = tk.Tk()

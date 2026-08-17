@@ -9,7 +9,9 @@ frame1 = tk.Frame(height=300, width=300, bg="RED", borderwidth=1)
 # label = tk.Label(frame2, text="Label")  # Receive a callback from button here
 # label.pack()
 frame1.pack()
-button = tk.Button(frame1, text="Button").pack()  # Send some action to Label here
+button = tk.Button(
+    frame1, text="Button"
+).pack()  # Send some action to Label here
 # frame2.pack()
 # button.pack()
 tk.PhotoImage()
