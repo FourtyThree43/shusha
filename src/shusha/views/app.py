@@ -19,7 +19,7 @@ from shusha.controller.api import ShushaAPI as Api
 from shusha.models.logger import LoggerService
 from shusha.models.structs_downloads import Download
 from shusha.models.structs_stats import Stats
-from shusha.models.utilities import user_log_dir
+from shusha.models.utilities import send_desktop_notification, user_log_dir
 from shusha.views.add_win import AddWindow
 from shusha.views.settings_win import SettingsWindow
 from shusha.views.status_win import DownloadWindow
@@ -56,6 +56,8 @@ class Aria2Gui(ttk.Frame):
         self.downloads_map: dict[str, Download] = {}
         self.stats_vars: dict[str, tk.StringVar] = {}
         self.active_category: str = "All"
+        self.notified_completed: set[str] = set()
+        self.notified_failed: set[str] = set()
 
         self.colors = ttk.Style().colors
 
@@ -590,6 +592,23 @@ class Aria2Gui(ttk.Frame):
             downloads = self.api.get_downloads()
             self.downloads_map = {str(d.gid): d for d in downloads if d.gid}
 
+            # Check for newly completed or failed downloads and dispatch notifications
+            for d in downloads:
+                if d.gid:
+                    gid_str = str(d.gid)
+                    if d.is_complete and gid_str not in self.notified_completed:
+                        self.notified_completed.add(gid_str)
+                        name = d.name or gid_str
+                        send_desktop_notification(
+                            "Download Complete", f"{name} has finished downloading."
+                        )
+                    elif d.has_failed and gid_str not in self.notified_failed:
+                        self.notified_failed.add(gid_str)
+                        name = d.name or gid_str
+                        send_desktop_notification(
+                            "Download Failed", f"{name} encountered a download error."
+                        )
+
             def matches(d: Download, category: str) -> bool:
                 cat = category.lower()
                 if cat == "all":
@@ -621,6 +640,22 @@ class Aria2Gui(ttk.Frame):
             self.after(0, _update_ui)
         except Exception as e:
             logger.log(f"Refresh downloads notice: {e}", level="debug")
+
+    def minimize_to_tray(self):
+        """Minimize main application window to tray/background."""
+        withdraw_fn = getattr(self.master, "withdraw", None)
+        if callable(withdraw_fn):
+            withdraw_fn()
+            self.show_toast("Shusha minimized to background")
+
+    def restore_from_tray(self):
+        """Restore main application window from background."""
+        deiconify_fn = getattr(self.master, "deiconify", None)
+        if callable(deiconify_fn):
+            deiconify_fn()
+            lift_fn = getattr(self.master, "lift", None)
+            if callable(lift_fn):
+                lift_fn()
 
     def on_category_changed(self, event=None):
         """Handle category filter combobox selection."""

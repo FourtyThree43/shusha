@@ -3,6 +3,9 @@ This module contains utility functions that are used to perform common tasks by
 other modules in the `shusha` package.
 """
 
+import shutil
+import subprocess
+import sys
 import textwrap
 from datetime import timedelta
 from importlib import metadata
@@ -337,6 +340,33 @@ def save_configuration(
     except Exception as error:
         print(f"Failed to save configuration file: {error}")
         return False
+
+
+def send_desktop_notification(title: str, message: str) -> bool:
+    """Send a native OS desktop notification in a cross-platform manner."""
+    try:
+        if sys.platform.startswith("linux"):
+            notify_send = shutil.which("notify-send")
+            if notify_send:
+                subprocess.Popen([notify_send, title, message])
+                return True
+        elif sys.platform == "darwin":
+            script = f'display notification "{message}" with title "{title}"'
+            subprocess.Popen(["osascript", "-e", script])
+            return True
+        elif sys.platform.startswith("win"):
+            ps_cmd = (
+                f'[reflection.assembly]::loadwithpartialname("System.Windows.Forms");'
+                f"$notify = new-object system.windows.forms.notifyicon;"
+                f"$notify.icon = [system.drawing.systemicons]::information;"
+                f"$notify.visible = $true;"
+                f'$notify.showballoontip(10, "{title}", "{message}", [system.windows.forms.tooltipicon]::info)'
+            )
+            subprocess.Popen(["powershell", "-NoProfile", "-Command", ps_cmd])
+            return True
+    except Exception:
+        pass
+    return False
 
 
 if __name__ == "__main__":

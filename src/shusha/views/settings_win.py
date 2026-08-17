@@ -65,6 +65,9 @@ class SettingsWindow(ttk.Toplevel):
         self.download_dir_var = tk.StringVar(value=str(default_dl))
         self.logs_dir_var = tk.StringVar(value=str(default_log))
         self.theme_var = tk.StringVar(value=user_config.get("theme", "darkly"))
+        self.notify_on_complete_var = tk.BooleanVar(
+            value=bool(user_config.get("notify_on_complete", True))
+        )
 
         self.max_concurrent_var = tk.StringVar(
             value=str(aria2_options.get("max_concurrent_downloads", 5))
@@ -129,18 +132,25 @@ class SettingsWindow(ttk.Toplevel):
             command=lambda: self._browse_dir(self.logs_dir_var),
         ).pack(side=tk.RIGHT)
 
-        # Appearance
-        theme_lf = ttk.Labelframe(general_tab, text="Appearance", padding=10)
-        theme_lf.pack(fill=tk.X)
+        # Appearance & Notifications
+        pref_lf = ttk.Labelframe(general_tab, text="Preferences", padding=10)
+        pref_lf.pack(fill=tk.X)
 
-        ttk.Label(theme_lf, text="Application Theme:").pack(anchor=tk.W, pady=(0, 2))
+        ttk.Label(pref_lf, text="Application Theme:").pack(anchor=tk.W, pady=(0, 2))
         theme_combo = ttk.Combobox(
-            theme_lf,
+            pref_lf,
             textvariable=self.theme_var,
             values=AVAILABLE_THEMES,
             state="readonly",
         )
-        theme_combo.pack(fill=tk.X)
+        theme_combo.pack(fill=tk.X, pady=(0, 8))
+
+        ttk.Checkbutton(
+            pref_lf,
+            text="Show desktop notifications on completion",
+            variable=self.notify_on_complete_var,
+            bootstyle="round-toggle",
+        ).pack(anchor=tk.W)
 
         # 2. Connection & Speed Tab
         conn_tab = ttk.Frame(notebook, padding=12)
@@ -269,6 +279,7 @@ class SettingsWindow(ttk.Toplevel):
                 "download_dir": download_dir,
                 "logs_dir": logs_dir,
                 "theme": theme,
+                "notify_on_complete": self.notify_on_complete_var.get(),
                 "aria2": {
                     "host": rpc_host,
                     "port": rpc_port,
