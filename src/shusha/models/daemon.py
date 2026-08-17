@@ -112,10 +112,26 @@ class Daemon:
 
     def _build_command(self):
         """Build the command to start the Aria2 server."""
+        from shusha.models.utilities import user_data_dir
+
         base_command = [str(self.aria2d)]
+        session_file = Path(user_data_dir("shusha")) / "aria2.session"
+        try:
+            session_file.parent.mkdir(parents=True, exist_ok=True)
+            if not session_file.exists():
+                session_file.touch(exist_ok=True)
+        except Exception:
+            pass
+
+        session_flags = [
+            f"--save-session={session_file}",
+            f"--input-file={session_file}",
+            "--save-session-interval=30",
+            "--auto-save-interval=30",
+        ]
 
         if CONF_PATH.exists():
-            command = [*base_command, f"--conf-path={CONF_PATH}"]
+            command = [*base_command, f"--conf-path={CONF_PATH}", *session_flags]
             if self.secret:
                 command.append(f"--rpc-secret={self.secret}")
         else:
@@ -127,6 +143,7 @@ class Daemon:
                 "--rpc-max-request-size=2M",
                 f"--rpc-secret={self.secret or 'null'}",
                 "--quiet=true",
+                *session_flags,
             ]
 
         return command

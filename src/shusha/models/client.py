@@ -249,10 +249,21 @@ class Client:
     def change_position(self, gid, pos, how):
         return self._call_method("changePosition", [gid, pos, how])
 
-    def change_uri(self, gid, file_index, del_uris, add_uris, position=None):
-        return self._call_method(
-            "changeUri", [gid, file_index, del_uris, add_uris, position]
-        )
+    def change_uri(
+        self,
+        gid: str,
+        file_index: int,
+        del_uris: list[str] | None = None,
+        add_uris: list[str] | None = None,
+        position: int | None = None,
+    ) -> list[int] | None:
+        """
+        Removes and/or adds URIs to a download.
+        """
+        params: list[Any] = [gid, file_index, del_uris or [], add_uris or []]
+        if position is not None:
+            params.append(position)
+        return self._call_method("changeUri", params)
 
     def get_option(self, gid: str):
         """

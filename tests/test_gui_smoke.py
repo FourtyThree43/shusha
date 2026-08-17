@@ -85,6 +85,18 @@ class TestGuiSmoke(unittest.TestCase):
         # Test logs directory opening
         app.open_logs_directory()
 
+        # Test selection methods
+        dls = app.get_selected_downloads()
+        self.assertEqual(dls, [])
+        dl = app.get_selected_download()
+        self.assertIsNone(dl)
+
+        # Test selection actions when nothing selected
+        app.start_selected_download()
+        app.pause_selected_download()
+        app.remove_selected_download()
+        app.open_uri_manager()
+
         root.destroy()
 
 

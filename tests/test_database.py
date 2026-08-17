@@ -1,3 +1,4 @@
+import contextlib
 import os
 import tempfile
 import unittest
@@ -12,6 +13,8 @@ class TestShushaDB(unittest.TestCase):
         self.db = ShushaDB(self.filename)
 
     def tearDown(self):
+        with contextlib.suppress(Exception):
+            self.db.close()
         self.temp_dir.cleanup()
 
     def test_insert_and_retrieve(self):

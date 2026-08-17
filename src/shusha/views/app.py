@@ -25,6 +25,7 @@ from shusha.views.add_win import AddWindow
 from shusha.views.settings_win import SettingsWindow
 from shusha.views.status_win import DownloadWindow
 from shusha.views.torrent_win import TorrentFilesWindow
+from shusha.views.uri_win import UriManagerWindow
 
 logger = LoggerService(__name__)
 SCRIPT_PATH = Path(__file__).parent
@@ -281,12 +282,15 @@ class Aria2Gui(ttk.Frame):
         self.context_menu.add_command(
             label="Select Files (Torrent)...", command=self.open_selective_files
         )
+        self.context_menu.add_command(
+            label="Manage Mirrors & URIs...", command=self.open_uri_manager
+        )
 
     def show_context_menu(self, event):
         """Display context menu on right-click."""
         with contextlib.suppress(Exception):
             row_id = self.dt.view.identify_row(event.y)
-            if row_id:
+            if row_id and row_id not in self.dt.view.selection():
                 self.dt.view.selection_set(row_id)
             self.context_menu.tk_popup(event.x_root, event.y_root)
 
@@ -520,81 +524,105 @@ class Aria2Gui(ttk.Frame):
             str(download.gid or ""),
         ]
 
-    def get_selected_download(self) -> Download | None:
-        """Retrieve the currently selected Download object from tableview."""
+    def get_selected_downloads(self) -> list[Download]:
+        """Retrieve all currently selected Download objects from tableview."""
         if not self.dt:
-            return None
+            return []
         selected_rows = self.dt.get_rows(selected=True)
         if not selected_rows:
-            return None
-        selected_row = selected_rows[0]
-        row_values = selected_row.values
-        if not row_values:
-            return None
+            return []
+        downloads: list[Download] = []
+        for row in selected_rows:
+            row_values = row.values
+            if row_values:
+                gid = str(row_values[-1])
+                if gid and gid in self.downloads_map:
+                    downloads.append(self.downloads_map[gid])
+                elif gid:
+                    try:
+                        dl = self.api.get_download(gid)
+                        if dl:
+                            self.downloads_map[gid] = dl
+                            downloads.append(dl)
+                    except Exception:
+                        pass
+        return downloads
 
-        # GID is stored in the last column
-        gid = str(row_values[-1])
-        if gid and gid in self.downloads_map:
-            return self.downloads_map[gid]
-
-        # Fallback to direct API lookup
-        if gid:
-            try:
-                dl = self.api.get_download(gid)
-                if dl:
-                    self.downloads_map[gid] = dl
-                    return dl
-            except Exception:
-                pass
-        return None
+    def get_selected_download(self) -> Download | None:
+        """Retrieve the first selected Download object from tableview."""
+        dls = self.get_selected_downloads()
+        return dls[0] if dls else None
 
     def start_selected_download(self):
-        """Resume the currently selected download."""
-        dl = self.get_selected_download()
-        if dl and dl.gid:
-            self._thread(self._start_download_bg, dl)
+        """Resume all currently selected downloads."""
+        dls = self.get_selected_downloads()
+        if dls:
+            self._thread(self._start_downloads_bg, dls)
         else:
             self.show_toast("No download selected")
 
-    def _start_download_bg(self, dl: Download):
-        try:
-            self.api.resume(dl.gid)
-            self.show_toast(f"Resumed: {dl.name}")
+    def _start_downloads_bg(self, dls: list[Download]):
+        count = 0
+        for dl in dls:
+            if dl.gid:
+                try:
+                    self.api.resume(dl.gid)
+                    count += 1
+                except Exception as e:
+                    logger.log(f"Error resuming download {dl.gid}: {e}", level="error")
+        if count:
+            self.show_toast(f"Resumed {count} download(s)")
             self.refresh_downloads_table()
-        except Exception as e:
-            logger.log(f"Error resuming download: {e}", level="error")
 
     def pause_selected_download(self):
-        """Pause the currently selected download."""
-        dl = self.get_selected_download()
-        if dl and dl.gid:
-            self._thread(self._pause_download_bg, dl)
+        """Pause all currently selected downloads."""
+        dls = self.get_selected_downloads()
+        if dls:
+            self._thread(self._pause_downloads_bg, dls)
         else:
             self.show_toast("No download selected")
 
-    def _pause_download_bg(self, dl: Download):
-        try:
-            self.api.pause(dl.gid)
-            self.show_toast(f"Paused: {dl.name}")
+    def _pause_downloads_bg(self, dls: list[Download]):
+        count = 0
+        for dl in dls:
+            if dl.gid:
+                try:
+                    self.api.pause(dl.gid)
+                    count += 1
+                except Exception as e:
+                    logger.log(f"Error pausing download {dl.gid}: {e}", level="error")
+        if count:
+            self.show_toast(f"Paused {count} download(s)")
             self.refresh_downloads_table()
-        except Exception as e:
-            logger.log(f"Error pausing download: {e}", level="error")
 
     def remove_selected_download(self, files: bool = False):
-        """Remove the selected download from table and aria2."""
-        dl = self.get_selected_download()
-        if dl and dl.gid:
-            self._thread(self._remove_download_bg, dl, files)
+        """Remove all selected downloads from table and aria2."""
+        dls = self.get_selected_downloads()
+        if dls:
+            self._thread(self._remove_downloads_bg, dls, files)
         else:
             self.show_toast("No download selected")
 
-    def _remove_download_bg(self, dl: Download, files: bool):
-        try:
-            self.api.remove(dl.gid, files=files)
-            self.show_toast(f"Removed: {dl.name}")
+    def _remove_downloads_bg(self, dls: list[Download], files: bool):
+        count = 0
+        for dl in dls:
+            if dl.gid:
+                try:
+                    self.api.remove(dl.gid, files=files)
+                    count += 1
+                except Exception as e:
+                    logger.log(f"Error removing download {dl.gid}: {e}", level="error")
+        if count:
+            self.show_toast(f"Removed {count} download(s)")
             self.refresh_downloads_table()
-        except Exception as e:
-            logger.log(f"Error removing download: {e}", level="error")
+
+    def open_uri_manager(self):
+        """Open dynamic mirror and URI management window for selected download."""
+        dl = self.get_selected_download()
+        if dl and dl.gid:
+            UriManagerWindow(master=self, api=self.api, gid=dl.gid)
+        else:
+            self.show_toast("No download selected")
 
     def move_download_up(self):
         """Increase queue priority of selected download."""
@@ -809,6 +837,11 @@ class Aria2Gui(ttk.Frame):
     def cleanup(self):
         """Method to perform cleanup operations."""
         logger.log("Performing cleanup...")
+        try:
+            if hasattr(self.api, "client") and hasattr(self.api.client, "save_session"):
+                self.api.client.save_session()
+        except Exception:
+            pass
         if self.download_gid:
             self.stop_downloads()
         self.stop_server()

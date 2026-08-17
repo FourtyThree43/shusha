@@ -385,13 +385,21 @@ class ShushaDB:
         """Return a string representation of the database."""
         return f"MySmallDB({self.filename!r})"
 
+    def close(self) -> None:
+        """Close database and save uncommitted state."""
+        try:
+            if not self.transaction_in_progress:
+                self.save()
+        except Exception:
+            pass
+
     def __del__(self):
         """Close the database when the instance is deleted."""
         try:
             if not self.transaction_in_progress:
                 self.save()
-        except Exception as e:
-            print(f"Error saving data: {e}")
+        except Exception:
+            pass
 
     # Transaction Management
     def begin_transaction(self, isolation_level="read_committed"):
@@ -530,20 +538,16 @@ class ShushaDB:
                 db["tables"] = self._tables
         except Exception as e:
             raise RuntimeError(f"Error committing save: {e}") from e
-        finally:
-            if self.transaction_in_progress:
-                # Release lock after saving changes for read_committed isolation
-                self.lock.release()
 
     def _load_tables_from_disk(self):
         """
         Load tables from the shelve file on disk.
         """
         try:
-            with shelve.open(self.filename, writeback=True) as db:
+            with shelve.open(self.filename, flag="r") as db:
                 return db.get("tables", {})
-        except Exception as e:
-            raise RuntimeError(f"Error loading tables from disk: {e}") from e
+        except Exception:
+            return {}
 
     # Transactional Operations
     # Document Manipulation
@@ -916,14 +920,9 @@ class ShushaDB:
         """
         try:
             with self.tables_lock:
-                if self.transaction_in_progress:
-                    # If a transaction is in progress, do not save directly
-                    print("Transaction in progress, skipping save.")
-                elif self._tables != self._load_tables_from_disk():
-                    # Save only if there are changes
+                if not self.transaction_in_progress:
                     self._commit_save()
-        except Exception as e:
-            print(f"Error saving data: {e}")
+        except Exception:
             self.rollback_transaction()
 
     def load(self):

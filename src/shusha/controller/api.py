@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import shutil
 from pathlib import Path
+from typing import Any
 
 from shusha.models.client import Client, XMLRPCClientException
 from shusha.models.daemon import Daemon
@@ -667,6 +668,62 @@ class ShushaAPI:
         except Exception as e:
             logger.log(f"Stats lookup error: {e}", level="debug")
             return Stats.from_dict({}) if hasattr(Stats, "from_dict") else Stats({})
+
+    def get_peers(self, gid: str) -> list[dict[str, Any]]:
+        """Retrieve live connected BitTorrent peers for a download."""
+        try:
+            peers = self.client.get_peers(gid)
+            return peers if isinstance(peers, list) else []
+        except Exception as e:
+            logger.log(f"Error fetching peers for {gid}: {e}", level="debug")
+            return []
+
+    def get_servers(self, gid: str) -> list[dict[str, Any]]:
+        """Retrieve live connected HTTP/FTP/Metalink servers for a download."""
+        try:
+            servers = self.client.get_servers(gid)
+            return servers if isinstance(servers, list) else []
+        except Exception as e:
+            logger.log(f"Error fetching servers for {gid}: {e}", level="debug")
+            return []
+
+    def change_uri(
+        self,
+        gid: str,
+        file_index: int = 1,
+        del_uris: list[str] | None = None,
+        add_uris: list[str] | None = None,
+        position: int | None = None,
+    ) -> list[int]:
+        """Dynamically add or remove mirror URIs for an active download."""
+        try:
+            res = self.client.change_uri(
+                gid, file_index, del_uris or [], add_uris or [], position
+            )
+            return res if isinstance(res, list) else [0, 0]
+        except Exception as e:
+            logger.log(f"Error changing URIs for {gid}: {e}", level="error")
+            return [0, 0]
+
+    def change_download_speed_limits(
+        self,
+        gid: str,
+        max_download: str | None = None,
+        max_upload: str | None = None,
+    ) -> bool:
+        """Set download/upload speed limits on a specific download."""
+        options: dict[str, str] = {}
+        if max_download is not None:
+            options["max-download-limit"] = max_download
+        if max_upload is not None:
+            options["max-upload-limit"] = max_upload
+        if not options:
+            return True
+        try:
+            return self.client.change_option(gid, options) == "OK"
+        except Exception as e:
+            logger.log(f"Error setting speed limits on {gid}: {e}", level="error")
+            return False
 
     @staticmethod
     def remove_files(

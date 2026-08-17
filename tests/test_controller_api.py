@@ -6,22 +6,18 @@ from unittest.mock import MagicMock
 from shusha.controller.api import ShushaAPI
 from shusha.models.client import Client, XMLRPCClientException
 from shusha.models.daemon import Daemon
-from shusha.models.database import ShushaDB
 
 
 class TestShushaAPI(unittest.TestCase):
     def setUp(self):
         self.mock_daemon = MagicMock(spec=Daemon)
         self.mock_client = MagicMock(spec=Client)
-        self.temp_dir = tempfile.TemporaryDirectory()
-        self.db_path = Path(self.temp_dir.name) / "test_api.db"
-        self.db = ShushaDB(str(self.db_path))
+        self.mock_client.get_option.return_value = {}
+        self.mock_client.get_global_option.return_value = {}
+        self.mock_db = MagicMock()
         self.api = ShushaAPI(
-            daemon=self.mock_daemon, client=self.mock_client, db=self.db
+            daemon=self.mock_daemon, client=self.mock_client, db=self.mock_db
         )
-
-    def tearDown(self):
-        self.temp_dir.cleanup()
 
     def test_start_stop_server(self):
         self.mock_daemon.start_server.return_value = 1234
