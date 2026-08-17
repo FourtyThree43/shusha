@@ -5,9 +5,9 @@ build-backend = "hatchling.build"
 [project]
 name = "shusha"
 dynamic = ["version"]
-description = 'Shuha download manager is a GUI for aria2.'
+description = "Shusha download manager is a GUI for aria2."
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 license = "MIT"
 keywords = [
   "aria2", "aria2c", "download-manager", "downloader", "aria2-gui", "python",
@@ -20,18 +20,18 @@ authors = [
 classifiers = [
   "Development Status :: 4 - Beta",
   "Programming Language :: Python",
-  "Programming Language :: Python :: 3.8",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "Programming Language :: Python :: Implementation :: CPython",
-  "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
-    "ttkbootstrap>=1.10.1",
-    "platformdirs>=4.1.0",
-    "tomli>=2.0.1; python_version < '3.11'"
+  "ttkbootstrap>=1.10.1",
+  "platformdirs>=4.1.0",
+  "pillow>=10.0.0",
+  "tomli>=2.0.1; python_version < '3.11'",
 ]
 
 [project.urls]
@@ -39,47 +39,41 @@ Documentation = "https://github.com/FourtyThree43/shusha#readme"
 Issues = "https://github.com/FourtyThree43/shusha/issues"
 Source = "https://github.com/FourtyThree43/shusha"
 
-[tool.ruff]
-line-length = 80
-# indent-width = 4
+[project.scripts]
+shusha = "shusha.ShushaDM:main"
 
+[project.gui-scripts]
+shusha-gui = "shusha.ShushaDM:main"
 
 [tool.hatch.version]
 path = "src/shusha/__about__.py"
 
-[tool.hatch.envs.default]
-dependencies = [
-  "coverage[toml]>=6.5",
-  "pytest",
-]
-[tool.hatch.envs.default.scripts]
-test = "pytest {args:tests}"
-test-cov = "coverage run -m pytest {args:tests}"
-cov-report = [
-  "- coverage combine",
-  "coverage report",
-]
-cov = [
-  "test-cov",
-  "cov-report",
+[tool.hatch.build.targets.wheel]
+packages = ["src/shusha"]
+exclude = [
+  "src/shusha/_drafts",
 ]
 
-[[tool.hatch.envs.all.matrix]]
-python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
-
-[tool.hatch.envs.types]
-dependencies = [
-  "mypy>=1.0.0",
+[dependency-groups]
+dev = [
+  "coverage[toml]>=7.6.1",
+  "pytest>=8.3.5",
+  "pytest-cov>=5.0.0",
+  "ruff>=0.16.3",
+  "ty>=0.0.72",
 ]
-[tool.hatch.envs.types.scripts]
-check = "mypy --install-types --non-interactive {args:src/shusha tests}"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+norecursedirs = [".venv", "ray", "_drafts", "src/shusha/_drafts"]
 
 [tool.coverage.run]
-source_pkgs = ["shusha", "tests"]
+source_pkgs = ["shusha"]
 branch = true
 parallel = true
 omit = [
   "src/shusha/__about__.py",
+  "src/shusha/_drafts/*",
 ]
 
 [tool.coverage.paths]
@@ -92,7 +86,39 @@ exclude_lines = [
   "if __name__ == .__main__.:",
   "if TYPE_CHECKING:",
 ]
-[tool.pdm.dev-dependencies]
-dev = [
-    "tox-pdm>=0.7.2",
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+extend-exclude = [
+  "ray",
+  "src/shusha/_drafts",
+]
+
+[tool.ruff.lint]
+select = [
+  "E",
+  "F",
+  "I",
+  "UP",
+  "B",
+  "SIM",
+  "RUF",
+]
+ignore = [
+  "E501",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"ray/*" = ["ALL"]
+"src/shusha/_drafts/*" = ["ALL"]
+"tests/*" = ["RUF012"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.ty.src]
+exclude = [
+  "ray/**",
+  "src/shusha/_drafts/**",
 ]

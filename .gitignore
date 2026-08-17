@@ -170,5 +170,8 @@ cython_debug/
 *.code-workspace
 *my_tmp_*
 
-# ShashaDB Persistence Files
+# ShushaDB Persistence Files
+shusha.db
 shusha.db.*
+test_shudb
+*.db
