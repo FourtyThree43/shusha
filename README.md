@@ -5,18 +5,21 @@
 [![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
-**Shusha** (*Swahili for "Download"*) is a fast, modern download manager that wraps around [aria2](https://aria2.github.io/), a high-performance multi-protocol and multi-source download utility. Shusha provides a graphical user interface (GUI) built with Tkinter and ttkbootstrap, coupled with a robust Model-View-Controller (MVC) engine and automatic local aria2 daemon lifecycle orchestration.
+**Shusha** (*Swahili for "Download"*) is a fast, modern download manager that wraps around [aria2](https://aria2.github.io/), a high-performance multi-protocol and multi-source download utility. Shusha provides a modern graphical user interface built with Tkinter and ttkbootstrap, coupled with a robust Model-View-Controller (MVC) engine and automatic local aria2 daemon lifecycle orchestration.
 
 ---
 
 ## Features
 
-- **Multi-Protocol Power**: HTTP/HTTPS, FTP, SFTP, BitTorrent, and Metalink.
-- **Segmented Acceleration**: Multi-connection downloads with configurable chunk splitting.
-- **Queue & Task Control**: Pause, resume, retry, reorder, and remove download tasks.
-- **Live Metrics**: Real-time download/upload speed meters, progress bars, and ETA calculations.
+- **Multi-Protocol Power**: HTTP/HTTPS, FTP, SFTP, BitTorrent (`.torrent`), and Metalink (`.metalink`).
+- **Segmented Acceleration**: Multi-connection downloads with configurable chunk splitting and speed throttles.
+- **Selective File Downloads**: Inspect files inside multi-file torrents and toggle individual file downloads.
+- **Queue & Task Control**: Start Queue, Pause Queue, Clear Queue, reorder tasks, and filter by status (*All*, *Active*, *Completed*, *Paused*, *Waiting*, *Error*, *Inactive*).
+- **Table Context Menu**: Right-click actions to Resume, Pause, Remove, Delete files, Open containing directory, and copy download info.
+- **Desktop Notifications & Tray**: Native OS notifications on download completion/failure and background tray minimization.
+- **Graphical Settings Modal**: Configure download folders, connection limits, speed caps, themes, and aria2 RPC options with native TOML persistence.
 - **Integrated Daemon Supervision**: Automatic discovery, startup, health monitoring, and shutdown of local `aria2c` processes.
-- **Modern Packaging & Tooling**: Built with Astral `uv`, `ruff`, and `ty` type checking.
+- **Modern Tooling & Zero-Bloat**: Built with Astral `uv`, `ruff`, and `ty` type checking.
 
 ---
 
@@ -72,6 +75,20 @@ uv build
 
 ---
 
+## Releasing & Publishing
+
+Automated GitHub Releases and PyPI publication run via GitHub Actions on Git tag push:
+
+```bash
+# Create and push a release tag
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+The workflow automatically validates the codebase across Python versions, builds distribution packages (`.whl` and `.tar.gz`), generates GitHub Release notes, and publishes to PyPI.
+
+---
+
 ## Architecture & Project Layout
 
 ```
@@ -85,51 +102,28 @@ shusha
 │       │   ├── client.py        # XML-RPC client for aria2
 │       │   ├── daemon.py        # Process supervision & daemon lifecycle
 │       │   ├── database.py      # Shelve-based NoSQL persistence
-│       │   ├── db.py            # SQLite relational task history
 │       │   ├── logger.py        # Rotating file & console logging service
 │       │   ├── settings.py      # TOML configuration manager
 │       │   ├── structs_downloads.py # Typed Download & BitTorrent models
-│       │   ├── structs_options.py   # Strongly typed aria2 option structs
+│       │   ├── structs_options.py   # Dynamic aria2 option mapping
 │       │   ├── structs_stats.py     # Download stats & speed models
-│       │   └── utilities.py     # Unit formatters & path resolution
+│       │   └── utilities.py     # Unit formatters, paths, & notifications
 │       ├── views                # View Layer (Tkinter / ttkbootstrap)
 │       │   ├── app.py           # Main window with download table & toolbar
 │       │   ├── add_win.py       # Add URIs / Torrents modal dialog
-│       │   └── status_win.py    # Download status meter dialog
+│       │   ├── settings_win.py  # Graphical Settings modal
+│       │   ├── status_win.py    # Download status meter dialog
+│       │   └── torrent_win.py   # Multi-file selective download inspector
 │       ├── controller           # Controller Layer
 │       │   └── api.py           # ShushaAPI high-level orchestrator
-│       └── resources            # Assets, icons, and themes
-├── tests                        # Comprehensive Pytest suite
-│   ├── test_client.py
-│   ├── test_controller_api.py
-│   ├── test_daemon.py
-│   ├── test_database.py
-│   ├── test_db.py
-│   ├── test_gui_smoke.py
-│   ├── test_logger.py
-│   ├── test_query_syntax.py
-│   ├── test_security.py
-│   ├── test_settings.py
-│   ├── test_structs.py
-│   └── test_utilities.py
-├── archive                      # Historical sandbox experiments & draft prototypes
-│   ├── drafts/
-│   └── ray/
-├── .github/workflows/ci.yml     # Multi-platform GitHub Actions CI
-├── pyproject.toml               # PEP 621 / UV configuration
-└── README.md
+│       └── resources            # UI Assets & icons
+├── archive                      # Archived legacy drafts & sandbox experiments
+├── tests                        # Comprehensive unit test suite (64 tests)
+└── pyproject.toml               # PEP 621 packaging metadata
 ```
 
 ---
 
 ## License
 
-`shusha` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
-
----
-
-## About Shusha
-
-Shusha (*Swahili for "download"*) was created to celebrate the beauty and vibrancy of East Africa while providing a powerful, reliable download manager for everyone.
-
-*Asante sana! (Thank you very much!)*
+This project is licensed under the MIT License — see the [LICENSE.txt](LICENSE.txt) file for details.
