@@ -112,6 +112,9 @@ shusha
 │   ├── test_settings.py
 │   ├── test_structs.py
 │   └── test_utilities.py
+├── archive                      # Historical sandbox experiments & draft prototypes
+│   ├── drafts/
+│   └── ray/
 ├── .github/workflows/ci.yml     # Multi-platform GitHub Actions CI
 ├── pyproject.toml               # PEP 621 / UV configuration
 └── README.md
