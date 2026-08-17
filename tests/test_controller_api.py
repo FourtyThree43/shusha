@@ -4,7 +4,7 @@ from pathlib import Path
 from unittest.mock import MagicMock
 
 from shusha.controller.api import ShushaAPI
-from shusha.models.client import Client
+from shusha.models.client import Client, XMLRPCClientException
 from shusha.models.daemon import Daemon
 from shusha.models.database import ShushaDB
 
@@ -61,6 +61,46 @@ class TestShushaAPI(unittest.TestCase):
         res_resume = self.api.resume("gid1")
         self.mock_client.unpause.assert_called_once_with("gid1")
         self.assertEqual(len(res_resume), 1)
+
+    def test_get_stats_success_and_fallback(self):
+        # Success
+        self.mock_client.get_global_stat.return_value = {
+            "downloadSpeed": "5000",
+            "uploadSpeed": "2000",
+            "numActive": "1",
+        }
+        stats = self.api.get_stats()
+        self.assertEqual(stats.download_speed, 5000)
+        self.assertEqual(stats.upload_speed, 2000)
+
+        # Fallback on RPC failure
+        self.mock_client.get_global_stat.side_effect = XMLRPCClientException(
+            1, "Unauthorized"
+        )
+        safe_stats = self.api.get_stats()
+        self.assertEqual(safe_stats.download_speed, 0)
+        self.assertEqual(safe_stats.num_active, 0)
+
+    def test_pause_all_and_resume_all(self):
+        self.mock_client.pause_all.return_value = "OK"
+        self.mock_client.unpause_all.return_value = "OK"
+        self.mock_client.tell_active.return_value = []
+        self.mock_client.tell_waiting.return_value = []
+        self.mock_client.tell_stopped.return_value = []
+
+        self.api.pause_all()
+        self.mock_client.pause_all.assert_called_once()
+
+        self.api.resume_all()
+        self.mock_client.unpause_all.assert_called_once()
+
+    def test_purge_all(self):
+        self.mock_client.purge_download_result.return_value = "OK"
+        self.mock_client.tell_active.return_value = []
+        self.mock_client.tell_waiting.return_value = []
+        self.mock_client.tell_stopped.return_value = []
+        res = self.api.purge()
+        self.assertIsInstance(res, list)
 
     def test_file_operations_move_and_copy(self):
         with (

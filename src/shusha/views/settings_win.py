@@ -300,6 +300,10 @@ class SettingsWindow(ttk.Toplevel):
 
             # Apply runtime options via aria2 API if connected
             if self.api and hasattr(self.api, "client"):
+                if hasattr(self.api.client, "secret"):
+                    self.api.client.secret = rpc_secret or None
+                if hasattr(self.api, "remote") and hasattr(self.api.remote, "secret"):
+                    self.api.remote.secret = rpc_secret or None
                 try:
                     aria2_runtime_opts = {
                         "max-overall-download-limit": (

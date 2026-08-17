@@ -25,7 +25,7 @@ class TestClient(unittest.TestCase):
         self.assertEqual(params, ["arg1", "arg2"])
 
     def test_build_request_params_with_secret(self):
-        self.client.secret = "token:mysecret"
+        self.client.secret = "mysecret"
         params = self.client._build_request_params(["arg1"])
         self.assertEqual(params, ["token:mysecret", "arg1"])
 
@@ -35,6 +35,15 @@ class TestClient(unittest.TestCase):
         self.assertEqual(gid, "gid12345")
         self.mock_server.aria2.addUri.assert_called_once_with(
             ["http://example.com/file.iso"], None, None
+        )
+
+    def test_add_uri_with_secret(self):
+        self.client.secret = "topsecret"
+        self.mock_server.aria2.addUri.return_value = "gid999"
+        gid = self.client.add_uri(["http://example.com/file.iso"])
+        self.assertEqual(gid, "gid999")
+        self.mock_server.aria2.addUri.assert_called_once_with(
+            "token:topsecret", ["http://example.com/file.iso"], None, None
         )
 
     def test_remove_success(self):
@@ -69,6 +78,38 @@ class TestClient(unittest.TestCase):
         self.mock_server.aria2.getGlobalStat.return_value = {"downloadSpeed": "1000"}
         self.assertEqual(self.client.get_global_option(), {"max-download-limit": "0"})
         self.assertEqual(self.client.get_global_stat(), {"downloadSpeed": "1000"})
+
+    def test_multicall_with_secret(self):
+        self.client.secret = "secret123"
+        self.mock_server.system.multicall.return_value = [["res1"], ["res2"]]
+        methods = [
+            {"methodName": "aria2.tellActive", "params": []},
+            {"methodName": "aria2.tellWaiting", "params": [0, 10]},
+        ]
+        result = self.client.multicall(methods)
+        self.assertEqual(result, [["res1"], ["res2"]])
+        self.mock_server.system.multicall.assert_called_once_with(
+            [
+                {"methodName": "aria2.tellActive", "params": ["token:secret123"]},
+                {
+                    "methodName": "aria2.tellWaiting",
+                    "params": ["token:secret123", 0, 10],
+                },
+            ]
+        )
+
+    def test_change_position(self):
+        self.mock_server.aria2.changePosition.return_value = 2
+        res = self.client.change_position("gid123", 1, "POS_CUR")
+        self.assertEqual(res, 2)
+        self.mock_server.aria2.changePosition.assert_called_once_with(
+            "gid123", 1, "POS_CUR"
+        )
+
+    def test_change_option(self):
+        self.mock_server.aria2.changeOption.return_value = "OK"
+        res = self.client.change_option("gid123", {"max-download-limit": "100K"})
+        self.assertEqual(res, "OK")
 
 
 if __name__ == "__main__":

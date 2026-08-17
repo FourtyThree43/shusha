@@ -46,19 +46,16 @@ class Client:
     A wrapper class for the XML-RPC client used to interact with the aria2 daemon
     """
 
-    def __init__(self, daemon: Daemon):
+    def __init__(self, daemon: Daemon, secret: str | None = None):
         """
-        Initialize the class with a Daemon instance.
+        Initialize the class with a Daemon instance and optional RPC secret token.
 
         Args:
             daemon (Daemon): The Daemon instance to be used.
-
-        Returns:
-            None
+            secret (str, optional): The RPC secret token for aria2.
         """
-        # self.logger = logger(logger_name="ShushaClient")
         self.remote = daemon
-        self.secret = None
+        self.secret = secret
         self.server_uri = f"http://{self.remote.host}:{self.remote.port}/rpc"
         self.server = xmlrpc.client.ServerProxy(self.server_uri, allow_none=True)
 
@@ -74,44 +71,31 @@ class Client:
         """
         return f"Client(host='{self.remote.host}', port='{self.remote.port}')"
 
-    def _build_request_params(self, params: list | None = None):
+    def _build_request_params(self, params: list | None = None) -> list[Any]:
         """
-        Build the request parameters for the XML-RPC server.
-
-        Args:
-            params: A list of parameters to be added to the request parameters.
-
-        Returns:
-            A list of parameters to be sent to the XML-RPC server.
+        Build the request parameters for the XML-RPC server, including token: prefix if secret is present.
         """
-        request_params = [self.secret] if self.secret else []
+        request_params: list[Any] = [f"token:{self.secret}"] if self.secret else []
         if params:
             request_params.extend(params)
         return request_params
 
-    def _call_method(self, method: str, params: list[Any] | None = None):
+    def _call_method(self, method: str, params: list[Any] | None = None) -> Any:
         """
         Call a method on the XML-RPC server.
-
-        Args:
-            method: The method to be called.
-            params: A list of parameters to be passed to the method.
-
-        Returns:
-            The result of the method call.
-
-        Raises:
-            XMLRPCClientException: If an XML-RPC error occurs.
         """
         request_params = self._build_request_params(params)
         try:
+            if "." in method:
+                parts = method.split(".")
+                target: Any = self.server
+                for part in parts:
+                    target = getattr(target, part)
+                return target(*request_params)
             return getattr(self.server.aria2, method)(*request_params)
         except xmlrpc.client.Fault as e:
             self._handle_xmlrpc_error(e)
-            return None
-        except Exception as e:
-            logger.log(f"Unexpected error: {e}", level="error")
-            return None
+            raise XMLRPCClientException(e.faultCode, e.faultString) from e
 
     def _handle_xmlrpc_error(self, xmlrpc_fault: xmlrpc.client.Fault):
         """
@@ -226,17 +210,19 @@ class Client:
         """
         return self._call_method("unpauseAll")
 
-    def tell_status(self, gid: str, keys: list[str] | None = None):
+    def tell_status(self, gid: str, keys: list[str] | None = None) -> dict[str, Any]:
         """
         A method to retrieve the status of a given identifier, with optional keys.
         :param gid: The identifier for which the status is to be retrieved.
         :param keys: Optional list of specific keys for which the status is to be retrieved.
-        :return: A dictionary containing the status information, or an empty dictionary if no status is found.
+        :return: A dictionary containing the status information, or an empty dictionary if not found.
         """
-        _struct = self._call_method("tellStatus", [gid, keys])
-
-        if _struct:
-            return _struct
+        try:
+            _struct = self._call_method("tellStatus", [gid, keys])
+            if _struct and isinstance(_struct, dict):
+                return _struct
+        except XMLRPCClientException:
+            pass
         return {}
 
     def get_uris(self, gid: str):
@@ -333,16 +319,21 @@ class Client:
     def save_session(self):
         return self._call_method("saveSession")
 
-    def multicall(self, methods):
+    def multicall(self, methods: list[dict[str, Any]]) -> Any:
         """
-        Call multiple methods in a single request.
-
-        :param methods: The list of methods to call.
-        :type methods: list
-        :return: The result of calling multiple methods.
-        :rtype: any
+        Call multiple methods in a single request with proper RPC token scoping.
         """
-        return self._call_method("system.multicall", [methods])
+        calls = []
+        for m in methods:
+            p = [f"token:{self.secret}"] if self.secret else []
+            if m.get("params"):
+                p.extend(m["params"])
+            calls.append({"methodName": m["methodName"], "params": p})
+        try:
+            return self.server.system.multicall(calls)
+        except xmlrpc.client.Fault as e:
+            self._handle_xmlrpc_error(e)
+            raise XMLRPCClientException(e.faultCode, e.faultString) from e
 
     def list_methods(self):
         """

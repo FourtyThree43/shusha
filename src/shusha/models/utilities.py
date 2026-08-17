@@ -3,6 +3,7 @@ This module contains utility functions that are used to perform common tasks by
 other modules in the `shusha` package.
 """
 
+import os
 import shutil
 import subprocess
 import sys
@@ -364,6 +365,36 @@ def send_desktop_notification(title: str, message: str) -> bool:
             )
             subprocess.Popen(["powershell", "-NoProfile", "-Command", ps_cmd])
             return True
+    except Exception:
+        pass
+    return False
+
+
+def open_path_in_file_manager(path: str | Path) -> bool:
+    """Open a folder or file in the default system file manager gracefully."""
+    target = str(path)
+    try:
+        if sys.platform.startswith("win"):
+            startfile = getattr(os, "startfile", None)
+            if startfile:
+                startfile(target)
+                return True
+        elif sys.platform == "darwin":
+            if shutil.which("open"):
+                subprocess.Popen(["open", target])
+                return True
+        else:
+            # Linux / Unix
+            for launcher in ["xdg-open", "gio"]:
+                bin_path = shutil.which(launcher)
+                if bin_path:
+                    args = (
+                        [bin_path, target]
+                        if launcher == "xdg-open"
+                        else [bin_path, "open", target]
+                    )
+                    subprocess.Popen(args)
+                    return True
     except Exception:
         pass
     return False

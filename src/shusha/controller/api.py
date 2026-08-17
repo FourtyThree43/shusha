@@ -18,6 +18,7 @@ from shusha.models.client import Client, XMLRPCClientException
 from shusha.models.daemon import Daemon
 from shusha.models.database import ShushaDB
 from shusha.models.logger import LoggerService
+from shusha.models.settings import AppSettings
 from shusha.models.structs_downloads import Download
 from shusha.models.structs_options import Options
 from shusha.models.structs_stats import Stats
@@ -39,9 +40,17 @@ class ShushaAPI:
         daemon: Daemon | None = None,
         client: Client | None = None,
         db: ShushaDB | None = None,
+        host: str | None = None,
+        port: int | None = None,
+        secret: str | None = None,
     ):
-        self.remote = daemon or Daemon()
-        self.client = client or Client(self.remote)
+        settings = AppSettings()
+        cfg_host = host or settings.get_aria2_host()
+        cfg_port = port or settings.get_aria2_port()
+        cfg_secret = secret or settings.get_aria2_secret()
+
+        self.remote = daemon or Daemon(host=cfg_host, port=cfg_port, secret=cfg_secret)
+        self.client = client or Client(self.remote, secret=cfg_secret)
         self.db = db or ShushaDB(filename="shusha.db")
 
     def __str__(self):
@@ -651,12 +660,13 @@ class ShushaAPI:
         return self.client.change_global_option(client_options) == "OK"
 
     def get_stats(self) -> Stats:
-        """Get the stats of the remote aria2c process.
-
-        Returns:
-            The global stats returned by the remote process.
-        """
-        return Stats(self.client.get_global_stat())
+        """Get the stats of the remote aria2c process."""
+        try:
+            raw = self.client.get_global_stat()
+            return Stats.from_dict(raw) if hasattr(Stats, "from_dict") else Stats(raw)
+        except Exception as e:
+            logger.log(f"Stats lookup error: {e}", level="debug")
+            return Stats.from_dict({}) if hasattr(Stats, "from_dict") else Stats({})
 
     @staticmethod
     def remove_files(

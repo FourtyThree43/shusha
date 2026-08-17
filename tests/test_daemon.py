@@ -19,8 +19,9 @@ class TestDaemon(unittest.TestCase):
         self.assertTrue(len(cmd) > 0)
         self.assertEqual(cmd[0], "aria2c")
 
+    @patch.object(Daemon, "is_port_open", return_value=False)
     @patch("subprocess.Popen")
-    def test_start_and_stop_server(self, mock_popen):
+    def test_start_and_stop_server(self, mock_popen, mock_is_open):
         mock_proc = MagicMock()
         mock_proc.pid = 9999
         mock_proc.poll.return_value = None

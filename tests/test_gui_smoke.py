@@ -4,7 +4,7 @@ import unittest
 
 import ttkbootstrap as ttk
 
-from shusha.views.app import relative_to_assets
+from shusha.views.app import Aria2Gui, relative_to_assets
 
 
 class TestGuiSmoke(unittest.TestCase):
@@ -55,10 +55,6 @@ class TestGuiSmoke(unittest.TestCase):
 
     def test_aria2_gui_components(self):
         try:
-            import ttkbootstrap as ttk
-
-            from shusha.views.app import Aria2Gui
-
             root = ttk.Window(themename="darkly")
             root.withdraw()
         except Exception:
@@ -76,6 +72,18 @@ class TestGuiSmoke(unittest.TestCase):
 
         # Test context menu exists
         self.assertIsNotNone(app.context_menu)
+
+        # Test queue actions
+        app.start_queue()
+        app.pause_queue()
+        app.clear_queue()
+
+        # Test tray actions
+        app.minimize_to_tray()
+        app.restore_from_tray()
+
+        # Test logs directory opening
+        app.open_logs_directory()
 
         root.destroy()
 

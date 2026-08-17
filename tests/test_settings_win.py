@@ -1,6 +1,5 @@
 import contextlib
 import tempfile
-import tkinter as tk
 import unittest
 from pathlib import Path
 from unittest.mock import MagicMock
@@ -61,9 +60,14 @@ class TestSettingsWindowAndConfig(unittest.TestCase):
         settings.set_logs_dir("/tmp/test_logs")
         self.assertEqual(settings.get_logs_dir(), "/tmp/test_logs")
 
+        settings.set_aria2_config(host="192.168.1.50", port=6801, secret="supertoken")
+        self.assertEqual(settings.get_aria2_host(), "192.168.1.50")
+        self.assertEqual(settings.get_aria2_port(), 6801)
+        self.assertEqual(settings.get_aria2_secret(), "supertoken")
+
     def test_settings_window_headless(self):
         try:
-            root = tk.Tk()
+            root = ttk.Window(themename="darkly")
             root.withdraw()
         except Exception:
             self.skipTest("Display not available for Tkinter SettingsWindow test")

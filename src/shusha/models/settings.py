@@ -6,8 +6,32 @@ class AppSettings:
         self.config_dict = load_configuration()
         self.config_dict.setdefault("USER", {})
 
-    def get_aria2_config(self):
+    def get_aria2_config(self) -> dict:
         return self.config_dict.get("USER", {}).get("aria2", {})
+
+    def get_aria2_host(self) -> str:
+        return self.get_aria2_config().get("host", "localhost")
+
+    def get_aria2_port(self) -> int:
+        return int(self.get_aria2_config().get("port", 6800))
+
+    def get_aria2_secret(self) -> str | None:
+        return self.get_aria2_config().get("secret") or None
+
+    def set_aria2_config(
+        self,
+        host: str | None = None,
+        port: int | None = None,
+        secret: str | None = None,
+    ):
+        aria2_cfg = self.config_dict.setdefault("USER", {}).setdefault("aria2", {})
+        if host is not None:
+            aria2_cfg["host"] = host
+        if port is not None:
+            aria2_cfg["port"] = int(port)
+        if secret is not None:
+            aria2_cfg["secret"] = secret
+        self.save_settings()
 
     def get_aria2_options(self):
         return self.config_dict.get("USER", {}).get("aria2.options", {})

@@ -34,15 +34,10 @@ class Daemon:
         host=DEFAULT_HOST,
         port=DEFAULT_PORT,
         timeout=DEFAULT_TIMEOUT,
+        secret: str | None = None,
     ):
         """
-        Initialize the Aria2 client.
-
-        :param aria2d: (str) The path to the Aria2 daemon executable.
-        :param host: (str) The host to connect to. Default is DEFAULT_HOST.
-        :param port: (int) The port to connect to. Default is DEFAULT_PORT.
-        :param timeout: (int) The timeout for the connection. Default is DEFAULT_TIMEOUT.
-        :return: None
+        Initialize the Aria2 daemon wrapper.
         """
         if aria2d is not None:
             self.aria2d = aria2d
@@ -53,6 +48,7 @@ class Daemon:
         self.host = host
         self.port = port
         self.timeout = timeout
+        self.secret = secret
         self.process = None
 
     def __str__(self):
@@ -100,25 +96,36 @@ class Daemon:
         else:
             return False
 
-    def _build_command(self):
-        """Build the command to start the Aria2 server.
+    def is_port_open(self) -> bool:
+        """Check if target host/port is already listening."""
+        import socket
 
-        Returns:
-            The command to start the Aria2 server.
-        """
+        target_host = (
+            "127.0.0.1" if self.host in ("localhost", "0.0.0.0") else self.host
+        )
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.settimeout(0.5)
+                return s.connect_ex((target_host, int(self.port))) == 0
+        except Exception:
+            return False
+
+    def _build_command(self):
+        """Build the command to start the Aria2 server."""
         base_command = [str(self.aria2d)]
 
         if CONF_PATH.exists():
             command = [*base_command, f"--conf-path={CONF_PATH}"]
+            if self.secret:
+                command.append(f"--rpc-secret={self.secret}")
         else:
-            # Use default configuration
             command = [
                 *base_command,
-                "--enable-rpc",
-                "--rpc-listen-all",
+                "--enable-rpc=true",
+                "--rpc-listen-all=true",
                 f"--rpc-listen-port={self.port}",
                 "--rpc-max-request-size=2M",
-                "--rpc-secret=null",
+                f"--rpc-secret={self.secret or 'null'}",
                 "--quiet=true",
             ]
 
@@ -146,7 +153,7 @@ class Daemon:
                 shell=False,
                 creationflags=creationflags,
             )
-            time.sleep(2)
+            time.sleep(1.5)
             logger.log("Aria2 server started successfully.")
             return self.process.pid
         except FileNotFoundError as e:
@@ -157,14 +164,17 @@ class Daemon:
             logger.log(f"Unexpected error starting Aria2 server: {e}")
 
     def start_server(self):
-        """Start the Aria2 server.
-
-        Returns:
-            The process ID of the Aria2 server.
-        """
+        """Start the Aria2 server or reuse existing instance."""
         if self.process and self.process.poll() is None:
             logger.log("Aria2 server is already running.", level="warning")
-            return
+            return self.process.pid
+
+        if self.is_port_open():
+            logger.log(
+                f"Aria2 server is already listening on {self.host}:{self.port}.",
+                level="info",
+            )
+            return None
 
         command = self._build_command()
         return self._start_server_process(command)

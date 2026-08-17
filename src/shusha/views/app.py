@@ -3,9 +3,6 @@
 # SPDX-License-Identifier: MIT
 
 import contextlib
-import os
-import subprocess
-import sys
 import threading
 import tkinter as tk
 from collections.abc import Callable
@@ -19,7 +16,11 @@ from shusha.controller.api import ShushaAPI as Api
 from shusha.models.logger import LoggerService
 from shusha.models.structs_downloads import Download
 from shusha.models.structs_stats import Stats
-from shusha.models.utilities import send_desktop_notification, user_log_dir
+from shusha.models.utilities import (
+    open_path_in_file_manager,
+    send_desktop_notification,
+    user_log_dir,
+)
 from shusha.views.add_win import AddWindow
 from shusha.views.settings_win import SettingsWindow
 from shusha.views.status_win import DownloadWindow
@@ -228,6 +229,19 @@ class Aria2Gui(ttk.Frame):
             stripecolor=(self.colors.dark, None),
         )
         self.dt.pack(fill=tk.BOTH, expand=tk.YES, padx=10)
+
+        # Safeguard ttkbootstrap tableview sort icon theme refresh bug
+        if hasattr(self.dt, "_refresh_sort_icon_theme"):
+            orig_refresh = self.dt._refresh_sort_icon_theme
+
+            def _safe_refresh(*args: Any, **kwargs: Any) -> None:
+                try:
+                    if getattr(self.dt, "_sorted_cid", None) is not None:
+                        orig_refresh(*args, **kwargs)
+                except Exception:
+                    pass
+
+            self.dt._refresh_sort_icon_theme = _safe_refresh  # ty: ignore[invalid-assignment]
 
         # Bind events
         if hasattr(self.dt, "view"):
@@ -689,16 +703,8 @@ class Aria2Gui(ttk.Frame):
             return
 
         folder_path = str(dl.dir)
-        try:
-            startfile = getattr(os, "startfile", None)
-            if startfile:
-                startfile(folder_path)
-            elif sys.platform == "darwin":
-                subprocess.Popen(["open", folder_path])
-            else:
-                subprocess.Popen(["xdg-open", folder_path])
-        except Exception as e:
-            logger.log(f"Failed to open folder {folder_path}: {e}", level="error")
+        if not open_path_in_file_manager(folder_path):
+            self.show_toast(f"Location: {folder_path}")
 
     def copy_selected_link(self):
         """Copy selected download filename or GID to clipboard."""
@@ -738,18 +744,9 @@ class Aria2Gui(ttk.Frame):
     def open_logs_directory(self):
         """Open application logs directory."""
         log_dir = str(user_log_dir("shusha"))
-        try:
-            Path(log_dir).mkdir(parents=True, exist_ok=True)
-            startfile = getattr(os, "startfile", None)
-            if startfile:
-                startfile(log_dir)
-            elif sys.platform == "darwin":
-                subprocess.Popen(["open", log_dir])
-            else:
-                subprocess.Popen(["xdg-open", log_dir])
-        except Exception as e:
+        Path(log_dir).mkdir(parents=True, exist_ok=True)
+        if not open_path_in_file_manager(log_dir):
             self.show_toast(f"Logs directory: {log_dir}")
-            logger.log(f"Logs folder: {e}", level="info")
 
     def start_queue(self):
         """Resume all paused/waiting downloads in the queue."""

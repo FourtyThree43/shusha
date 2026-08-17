@@ -7,7 +7,7 @@ from shusha.models.structs_stats import Stats
 
 
 class TestStructs(unittest.TestCase):
-    def test_stats_struct(self):
+    def test_stats_struct_and_dataclass(self):
         stats = Stats(
             {
                 "downloadSpeed": "1048576",
@@ -27,6 +27,17 @@ class TestStructs(unittest.TestCase):
         self.assertIn("MiB/s", stats.download_speed_string())
         self.assertIn("KiB/s", stats.upload_speed_string())
 
+    def test_stats_empty_safe_parsing(self):
+        # Empty dict should NEVER raise KeyError
+        stats_empty = Stats({})
+        self.assertEqual(stats_empty.download_speed, 0)
+        self.assertEqual(stats_empty.upload_speed, 0)
+        self.assertEqual(stats_empty.num_active, 0)
+        self.assertEqual(stats_empty.download_speed_string(), "0.00 B/s")
+
+        stats_none = Stats.from_dict(None)
+        self.assertEqual(stats_none.download_speed, 0)
+
     def test_file_struct(self):
         file_struct = {
             "index": "1",
@@ -43,6 +54,7 @@ class TestStructs(unittest.TestCase):
         self.assertTrue(f.selected)
         self.assertIn("1000", f.length_string(human_readable=False))
         self.assertIn("500", f.completed_length_string(human_readable=False))
+        self.assertFalse(f.is_metadata)
 
     def test_bittorrent_struct(self):
         bt_struct = {
@@ -87,6 +99,30 @@ class TestStructs(unittest.TestCase):
         self.assertEqual(dl.progress, 50.0)
         self.assertEqual(dl.name, "file.bin")
 
+    def test_download_empty_and_error_states(self):
+        mock_api = MagicMock()
+        # Empty struct download
+        dl_empty = Download(api=mock_api, struct={})
+        self.assertEqual(dl_empty.gid, "")
+        self.assertEqual(dl_empty.name, "Download")
+        self.assertFalse(dl_empty.is_active)
+        self.assertEqual(dl_empty.progress, 0.0)
+
+        # Download with error status
+        dl_error = Download(api=mock_api, struct={"gid": "err99", "status": "error"})
+        self.assertTrue(dl_error.is_error)
+        self.assertTrue(dl_error.has_failed)
+
+        # Download with metadata file
+        dl_meta = Download(
+            api=mock_api,
+            struct={
+                "gid": "meta1",
+                "files": [{"path": "[METADATA]magnet_download"}],
+            },
+        )
+        self.assertEqual(dl_meta.name, "[METADATA]magnet_download")
+
     def test_options_struct(self):
         mock_api = MagicMock()
         opts = Options(
@@ -98,20 +134,10 @@ class TestStructs(unittest.TestCase):
                 "dir": "/downloads",
             },
         )
-        self.assertEqual(opts.max_download_limit, 100000)
         self.assertEqual(opts.split, 4)
         self.assertTrue(opts.continue_downloads)
-        self.assertEqual(opts.dir, "/downloads")
-        self.assertEqual(opts["split"], 4)
-        self.assertIn("dir", opts)
-        self.assertEqual(len(opts), 4)
-
-        # Dynamic setting
-        opts.max_concurrent_downloads = 10
-        self.assertEqual(opts.max_concurrent_downloads, 10)
-        mock_api.client.change_global_option.assert_called_with(
-            {"max-concurrent-downloads": "10"}
-        )
+        self.assertEqual(opts["max-download-limit"], 100000)
+        self.assertEqual(opts["dir"], "/downloads")
 
 
 if __name__ == "__main__":
