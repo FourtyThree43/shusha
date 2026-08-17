@@ -113,7 +113,7 @@ class SettingsWindow(ttk.Toplevel):
             dl_row,
             text="Browse...",
             bootstyle="secondary-outline",
-            command=self._browse_download_dir,
+            command=lambda: self._browse_dir(self.download_dir_var),
         ).pack(side=tk.RIGHT)
 
         ttk.Label(dl_lf, text="Logs Directory:").pack(anchor=tk.W, pady=(0, 2))
@@ -126,7 +126,7 @@ class SettingsWindow(ttk.Toplevel):
             log_row,
             text="Browse...",
             bootstyle="secondary-outline",
-            command=self._browse_logs_dir,
+            command=lambda: self._browse_dir(self.logs_dir_var),
         ).pack(side=tk.RIGHT)
 
         # Appearance
@@ -242,19 +242,10 @@ class SettingsWindow(ttk.Toplevel):
             width=12,
         ).pack(side=tk.RIGHT)
 
-    def _browse_download_dir(self):
-        selected = filedialog.askdirectory(
-            initialdir=self.download_dir_var.get(), parent=self
-        )
+    def _browse_dir(self, var: tk.StringVar):
+        selected = filedialog.askdirectory(initialdir=var.get(), parent=self)
         if selected:
-            self.download_dir_var.set(selected)
-
-    def _browse_logs_dir(self):
-        selected = filedialog.askdirectory(
-            initialdir=self.logs_dir_var.get(), parent=self
-        )
-        if selected:
-            self.logs_dir_var.set(selected)
+            var.set(selected)
 
     def _save_and_apply(self):
         """Save settings to disk and apply options to active aria2 instance."""

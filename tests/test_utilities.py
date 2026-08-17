@@ -19,7 +19,6 @@ from shusha.models.utilities import (
     log_dir,
     sizeof_fmt,
     timedelta_fmt,
-    timedelta_fmt_v2,
 )
 
 
@@ -54,13 +53,6 @@ class TestUtilities(unittest.TestCase):
 
         td2 = timedelta(days=2, hours=2, minutes=3, seconds=4)
         self.assertEqual(timedelta_fmt(td2), "2D:2H:3M:4S")
-
-    def test_timedelta_fmt_v2(self):
-        td = timedelta(days=2, hours=1, minutes=10, seconds=5)
-        formatted = timedelta_fmt_v2(td)
-        self.assertIn("2 days", formatted)
-        self.assertIn("1 hour", formatted)
-        self.assertIn("10 minutes", formatted)
 
     def test_format_eta(self):
         self.assertEqual(format_eta(timedelta.max), "-")

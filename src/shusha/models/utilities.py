@@ -199,44 +199,6 @@ def timedelta_fmt(value: timedelta, precision: int = 0) -> str:
     return "".join(pieces[:precision] if precision > 0 else pieces)
 
 
-def timedelta_fmt_v2(value: timedelta, precision: int = 0) -> str:
-    """
-    Format a timedelta into a human readable format.
-
-    Args:
-        value (timedelta): The timedelta.
-        precision (int, optional): The precision. Defaults to 0.
-
-            - `0` to display all units
-            - `1` to display the biggest unit only
-            - `2` to display the first two biggest units only
-            - `n` for the first N biggest units, etc.
-
-    Returns:
-        str: The human readable format.
-    """
-    pieces = []
-
-    def add_piece(unit: int, label_singular: str, label_plural: str):
-        """
-        Add a formatted piece to the pieces list.
-        """
-        if unit > 0:
-            label = label_singular if unit == 1 else label_plural
-            pieces.append(f"{unit}{label}")
-
-    add_piece(value.days, " day ", " days ")
-
-    hours, seconds = divmod(value.seconds, 3600)
-    minutes, seconds = divmod(seconds, 60)
-
-    add_piece(hours, " hour ", " hours ")
-    add_piece(minutes, " minute ", " minutes ")
-    add_piece(seconds, " second", " seconds")
-
-    return "".join(pieces[:precision] if precision > 0 else pieces)
-
-
 def format_eta(eta: timedelta, precision: int = 0) -> str:
     """Format a number of seconds into a human readable format.
 

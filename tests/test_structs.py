@@ -90,10 +90,28 @@ class TestStructs(unittest.TestCase):
     def test_options_struct(self):
         mock_api = MagicMock()
         opts = Options(
-            api=mock_api, struct={"max-download-limit": "100000", "split": "4"}
+            api=mock_api,
+            struct={
+                "max-download-limit": "100000",
+                "split": "4",
+                "continue": "true",
+                "dir": "/downloads",
+            },
         )
         self.assertEqual(opts.max_download_limit, 100000)
         self.assertEqual(opts.split, 4)
+        self.assertTrue(opts.continue_downloads)
+        self.assertEqual(opts.dir, "/downloads")
+        self.assertEqual(opts["split"], 4)
+        self.assertIn("dir", opts)
+        self.assertEqual(len(opts), 4)
+
+        # Dynamic setting
+        opts.max_concurrent_downloads = 10
+        self.assertEqual(opts.max_concurrent_downloads, 10)
+        mock_api.client.change_global_option.assert_called_with(
+            {"max-concurrent-downloads": "10"}
+        )
 
 
 if __name__ == "__main__":

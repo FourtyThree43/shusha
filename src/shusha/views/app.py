@@ -395,7 +395,7 @@ class Aria2Gui(ttk.Frame):
             global_stats = self.api.get_stats()
             self.update_stats_frame(global_stats)
         except Exception as e:
-            self.log_debug(f"Stats polling notice: {e}")
+            logger.log(f"Stats polling notice: {e}", level="debug")
         finally:
             self.after(1000, self.get_stats)
 
@@ -440,7 +440,7 @@ class Aria2Gui(ttk.Frame):
                 self.refresh_downloads_table()
 
         except Exception as e:
-            self.log_error(f"Error starting download: {e}")
+            logger.log(f"Error starting download: {e}", level="error")
 
     def add_download_to_table(self, download: Download):
         """Add a download to the tableview."""
@@ -527,7 +527,7 @@ class Aria2Gui(ttk.Frame):
             self.show_toast(f"Resumed: {dl.name}")
             self.refresh_downloads_table()
         except Exception as e:
-            self.log_error(f"Error resuming download: {e}")
+            logger.log(f"Error resuming download: {e}", level="error")
 
     def pause_selected_download(self):
         """Pause the currently selected download."""
@@ -543,7 +543,7 @@ class Aria2Gui(ttk.Frame):
             self.show_toast(f"Paused: {dl.name}")
             self.refresh_downloads_table()
         except Exception as e:
-            self.log_error(f"Error pausing download: {e}")
+            logger.log(f"Error pausing download: {e}", level="error")
 
     def remove_selected_download(self, files: bool = False):
         """Remove the selected download from table and aria2."""
@@ -559,7 +559,7 @@ class Aria2Gui(ttk.Frame):
             self.show_toast(f"Removed: {dl.name}")
             self.refresh_downloads_table()
         except Exception as e:
-            self.log_error(f"Error removing download: {e}")
+            logger.log(f"Error removing download: {e}", level="error")
 
     def move_download_up(self):
         """Increase queue priority of selected download."""
@@ -569,7 +569,7 @@ class Aria2Gui(ttk.Frame):
                 self.api.client.change_position(dl.gid, -1, "POS_CUR")
                 self.refresh_downloads_table()
             except Exception as e:
-                self.log_error(f"Error reordering download: {e}")
+                logger.log(f"Error reordering download: {e}", level="error")
 
     def move_download_down(self):
         """Decrease queue priority of selected download."""
@@ -579,7 +579,7 @@ class Aria2Gui(ttk.Frame):
                 self.api.client.change_position(dl.gid, 1, "POS_CUR")
                 self.refresh_downloads_table()
             except Exception as e:
-                self.log_error(f"Error reordering download: {e}")
+                logger.log(f"Error reordering download: {e}", level="error")
 
     def refresh_downloads_table(self):
         """Query aria2 downloads and synchronize tableview rows."""
@@ -620,7 +620,7 @@ class Aria2Gui(ttk.Frame):
 
             self.after(0, _update_ui)
         except Exception as e:
-            self.log_debug(f"Refresh downloads notice: {e}")
+            logger.log(f"Refresh downloads notice: {e}", level="debug")
 
     def on_category_changed(self, event=None):
         """Handle category filter combobox selection."""
@@ -644,7 +644,7 @@ class Aria2Gui(ttk.Frame):
             else:
                 subprocess.Popen(["xdg-open", folder_path])
         except Exception as e:
-            self.log_error(f"Failed to open folder {folder_path}: {e}")
+            logger.log(f"Failed to open folder {folder_path}: {e}", level="error")
 
     def copy_selected_link(self):
         """Copy selected download filename or GID to clipboard."""
@@ -682,43 +682,46 @@ class Aria2Gui(ttk.Frame):
                 subprocess.Popen(["xdg-open", log_dir])
         except Exception as e:
             self.show_toast(f"Logs directory: {log_dir}")
-            self.log_info(f"Logs folder: {e}")
+            logger.log(f"Logs folder: {e}", level="info")
 
     def start_queue(self):
         """Resume all paused/waiting downloads in the queue."""
-        self._thread(self._start_queue_bg)
 
-    def _start_queue_bg(self):
-        try:
-            self.api.unpause_all()
-            self.show_toast("Resumed all downloads")
-            self.refresh_downloads_table()
-        except Exception as e:
-            self.log_error(f"Error resuming queue: {e}")
+        def _bg():
+            try:
+                self.api.resume_all()
+                self.show_toast("Resumed all downloads")
+                self.refresh_downloads_table()
+            except Exception as e:
+                logger.log(f"Error resuming queue: {e}", level="error")
+
+        self._thread(_bg)
 
     def pause_queue(self):
         """Pause all active downloads in the queue."""
-        self._thread(self._pause_queue_bg)
 
-    def _pause_queue_bg(self):
-        try:
-            self.api.pause_all()
-            self.show_toast("Paused all downloads")
-            self.refresh_downloads_table()
-        except Exception as e:
-            self.log_error(f"Error pausing queue: {e}")
+        def _bg():
+            try:
+                self.api.pause_all()
+                self.show_toast("Paused all downloads")
+                self.refresh_downloads_table()
+            except Exception as e:
+                logger.log(f"Error pausing queue: {e}", level="error")
+
+        self._thread(_bg)
 
     def clear_queue(self):
         """Clear all completed and stopped downloads."""
-        self._thread(self._clear_queue_bg)
 
-    def _clear_queue_bg(self):
-        try:
-            self.api.purge()
-            self.show_toast("Cleared completed / stopped tasks")
-            self.refresh_downloads_table()
-        except Exception as e:
-            self.log_error(f"Error clearing queue: {e}")
+        def _bg():
+            try:
+                self.api.purge()
+                self.show_toast("Cleared completed / stopped tasks")
+                self.refresh_downloads_table()
+            except Exception as e:
+                logger.log(f"Error clearing queue: {e}", level="error")
+
+        self._thread(_bg)
 
     def pause_download(self):
         """Method to pause a download."""
@@ -745,21 +748,6 @@ class Aria2Gui(ttk.Frame):
         if self.download_gid:
             self.stop_downloads()
         self.stop_server()
-
-    def log_error(self, message):
-        logger.log(message, level="error")
-
-    def log_warning(self, message):
-        logger.log(message, level="warning")
-
-    def log_debug(self, message):
-        logger.log(message, level="debug")
-
-    def log_info(self, message):
-        logger.log(message, level="info")
-
-    def log_critical(self, message):
-        logger.log(message, level="critical")
 
 
 if __name__ == "__main__":
