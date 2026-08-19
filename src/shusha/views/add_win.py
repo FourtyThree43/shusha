@@ -331,6 +331,6 @@ class AddWindow(ttk.Toplevel):
 
 
 if __name__ == "__main__":
-    root = ttk.Window(themename="darkly", position=(900, 100))
+    root = ttk.Window(themename="bootstrap-dark", position=(900, 100))
     app = AddWindow(callback=lambda u, o: None)
     root.mainloop()

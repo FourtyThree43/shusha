@@ -855,7 +855,7 @@ if __name__ == "__main__":
 
     app = ttk.Window(
         title="App",
-        themename="darkly",
+        themename="bootstrap-dark",
         size=(1270, 550),
         resizable=(False, False),
         position=(10, 140),

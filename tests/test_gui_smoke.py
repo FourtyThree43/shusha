@@ -55,7 +55,8 @@ class TestGuiSmoke(unittest.TestCase):
 
     def test_aria2_gui_components(self):
         try:
-            root = ttk.Window(themename="darkly")
+            # Use modern ttkbootstrap 2.x theme
+            root = ttk.Window(themename="bootstrap-dark")
             root.withdraw()
         except Exception:
             self.skipTest("No display available for Aria2Gui test")

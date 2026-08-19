@@ -45,7 +45,7 @@ class TestTorrentFeatures(unittest.TestCase):
 
     def test_torrent_files_window_headless(self):
         try:
-            root = ttk.Window(themename="darkly")
+            root = ttk.Window(themename="bootstrap-dark")
             root.withdraw()
         except Exception:
             self.skipTest("No display available for TorrentFilesWindow test")
@@ -88,7 +88,7 @@ class TestTorrentFeatures(unittest.TestCase):
 
     def test_add_window_torrent_tab(self):
         try:
-            root = ttk.Window(themename="darkly")
+            root = ttk.Window(themename="bootstrap-dark")
             root.withdraw()
         except Exception:
             self.skipTest("No display available for AddWindow test")

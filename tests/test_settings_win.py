@@ -27,14 +27,14 @@ class TestSettingsWindowAndConfig(unittest.TestCase):
                 "port": 6800,
                 "continue": True,
             },
-            "theme": "darkly",
+            "theme": "bootstrap-dark",
         }
         res = dump_toml(data)
         self.assertIn("[aria2]", res)
         self.assertIn('host = "127.0.0.1"', res)
         self.assertIn("port = 6800", res)
         self.assertIn("continue = true", res)
-        self.assertIn('theme = "darkly"', res)
+        self.assertIn('theme = "bootstrap-dark"', res)
 
     def test_save_configuration(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -67,7 +67,7 @@ class TestSettingsWindowAndConfig(unittest.TestCase):
 
     def test_settings_window_headless(self):
         try:
-            root = ttk.Window(themename="darkly")
+            root = ttk.Window(themename="bootstrap-dark")
             root.withdraw()
         except Exception:
             self.skipTest("Display not available for Tkinter SettingsWindow test")

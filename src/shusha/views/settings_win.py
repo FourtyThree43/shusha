@@ -16,22 +16,36 @@ from shusha.models.utilities import user_downloads_dir, user_log_dir
 logger = LoggerService(__name__)
 
 AVAILABLE_THEMES = [
-    "darkly",
-    "flatly",
-    "cosmo",
-    "superhero",
-    "journal",
-    "minty",
-    "cyborg",
-    "solar",
-    "vapor",
-    "pulse",
-    "sandstone",
-    "united",
-    "yeti",
-    "morph",
-    "simplex",
-    "cerculean",
+    "bootstrap-light",
+    "bootstrap-dark",
+    "pydata-light",
+    "pydata-dark",
+    "nord-light",
+    "nord-dark",
+    "solarized-light",
+    "solarized-dark",
+    "catppuccin-light",
+    "catppuccin-dark",
+    "gruvbox-light",
+    "gruvbox-dark",
+    "dracula-light",
+    "dracula-dark",
+    "tokyo-night-light",
+    "tokyo-night-dark",
+    "one-light",
+    "one-dark",
+    "everforest-light",
+    "everforest-dark",
+    "vapor-light",
+    "vapor-dark",
+    "minty-light",
+    "minty-dark",
+    "pulse-light",
+    "pulse-dark",
+    "united-light",
+    "united-dark",
+    "sandstone-light",
+    "sandstone-dark",
 ]
 
 
@@ -64,7 +78,7 @@ class SettingsWindow(ttk.Toplevel):
 
         self.download_dir_var = tk.StringVar(value=str(default_dl))
         self.logs_dir_var = tk.StringVar(value=str(default_log))
-        self.theme_var = tk.StringVar(value=user_config.get("theme", "darkly"))
+        self.theme_var = tk.StringVar(value=user_config.get("theme", "bootstrap-dark"))
         self.notify_on_complete_var = tk.BooleanVar(
             value=bool(user_config.get("notify_on_complete", True))
         )
@@ -335,7 +349,7 @@ class SettingsWindow(ttk.Toplevel):
 
 
 if __name__ == "__main__":
-    root = ttk.Window(themename="darkly")
+    root = ttk.Window(themename="bootstrap-dark")
     root.withdraw()
     win = SettingsWindow(root)
     win.mainloop()

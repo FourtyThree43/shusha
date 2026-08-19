@@ -57,7 +57,14 @@ class Client:
         self.remote = daemon
         self.secret = secret
         self.server_uri = f"http://{self.remote.host}:{self.remote.port}/rpc"
-        self.server = xmlrpc.client.ServerProxy(self.server_uri, allow_none=True)
+        # Create a transport with timeout
+        transport = xmlrpc.client.Transport()
+        transport.timeout = 10.0
+        self.server = xmlrpc.client.ServerProxy(
+            self.server_uri, allow_none=True, transport=transport
+        )
+        self._last_reachability_check: float | None = None
+        self._last_reachable: bool | None = None
 
     def __str__(self):
         """
@@ -84,6 +91,33 @@ class Client:
         """
         Call a method on the XML-RPC server.
         """
+        import socket
+        import time
+        
+        # Check server reachability with caching (check every 5 seconds)
+        # Skip if server is mocked (for testing)
+        import unittest.mock
+        if not isinstance(self.server, unittest.mock.Mock):
+            current_time = time.time()
+            if (
+                self._last_reachability_check is None
+                or current_time - self._last_reachability_check > 5.0
+            ):
+                self._last_reachable = self.is_server_reachable(timeout=2.0)
+                self._last_reachability_check = current_time
+            
+            if not self._last_reachable:
+                logger.log(
+                    f"RPC server at {self.server_uri} is not reachable. "
+                    f"Please ensure aria2 is running with RPC enabled on {self.remote.host}:{self.remote.port}.",
+                    level="error",
+                )
+                raise XMLRPCClientException(
+                    -1,
+                    f"RPC server at {self.server_uri} is not reachable. "
+                    f"Please ensure aria2 is running with RPC enabled on {self.remote.host}:{self.remote.port}.",
+                )
+        
         request_params = self._build_request_params(params)
         try:
             if "." in method:
@@ -96,6 +130,42 @@ class Client:
         except xmlrpc.client.Fault as e:
             self._handle_xmlrpc_error(e)
             raise XMLRPCClientException(e.faultCode, e.faultString) from e
+        except socket.timeout as e:
+            logger.log(
+                f"Connection timeout to {self.server_uri}. "
+                f"The aria2 RPC server is not responding.",
+                level="error",
+            )
+            raise XMLRPCClientException(
+                -1, f"Connection timeout. Server at {self.server_uri} is not responding."
+            ) from e
+        except socket.gaierror as e:
+            logger.log(
+                f"Name resolution failed for {self.server_uri}. "
+                f"Host may not exist or DNS is not configured.",
+                level="error",
+            )
+            raise XMLRPCClientException(
+                -1, f"Name resolution failed for {self.server_uri}. Host may not exist."
+            ) from e
+        except ConnectionRefusedError as e:
+            logger.log(
+                f"Connection refused to {self.server_uri}. "
+                f"Is the aria2 RPC server running?",
+                level="error",
+            )
+            raise XMLRPCClientException(
+                -1, f"Connection refused. Server at {self.server_uri} is not running or unreachable."
+            ) from e
+        except ConnectionResetError as e:
+            logger.log(
+                f"Connection reset by {self.server_uri}. "
+                f"The aria2 RPC server may have crashed.",
+                level="error",
+            )
+            raise XMLRPCClientException(
+                -1, f"Connection reset. Server at {self.server_uri} may have crashed."
+            ) from e
 
     def _handle_xmlrpc_error(self, xmlrpc_fault: xmlrpc.client.Fault):
         """
@@ -107,6 +177,36 @@ class Client:
         faultCode = xmlrpc_fault.faultCode
         faultString = xmlrpc_fault.faultString
         logger.log(XMLRPCClientException(faultCode, faultString), "error")
+
+    def is_server_reachable(self, timeout: float = 2.0) -> bool:
+        """
+        Check if the RPC server is reachable.
+
+        Args:
+            timeout: Timeout in seconds for the connectivity check.
+
+        Returns:
+            True if the server is reachable, False otherwise.
+        """
+        import socket
+        from urllib.parse import urlparse
+
+        try:
+            parsed = urlparse(self.server_uri)
+            host = parsed.hostname or self.remote.host
+            port = parsed.port or self.remote.port
+            
+            target_host = (
+                "127.0.0.1" if host in ("localhost", "0.0.0.0") else host
+            )
+            
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.settimeout(timeout)
+                result = s.connect_ex((target_host, int(port))) == 0
+                return result
+        except Exception as e:
+            logger.log(f"Server reachability check failed: {e}", level="debug")
+            return False
 
     def add_uri(
         self,

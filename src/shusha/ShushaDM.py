@@ -46,9 +46,12 @@ def main(argv: list[str] | None = None):
         # Destroy the ttk.Window instance
         app.destroy()
 
+    # Use modern ttkbootstrap 2.x theme
+    # Available themes: 'bootstrap-light', 'bootstrap-dark', 'pydata-light', etc.
+    theme_name = "bootstrap-dark"
     app = ttk.Window(
         title="Shusha",
-        themename="darkly",
+        themename=theme_name,
         size=(1270, 550),
         resizable=(False, False),
         position=(10, 140),
