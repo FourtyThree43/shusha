@@ -1,124 +1,176 @@
 <!DOCTYPE html>
-<html lang="en" x-data="{ darkMode: true, selectedTab: 'python' }" :class="{ 'dark': darkMode }">
+<html lang="en" x-data="{ darkMode: true }" :class="{ 'dark': darkMode }">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>API Reference - Shusha Download Manager</title>
+  <title>API Reference &amp; Specifications - Shusha</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  
+  <!-- Tailwind CSS & DaisyUI via CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.23/dist/full.min.css" rel="stylesheet" type="text/css" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
-          colors: { brand: { 500: '#00bc8c', 600: '#00a379' } }
+          colors: {
+            emerald: {
+              50: '#ecfdf5',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+            }
+          },
+          fontFamily: {
+            serif: ['Charter', 'Bitstream Charter', 'Sitka Text', 'Cambria', 'serif'],
+            sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+            mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+          }
         }
       }
     }
   </script>
+  <!-- Alpine.js -->
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+  <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 min-h-screen font-sans antialiased transition-colors duration-200">
-  <!-- Nav -->
-  <nav class="border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-      <a href="index.html" class="flex items-center space-x-3">
-        <span class="text-2xl">⚡</span>
-        <span class="text-xl font-bold bg-gradient-to-r from-emerald-500 to-teal-400 bg-clip-text text-transparent">Shusha</span>
-      </a>
-      <div class="flex items-center space-x-6">
-        <a href="index.html" class="text-sm text-gray-600 dark:text-gray-400 hover:text-emerald-500">Home</a>
-        <a href="about.html" class="text-sm text-gray-600 dark:text-gray-400 hover:text-emerald-500">About</a>
-        <a href="api.html" class="text-sm font-semibold text-emerald-500">API Reference</a>
-        <a href="manual.html" class="text-sm text-gray-600 dark:text-gray-400 hover:text-emerald-500">User Manual</a>
-        <button @click="darkMode = !darkMode" class="p-2 rounded-lg bg-gray-200 dark:bg-gray-800">
-          <span x-show="!darkMode">🌙</span>
-          <span x-show="darkMode">☀️</span>
+<body class="bg-stone-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 min-h-screen font-sans antialiased selection:bg-emerald-500 selection:text-white transition-colors duration-200">
+
+  <!-- WCAG 2.2 Skip Link -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Top Ruby-lang Style Header -->
+  <header class="border-b border-stone-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <a href="index.html" class="flex items-center space-x-3 text-decoration-none group" aria-label="Shusha Home">
+          <img src="assets/logo.svg" alt="Shusha Logo" class="w-9 h-9 rounded-lg shadow-sm group-hover:scale-105 transition-transform" />
+          <span class="text-2xl font-serif font-bold text-zinc-900 dark:text-white tracking-tight">Shusha</span>
+        </a>
+        <span class="text-xs font-mono px-2 py-0.5 rounded border border-emerald-500/30 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 font-semibold">
+          API Reference
+        </span>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="flex items-center space-x-1 sm:space-x-4" aria-label="Main Navigation">
+        <a href="index.html" class="px-3 py-1.5 rounded-md text-sm font-medium text-zinc-600 dark:text-zinc-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition">Home</a>
+        <a href="manual.html" class="px-3 py-1.5 rounded-md text-sm font-medium text-zinc-600 dark:text-zinc-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition">Documentation</a>
+        <a href="webui.html" class="px-3 py-1.5 rounded-md text-sm font-medium text-zinc-600 dark:text-zinc-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition">Web UI</a>
+        <a href="api.html" class="px-3 py-1.5 rounded-md text-sm font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40" aria-current="page">API Reference</a>
+        <a href="about.html" class="px-3 py-1.5 rounded-md text-sm font-medium text-zinc-600 dark:text-zinc-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition">About</a>
+        <button @click="darkMode = !darkMode" class="p-2 rounded-lg bg-stone-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-stone-200 dark:hover:bg-zinc-700 transition" aria-label="Toggle dark mode">
+          <span x-show="!darkMode" aria-hidden="true">🌙</span>
+          <span x-show="darkMode" aria-hidden="true">☀️</span>
         </button>
-      </div>
+      </nav>
     </div>
-  </nav>
+  </header>
 
-  <main class="max-w-5xl mx-auto px-4 py-12">
-    <div class="mb-8">
-      <h1 class="text-3xl font-extrabold mb-2">API & RPC Reference</h1>
-      <p class="text-gray-600 dark:text-gray-400">Complete guide for interacting with ShushaAPI, WebSocket events, and aria2 JSON-RPC methods.</p>
-    </div>
+  <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
 
-    <!-- Language Selector -->
-    <div class="flex space-x-2 border-b border-gray-200 dark:border-gray-800 mb-8 pb-2">
-      <button @click="selectedTab = 'python'" :class="selectedTab === 'python' ? 'border-b-2 border-emerald-500 text-emerald-500 font-semibold' : 'text-gray-500'" class="px-4 py-2 text-sm transition">Python API</button>
-      <button @click="selectedTab = 'websocket'" :class="selectedTab === 'websocket' ? 'border-b-2 border-emerald-500 text-emerald-500 font-semibold' : 'text-gray-500'" class="px-4 py-2 text-sm transition">WebSocket Events</button>
-      <button @click="selectedTab = 'jsonrpc'" :class="selectedTab === 'jsonrpc' ? 'border-b-2 border-emerald-500 text-emerald-500 font-semibold' : 'text-gray-500'" class="px-4 py-2 text-sm transition">JSON-RPC 2.0</button>
-    </div>
-
-    <!-- Python API Tab -->
-    <div x-show="selectedTab === 'python'" class="space-y-8">
-      <div class="p-6 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm">
-        <h3 class="text-lg font-bold text-emerald-500 mb-2">ShushaAPI.add_uris(uris, options=None)</h3>
-        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Adds one or more HTTP/HTTPS/FTP or Magnet URIs to the download queue.</p>
-        <pre class="p-4 bg-gray-100 dark:bg-gray-950 rounded-lg text-xs font-mono overflow-x-auto text-emerald-600 dark:text-emerald-400"><code>from shusha.controller.api import ShushaAPI
-
-api = ShushaAPI()
-download = api.add_uris(
-    ["https://releases.ubuntu.com/24.04/ubuntu-24.04-desktop-amd64.iso"],
-    options={"dir": "/home/user/Downloads", "split": "16", "max-connection-per-server": "16"}
-)
-print("Added Download GID:", download.gid)</code></pre>
-      </div>
-
-      <div class="p-6 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm">
-        <h3 class="text-lg font-bold text-emerald-500 mb-2">ShushaAPI.add_batch_urls(text_or_urls, options=None)</h3>
-        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Parses multi-line text with pattern sequence expansion brackets (e.g. <code>[01-10]</code>) and dispatches downloads.</p>
-        <pre class="p-4 bg-gray-100 dark:bg-gray-950 rounded-lg text-xs font-mono overflow-x-auto text-emerald-600 dark:text-emerald-400"><code>batch_text = """
-http://example.com/assets/archive_part[01-05].rar
-magnet:?xt=urn:btih:3b245504d603a1a6b0805342c3cd3ef10f9b6e23
-"""
-downloads = api.add_batch_urls(batch_text)
-print(f"Dispatched {len(downloads)} tasks!")</code></pre>
-      </div>
-
-      <div class="p-6 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm">
-        <h3 class="text-lg font-bold text-emerald-500 mb-2">ShushaAPI.on_event(event_name, callback)</h3>
-        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Registers a real-time event listener for asynchronous daemon notifications.</p>
-        <pre class="p-4 bg-gray-100 dark:bg-gray-950 rounded-lg text-xs font-mono overflow-x-auto text-emerald-600 dark:text-emerald-400"><code>def handle_completion(event_name, data):
-    print("Download completed! GID:", data.get("gid"))
-
-api.connect_ws()
-api.on_event("aria2.onDownloadComplete", handle_completion)</code></pre>
-      </div>
-    </div>
-
-    <!-- WebSocket Events Tab -->
-    <div x-show="selectedTab === 'websocket'" class="space-y-6">
-      <div class="p-6 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm">
-        <h3 class="text-lg font-bold mb-3">Supported Real-Time Notification Frames</h3>
-        <div class="space-y-3 text-sm">
-          <div class="flex items-start space-x-3"><span class="px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-600 font-mono text-xs">aria2.onDownloadStart</span> <span class="text-gray-600 dark:text-gray-400">Dispatched when a download begins executing.</span></div>
-          <div class="flex items-start space-x-3"><span class="px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-950 text-amber-600 font-mono text-xs">aria2.onDownloadPause</span> <span class="text-gray-600 dark:text-gray-400">Dispatched when a download is paused.</span></div>
-          <div class="flex items-start space-x-3"><span class="px-2 py-0.5 rounded bg-rose-100 dark:bg-rose-950 text-rose-600 font-mono text-xs">aria2.onDownloadStop</span> <span class="text-gray-600 dark:text-gray-400">Dispatched when a download is aborted or removed.</span></div>
-          <div class="flex items-start space-x-3"><span class="px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-950 text-blue-600 font-mono text-xs">aria2.onDownloadComplete</span> <span class="text-gray-600 dark:text-gray-400">Dispatched when HTTP/FTP download finishes and passes hash checks.</span></div>
-          <div class="flex items-start space-x-3"><span class="px-2 py-0.5 rounded bg-purple-100 dark:bg-purple-950 text-purple-600 font-mono text-xs">aria2.onBtDownloadComplete</span> <span class="text-gray-600 dark:text-gray-400">Dispatched when BitTorrent payload completes downloading.</span></div>
-          <div class="flex items-start space-x-3"><span class="px-2 py-0.5 rounded bg-red-100 dark:bg-red-950 text-red-600 font-mono text-xs">aria2.onDownloadError</span> <span class="text-gray-600 dark:text-gray-400">Dispatched when a task encounters an unrecoverable network or disk error.</span></div>
+      <!-- Left Sidebar -->
+      <aside class="lg:col-span-3">
+        <div class="sticky top-24 space-y-6">
+          <div class="p-4 rounded-lg border border-stone-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm text-sm">
+            <h2 class="font-serif font-bold text-base text-zinc-900 dark:text-white mb-3">API Sections</h2>
+            <nav class="space-y-2">
+              <a href="#overview" class="block text-zinc-700 dark:text-zinc-300 hover:text-emerald-600 dark:hover:text-emerald-400">1. RPC Overview &amp; WS</a>
+              <a href="#methods" class="block text-zinc-700 dark:text-zinc-300 hover:text-emerald-600 dark:hover:text-emerald-400">2. JSON-RPC Methods</a>
+              <a href="#events" class="block text-zinc-700 dark:text-zinc-300 hover:text-emerald-600 dark:hover:text-emerald-400">3. WebSocket Push Events</a>
+              <a href="#webhook" class="block text-zinc-700 dark:text-zinc-300 hover:text-emerald-600 dark:hover:text-emerald-400">4. Local HTTP Webhook Bridge</a>
+            </nav>
+          </div>
         </div>
-      </div>
-    </div>
+      </aside>
 
-    <!-- JSON-RPC Tab -->
-    <div x-show="selectedTab === 'jsonrpc'" class="space-y-6">
-      <div class="p-6 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm">
-        <h3 class="text-lg font-bold mb-2">JSON-RPC 2.0 Frame Structure</h3>
-        <pre class="p-4 bg-gray-100 dark:bg-gray-950 rounded-lg text-xs font-mono overflow-x-auto text-emerald-600 dark:text-emerald-400"><code>{
-  "jsonrpc": "2.0",
-  "id": "req_101",
-  "method": "aria2.addUri",
-  "params": [
-    "token:my_secret_token",
-    ["https://example.com/file.zip"],
-    {"dir": "/downloads", "split": "8"}
-  ]
-}</code></pre>
-      </div>
+      <!-- Main API Documentation Content -->
+      <article class="lg:col-span-9 prose-ruby">
+
+        <section id="overview" class="mb-12">
+          <h1 class="text-3xl sm:text-4xl font-serif font-bold text-zinc-900 dark:text-white border-b border-stone-200 dark:border-zinc-800 pb-3 mb-6">
+            API Reference &amp; Specifications
+          </h1>
+          <p class="text-zinc-700 dark:text-zinc-300 text-sm leading-relaxed mb-4">
+            Shusha interacts with aria2 via standard JSON-RPC 2.0 over HTTP (<code class="font-mono text-xs">http://127.0.0.1:6800/jsonrpc</code>) and persistent WebSockets (<code class="font-mono text-xs">ws://127.0.0.1:6800/jsonrpc</code>). Additionally, Shusha hosts a local HTTP Webhook Server on port <strong>6810</strong> for lightweight browser integration.
+          </p>
+        </section>
+
+        <!-- JSON-RPC Methods -->
+        <section id="methods" class="mb-12">
+          <h2 class="text-2xl font-serif font-bold text-zinc-900 dark:text-white mb-6">
+            2. Core JSON-RPC 2.0 Methods
+          </h2>
+
+          <div class="space-y-6">
+            <!-- Method: aria2.addUri -->
+            <div class="p-5 rounded-lg border border-stone-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
+              <h3 class="font-mono font-bold text-base text-emerald-600 dark:text-emerald-400">aria2.addUri</h3>
+              <p class="text-xs text-zinc-600 dark:text-zinc-400 mt-1 mb-3">
+                Adds a new download from one or more mirror URIs.
+              </p>
+
+              <div class="bg-zinc-950 rounded p-3 font-mono text-xs text-zinc-200 overflow-x-auto">
+                <span class="text-zinc-500">// Request Payload</span><br>
+                {<br>
+                &nbsp;&nbsp;"jsonrpc": "2.0",<br>
+                &nbsp;&nbsp;"id": "req-1",<br>
+                &nbsp;&nbsp;"method": "aria2.addUri",<br>
+                &nbsp;&nbsp;"params": [<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;["https://example.com/file.zip"],<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;{ "dir": "/home/user/Downloads", "split": "8", "out": "archive.zip" }<br>
+                &nbsp;&nbsp;]<br>
+                }
+              </div>
+            </div>
+
+            <!-- Method: aria2.tellActive -->
+            <div class="p-5 rounded-lg border border-stone-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
+              <h3 class="font-mono font-bold text-base text-emerald-600 dark:text-emerald-400">aria2.tellActive</h3>
+              <p class="text-xs text-zinc-600 dark:text-zinc-400 mt-1 mb-3">
+                Returns the list of currently active downloads with transfer metrics.
+              </p>
+
+              <div class="bg-zinc-950 rounded p-3 font-mono text-xs text-zinc-200 overflow-x-auto">
+                <span class="text-zinc-500">// Request</span><br>
+                { "jsonrpc": "2.0", "id": "req-2", "method": "aria2.tellActive", "params": [["gid", "status", "totalLength", "completedLength", "downloadSpeed"]] }
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Webhook Bridge -->
+        <section id="webhook" class="mb-12">
+          <h2 class="text-2xl font-serif font-bold text-zinc-900 dark:text-white mb-6">
+            3. Local HTTP Webhook Bridge (<code class="font-mono text-xl">127.0.0.1:6810</code>)
+          </h2>
+
+          <div class="p-5 rounded-lg border border-stone-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
+            <h3 class="font-mono font-bold text-base text-emerald-600 dark:text-emerald-400">POST /add</h3>
+            <p class="text-xs text-zinc-600 dark:text-zinc-400 mt-1 mb-3">
+              Accepts JSON payload from extensions and scripts to queue downloads immediately.
+            </p>
+
+            <div class="bg-zinc-950 rounded p-3 font-mono text-xs text-zinc-200 overflow-x-auto">
+              curl -X POST http://127.0.0.1:6810/add \<br>
+              &nbsp;&nbsp;-H "Content-Type: application/json" \<br>
+              &nbsp;&nbsp;-d '{"url": "https://example.com/movie.mp4", "filename": "movie.mp4"}'
+            </div>
+          </div>
+        </section>
+
+      </article>
     </div>
   </main>
+
+  <footer class="border-t border-stone-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 py-8 mt-16 text-xs text-zinc-500">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+      <span>Shusha API Reference • JSON-RPC 2.0 Standard</span>
+      <a href="manual.html" class="hover:underline">Documentation</a>
+    </div>
+  </footer>
 </body>
 </html>

@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en" x-data="shushaWebUI()" :class="{ 'dark': darkMode }">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shusha Web UI - Modern Aria2 &amp; Shusha Web Client</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  
+  <!-- Tailwind CSS & DaisyUI via CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.23/dist/full.min.css" rel="stylesheet" type="text/css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            emerald: {
+              50: '#ecfdf5',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+            }
+          },
+          fontFamily: {
+            serif: ['Charter', 'Bitstream Charter', 'Sitka Text', 'Cambria', 'serif'],
+            sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+            mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-stone-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 min-h-screen font-sans antialiased selection:bg-emerald-500 selection:text-white transition-colors duration-200">
+
+  <!-- WCAG 2.2 Skip Link -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Top Ruby-lang Style Header -->
+  <header class="border-b border-stone-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <a href="index.html" class="flex items-center space-x-3 text-decoration-none group" aria-label="Shusha Home">
+          <img src="assets/logo.svg" alt="Shusha Logo" class="w-9 h-9 rounded-lg shadow-sm group-hover:scale-105 transition-transform" />
+          <span class="text-2xl font-serif font-bold text-zinc-900 dark:text-white tracking-tight">Shusha</span>
+        </a>
+        <span class="text-xs font-mono px-2 py-0.5 rounded border border-emerald-500/30 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 font-semibold">
+          Web UI
+        </span>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="flex items-center space-x-1 sm:space-x-4" aria-label="Main Navigation">
+        <a href="index.html" class="px-3 py-1.5 rounded-md text-sm font-medium text-zinc-600 dark:text-zinc-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition">Home</a>
+        <a href="manual.html" class="px-3 py-1.5 rounded-md text-sm font-medium text-zinc-600 dark:text-zinc-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition">Documentation</a>
+        <a href="webui.html" class="px-3 py-1.5 rounded-md text-sm font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40" aria-current="page">Web UI</a>
+        <a href="api.html" class="px-3 py-1.5 rounded-md text-sm font-medium text-zinc-600 dark:text-zinc-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition">API Reference</a>
+        <a href="about.html" class="px-3 py-1.5 rounded-md text-sm font-medium text-zinc-600 dark:text-zinc-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition">About</a>
+        <button @click="darkMode = !darkMode" class="p-2 rounded-lg bg-stone-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-stone-200 dark:hover:bg-zinc-700 transition" aria-label="Toggle dark mode">
+          <span x-show="!darkMode" aria-hidden="true">🌙</span>
+          <span x-show="darkMode" aria-hidden="true">☀️</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Web UI Status & Top Action Bar -->
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-stone-200 dark:border-zinc-800 pb-6 mb-6">
+      <div>
+        <h1 class="text-3xl font-serif font-bold text-zinc-900 dark:text-white">Aria2 &amp; Shusha Web Client</h1>
+        <div class="flex items-center gap-3 mt-1 text-xs">
+          <span class="inline-flex items-center gap-1.5 font-medium" :class="isConnected ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'">
+            <span class="w-2 h-2 rounded-full" :class="isConnected ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'"></span>
+            <span x-text="isConnected ? `Connected: ${rpcHost}:${rpcPort}` : 'Disconnected (Aria2 daemon not reachable)'"></span>
+          </span>
+          <span class="text-zinc-400">•</span>
+          <span class="text-zinc-500 font-mono" x-text="`Poll: 1.0s`"></span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button @click="showAddModal = true" class="btn btn-success text-white btn-sm font-medium">
+          + Add Download
+        </button>
+        <button @click="pauseAll()" class="btn btn-outline btn-sm text-zinc-700 dark:text-zinc-300">
+          Pause All
+        </button>
+        <button @click="resumeAll()" class="btn btn-outline btn-sm text-zinc-700 dark:text-zinc-300">
+          Resume All
+        </button>
+        <button @click="showSettingsModal = true" class="btn btn-ghost btn-sm text-zinc-600 dark:text-zinc-400" aria-label="Connection Settings">
+          ⚙️ RPC Settings
+        </button>
+      </div>
+    </div>
+
+    <!-- Live Bandwidth & Queue Metric Cards -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+      <div class="p-4 rounded-lg border border-stone-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
+        <div class="text-xs text-zinc-500 font-medium">Download Speed</div>
+        <div class="text-xl font-bold font-mono text-emerald-600 dark:text-emerald-400 mt-1" x-text="formatSpeed(stats.downloadSpeed)">0 B/s</div>
+      </div>
+      <div class="p-4 rounded-lg border border-stone-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
+        <div class="text-xs text-zinc-500 font-medium">Upload Speed</div>
+        <div class="text-xl font-bold font-mono text-teal-600 dark:text-teal-400 mt-1" x-text="formatSpeed(stats.uploadSpeed)">0 B/s</div>
+      </div>
+      <div class="p-4 rounded-lg border border-stone-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
+        <div class="text-xs text-zinc-500 font-medium">Active Tasks</div>
+        <div class="text-xl font-bold font-mono text-zinc-900 dark:text-white mt-1" x-text="stats.numActive">0</div>
+      </div>
+      <div class="p-4 rounded-lg border border-stone-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
+        <div class="text-xs text-zinc-500 font-medium">Completed / Stopped</div>
+        <div class="text-xl font-bold font-mono text-zinc-900 dark:text-white mt-1" x-text="stats.numStopped">0</div>
+      </div>
+    </div>
+
+    <!-- Category / Filter Tabs -->
+    <div class="flex items-center justify-between border-b border-stone-200 dark:border-zinc-800 mb-4 pb-2">
+      <div class="flex space-x-2">
+        <button @click="currentFilter = 'all'" :class="currentFilter === 'all' ? 'text-emerald-600 font-bold border-b-2 border-emerald-600' : 'text-zinc-500'" class="px-3 py-1 text-sm transition">All (<span x-text="downloads.length"></span>)</button>
+        <button @click="currentFilter = 'active'" :class="currentFilter === 'active' ? 'text-emerald-600 font-bold border-b-2 border-emerald-600' : 'text-zinc-500'" class="px-3 py-1 text-sm transition">Active (<span x-text="downloads.filter(d => d.status === 'active').length"></span>)</button>
+        <button @click="currentFilter = 'waiting'" :class="currentFilter === 'waiting' ? 'text-emerald-600 font-bold border-b-2 border-emerald-600' : 'text-zinc-500'" class="px-3 py-1 text-sm transition">Waiting / Paused (<span x-text="downloads.filter(d => ['waiting', 'paused'].includes(d.status)).length"></span>)</button>
+        <button @click="currentFilter = 'complete'" :class="currentFilter === 'complete' ? 'text-emerald-600 font-bold border-b-2 border-emerald-600' : 'text-zinc-500'" class="px-3 py-1 text-sm transition">Completed (<span x-text="downloads.filter(d => d.status === 'complete').length"></span>)</button>
+      </div>
+      <button @click="purgeCompleted()" class="text-xs text-zinc-500 hover:text-rose-500 transition">
+        Clear Completed
+      </button>
+    </div>
+
+    <!-- Downloads Table View -->
+    <div class="border border-stone-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 overflow-hidden shadow-sm">
+      <table class="table w-full text-sm">
+        <thead class="bg-stone-50 dark:bg-zinc-950/80 text-zinc-600 dark:text-zinc-400 font-mono text-xs border-b border-stone-200 dark:border-zinc-800">
+          <tr>
+            <th class="w-1/3">Filename / GID</th>
+            <th>Status</th>
+            <th>Progress</th>
+            <th>Size</th>
+            <th>Speed</th>
+            <th>ETA</th>
+            <th class="text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-stone-100 dark:divide-zinc-800 font-mono">
+          <template x-for="item in filteredDownloads" :key="item.gid">
+            <tr class="hover:bg-stone-50/50 dark:hover:bg-zinc-800/40">
+              <td>
+                <div class="font-sans font-semibold text-zinc-900 dark:text-white truncate max-w-sm" x-text="getDownloadName(item)"></div>
+                <div class="text-xs text-zinc-400" x-text="item.gid"></div>
+              </td>
+              <td>
+                <span class="badge badge-sm" :class="item.status === 'active' ? 'badge-success' : (item.status === 'complete' ? 'badge-neutral' : (item.status === 'error' ? 'badge-error' : 'badge-warning'))" x-text="item.status"></span>
+              </td>
+              <td class="w-48">
+                <div class="text-xs text-zinc-600 dark:text-zinc-400 mb-1 flex justify-between">
+                  <span x-text="`${calculateProgress(item)}%`"></span>
+                  <span x-text="`${formatSize(item.completedLength)} / ${formatSize(item.totalLength)}`"></span>
+                </div>
+                <progress class="progress progress-success w-full" :value="calculateProgress(item)" max="100"></progress>
+              </td>
+              <td class="text-xs" x-text="formatSize(item.totalLength)"></td>
+              <td class="text-xs text-emerald-600 dark:text-emerald-400 font-semibold" x-text="formatSpeed(item.downloadSpeed)"></td>
+              <td class="text-xs text-zinc-500" x-text="calculateETA(item)"></td>
+              <td class="text-right space-x-1">
+                <button x-show="item.status === 'active'" @click="pauseDownload(item.gid)" class="btn btn-xs btn-outline" title="Pause">⏸</button>
+                <button x-show="['paused', 'waiting'].includes(item.status)" @click="resumeDownload(item.gid)" class="btn btn-xs btn-outline" title="Resume">▶</button>
+                <button @click="removeDownload(item.gid)" class="btn btn-xs btn-error btn-outline" title="Remove">✕</button>
+              </td>
+            </tr>
+          </template>
+          <tr x-show="filteredDownloads.length === 0">
+            <td colspan="7" class="text-center py-8 text-zinc-500 font-sans">
+              No downloads matching current filter. Click "+ Add Download" above or use Shusha CLI / Extension.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Modal: Add Download -->
+    <div x-show="showAddModal" class="modal modal-open bg-black/60 backdrop-blur-sm" style="display: none;" x-transition>
+      <div class="modal-box bg-white dark:bg-zinc-900 border border-stone-200 dark:border-zinc-800">
+        <h3 class="font-serif font-bold text-lg text-zinc-900 dark:text-white">Add New Download</h3>
+        <p class="text-xs text-zinc-500 mt-1">Supports HTTP, HTTPS, FTP, Magnet URIs, and direct streams.</p>
+
+        <div class="form-control mt-4">
+          <label class="label text-xs font-semibold text-zinc-700 dark:text-zinc-300">Download URL(s) / Magnet Links (One per line)</label>
+          <textarea x-model="addUrls" rows="4" class="textarea textarea-bordered font-mono text-xs w-full bg-stone-50 dark:bg-zinc-950" placeholder="https://example.com/file.iso&#10;magnet:?xt=urn:btih:..."></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mt-3">
+          <div class="form-control">
+            <label class="label text-xs font-semibold text-zinc-700 dark:text-zinc-300">Custom Filename (Optional)</label>
+            <input type="text" x-model="addOut" class="input input-sm input-bordered font-mono text-xs" placeholder="custom_name.zip" />
+          </div>
+          <div class="form-control">
+            <label class="label text-xs font-semibold text-zinc-700 dark:text-zinc-300">Split Connections</label>
+            <input type="number" x-model="addSplit" min="1" max="16" class="input input-sm input-bordered font-mono text-xs" />
+          </div>
+        </div>
+
+        <div class="modal-action mt-6">
+          <button @click="showAddModal = false" class="btn btn-sm btn-ghost">Cancel</button>
+          <button @click="submitAdd()" class="btn btn-sm btn-success text-white">Start Download</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: RPC Settings -->
+    <div x-show="showSettingsModal" class="modal modal-open bg-black/60 backdrop-blur-sm" style="display: none;" x-transition>
+      <div class="modal-box bg-white dark:bg-zinc-900 border border-stone-200 dark:border-zinc-800">
+        <h3 class="font-serif font-bold text-lg text-zinc-900 dark:text-white">Aria2 RPC Configuration</h3>
+        <p class="text-xs text-zinc-500 mt-1">Configure JSON-RPC endpoint to connect to your local or remote Aria2 daemon.</p>
+
+        <div class="grid grid-cols-3 gap-3 mt-4">
+          <div class="form-control col-span-2">
+            <label class="label text-xs font-semibold text-zinc-700 dark:text-zinc-300">Host</label>
+            <input type="text" x-model="rpcHost" class="input input-sm input-bordered font-mono text-xs" />
+          </div>
+          <div class="form-control">
+            <label class="label text-xs font-semibold text-zinc-700 dark:text-zinc-300">Port</label>
+            <input type="number" x-model="rpcPort" class="input input-sm input-bordered font-mono text-xs" />
+          </div>
+        </div>
+
+        <div class="form-control mt-3">
+          <label class="label text-xs font-semibold text-zinc-700 dark:text-zinc-300">RPC Secret Token (Optional)</label>
+          <input type="password" x-model="rpcSecret" class="input input-sm input-bordered font-mono text-xs" placeholder="aria2 secret token" />
+        </div>
+
+        <div class="modal-action mt-6">
+          <button @click="showSettingsModal = false" class="btn btn-sm btn-ghost">Close</button>
+          <button @click="saveSettings()" class="btn btn-sm btn-primary">Save &amp; Connect</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="border-t border-stone-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 py-6 mt-16 text-xs text-zinc-500">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+      <span>Shusha Web UI Client • Connected directly to Aria2 JSON-RPC</span>
+      <a href="manual.html" class="hover:underline">Documentation</a>
+    </div>
+  </footer>
+
+  <script>
+    function shushaWebUI() {
+      return {
+        darkMode: true,
+        isConnected: false,
+        rpcHost: localStorage.getItem('shusha_rpc_host') || '127.0.0.1',
+        rpcPort: localStorage.getItem('shusha_rpc_port') || 6800,
+        rpcSecret: localStorage.getItem('shusha_rpc_secret') || '',
+        currentFilter: 'all',
+        downloads: [],
+        stats: { downloadSpeed: 0, uploadSpeed: 0, numActive: 0, numWaiting: 0, numStopped: 0 },
+        showAddModal: false,
+        showSettingsModal: false,
+        addUrls: '',
+        addOut: '',
+        addSplit: 8,
+        timer: null,
+
+        init() {
+          this.fetchData();
+          this.timer = setInterval(() => this.fetchData(), 1000);
+        },
+
+        get rpcEndpoint() {
+          return `http://${this.rpcHost}:${this.rpcPort}/jsonrpc`;
+        },
+
+        async callRpc(method, params = []) {
+          const authParams = this.rpcSecret ? [`token:${this.rpcSecret}`, ...params] : params;
+          const body = {
+            jsonrpc: '2.0',
+            id: 'shusha-webui-' + Date.now(),
+            method: method,
+            params: authParams
+          };
+          const res = await fetch(this.rpcEndpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+          });
+          const json = await res.json();
+          if (json.error) throw new Error(json.error.message);
+          return json.result;
+        },
+
+        async fetchData() {
+          try {
+            const [active, waiting, stopped, stat] = await Promise.all([
+              this.callRpc('aria2.tellActive', [['gid', 'status', 'totalLength', 'completedLength', 'downloadSpeed', 'files']]),
+              this.callRpc('aria2.tellWaiting', [0, 50, ['gid', 'status', 'totalLength', 'completedLength', 'downloadSpeed', 'files']]),
+              this.callRpc('aria2.tellStopped', [0, 50, ['gid', 'status', 'totalLength', 'completedLength', 'downloadSpeed', 'files']]),
+              this.callRpc('aria2.getGlobalStat')
+            ]);
+            this.downloads = [...active, ...waiting, ...stopped];
+            this.stats = {
+              downloadSpeed: parseInt(stat.downloadSpeed || 0),
+              uploadSpeed: parseInt(stat.uploadSpeed || 0),
+              numActive: parseInt(stat.numActive || 0),
+              numWaiting: parseInt(stat.numWaiting || 0),
+              numStopped: parseInt(stat.numStopped || 0)
+            };
+            this.isConnected = true;
+          } catch (e) {
+            this.isConnected = false;
+            // Fallback demo mock if daemon is offline
+            if (this.downloads.length === 0) {
+              this.downloads = [
+                { gid: '1001', status: 'active', totalLength: 1073741824, completedLength: 644245094, downloadSpeed: 14500000, files: [{ path: 'Ubuntu-26.04-LTS-Desktop.iso' }] },
+                { gid: '1002', status: 'complete', totalLength: 524288000, completedLength: 524288000, downloadSpeed: 0, files: [{ path: 'Linux-Kernel-Source.tar.xz' }] }
+              ];
+            }
+          }
+        },
+
+        get filteredDownloads() {
+          if (this.currentFilter === 'all') return this.downloads;
+          if (this.currentFilter === 'active') return this.downloads.filter(d => d.status === 'active');
+          if (this.currentFilter === 'waiting') return this.downloads.filter(d => ['waiting', 'paused'].includes(d.status));
+          if (this.currentFilter === 'complete') return this.downloads.filter(d => d.status === 'complete');
+          return this.downloads;
+        },
+
+        getDownloadName(item) {
+          if (item.files && item.files.length > 0 && item.files[0].path) {
+            const parts = item.files[0].path.split(/[\\/]/);
+            return parts[parts.length - 1];
+          }
+          return item.gid;
+        },
+
+        calculateProgress(item) {
+          const tot = parseInt(item.totalLength || 0);
+          const comp = parseInt(item.completedLength || 0);
+          if (tot <= 0) return 0;
+          return Math.min(100, Math.round((comp / tot) * 1000) / 10);
+        },
+
+        calculateETA(item) {
+          if (item.status === 'complete') return 'Done';
+          const speed = parseInt(item.downloadSpeed || 0);
+          if (speed <= 0) return '--';
+          const rem = Math.max(0, parseInt(item.totalLength || 0) - parseInt(item.completedLength || 0));
+          const sec = Math.floor(rem / speed);
+          if (sec < 60) return `${sec}s`;
+          if (sec < 3600) return `${Math.floor(sec / 60)}m ${sec % 60}s`;
+          return `${Math.floor(sec / 3600)}h ${Math.floor((sec % 3600) / 60)}m`;
+        },
+
+        formatSize(bytes) {
+          const b = parseInt(bytes || 0);
+          if (b <= 0) return '0 B';
+          const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+          const i = Math.floor(Math.log(b) / Math.log(1024));
+          return (b / Math.pow(1024, i)).toFixed(1) + ' ' + units[i];
+        },
+
+        formatSpeed(bytesPerSec) {
+          return this.formatSize(bytesPerSec) + '/s';
+        },
+
+        async submitAdd() {
+          const lines = this.addUrls.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+          if (lines.length === 0) return;
+          const opts = { split: String(this.addSplit) };
+          if (this.addOut) opts.out = this.addOut;
+
+          for (const u of lines) {
+            try {
+              await this.callRpc('aria2.addUri', [[u], opts]);
+            } catch (err) {
+              console.error('AddUri error:', err);
+            }
+          }
+          this.addUrls = '';
+          this.addOut = '';
+          this.showAddModal = false;
+          this.fetchData();
+        },
+
+        async pauseDownload(gid) {
+          try { await this.callRpc('aria2.pause', [gid]); this.fetchData(); } catch(e) {}
+        },
+
+        async resumeDownload(gid) {
+          try { await this.callRpc('aria2.unpause', [gid]); this.fetchData(); } catch(e) {}
+        },
+
+        async removeDownload(gid) {
+          try { await this.callRpc('aria2.remove', [gid]); this.fetchData(); } catch(e) {}
+        },
+
+        async pauseAll() {
+          try { await this.callRpc('aria2.pauseAll'); this.fetchData(); } catch(e) {}
+        },
+
+        async resumeAll() {
+          try { await this.callRpc('aria2.unpauseAll'); this.fetchData(); } catch(e) {}
+        },
+
+        async purgeCompleted() {
+          try { await this.callRpc('aria2.purgeDownloadResult'); this.fetchData(); } catch(e) {}
+        },
+
+        saveSettings() {
+          localStorage.setItem('shusha_rpc_host', this.rpcHost);
+          localStorage.setItem('shusha_rpc_port', this.rpcPort);
+          localStorage.setItem('shusha_rpc_secret', this.rpcSecret);
+          this.showSettingsModal = false;
+          this.fetchData();
+        }
+      };
+    }
+  </script>
+</body>
+</html>

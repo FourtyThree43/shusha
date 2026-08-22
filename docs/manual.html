@@ -3,106 +3,215 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>User Manual - Shusha Download Manager</title>
+  <title>User Manual &amp; CLI Reference - Shusha</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  
+  <!-- Tailwind CSS & DaisyUI via CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.23/dist/full.min.css" rel="stylesheet" type="text/css" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
-          colors: { brand: { 500: '#00bc8c', 600: '#00a379' } }
+          colors: {
+            emerald: {
+              50: '#ecfdf5',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+            }
+          },
+          fontFamily: {
+            serif: ['Charter', 'Bitstream Charter', 'Sitka Text', 'Cambria', 'serif'],
+            sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+            mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+          }
         }
       }
     }
   </script>
+  <!-- Alpine.js -->
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+  <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 min-h-screen font-sans antialiased transition-colors duration-200">
-  <!-- Nav -->
-  <nav class="border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-      <a href="index.html" class="flex items-center space-x-3">
-        <span class="text-2xl">⚡</span>
-        <span class="text-xl font-bold bg-gradient-to-r from-emerald-500 to-teal-400 bg-clip-text text-transparent">Shusha</span>
-      </a>
-      <div class="flex items-center space-x-6">
-        <a href="index.html" class="text-sm text-gray-600 dark:text-gray-400 hover:text-emerald-500">Home</a>
-        <a href="about.html" class="text-sm text-gray-600 dark:text-gray-400 hover:text-emerald-500">About</a>
-        <a href="api.html" class="text-sm text-gray-600 dark:text-gray-400 hover:text-emerald-500">API Reference</a>
-        <a href="manual.html" class="text-sm font-semibold text-emerald-500">User Manual</a>
-        <button @click="darkMode = !darkMode" class="p-2 rounded-lg bg-gray-200 dark:bg-gray-800">
-          <span x-show="!darkMode">🌙</span>
-          <span x-show="darkMode">☀️</span>
+<body class="bg-stone-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 min-h-screen font-sans antialiased selection:bg-emerald-500 selection:text-white transition-colors duration-200">
+
+  <!-- WCAG 2.2 Skip Link -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Top Ruby-lang Style Header -->
+  <header class="border-b border-stone-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <a href="index.html" class="flex items-center space-x-3 text-decoration-none group" aria-label="Shusha Home">
+          <img src="assets/logo.svg" alt="Shusha Logo" class="w-9 h-9 rounded-lg shadow-sm group-hover:scale-105 transition-transform" />
+          <span class="text-2xl font-serif font-bold text-zinc-900 dark:text-white tracking-tight">Shusha</span>
+        </a>
+        <span class="text-xs font-mono px-2 py-0.5 rounded border border-emerald-500/30 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 font-semibold">
+          Documentation
+        </span>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="flex items-center space-x-1 sm:space-x-4" aria-label="Main Navigation">
+        <a href="index.html" class="px-3 py-1.5 rounded-md text-sm font-medium text-zinc-600 dark:text-zinc-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition">Home</a>
+        <a href="manual.html" class="px-3 py-1.5 rounded-md text-sm font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40" aria-current="page">Documentation</a>
+        <a href="webui.html" class="px-3 py-1.5 rounded-md text-sm font-medium text-zinc-600 dark:text-zinc-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition">Web UI</a>
+        <a href="api.html" class="px-3 py-1.5 rounded-md text-sm font-medium text-zinc-600 dark:text-zinc-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition">API Reference</a>
+        <a href="about.html" class="px-3 py-1.5 rounded-md text-sm font-medium text-zinc-600 dark:text-zinc-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition">About</a>
+        <button @click="darkMode = !darkMode" class="p-2 rounded-lg bg-stone-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-stone-200 dark:hover:bg-zinc-700 transition" aria-label="Toggle dark mode">
+          <span x-show="!darkMode" aria-hidden="true">🌙</span>
+          <span x-show="darkMode" aria-hidden="true">☀️</span>
         </button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+
+      <!-- Left Sidebar Navigation -->
+      <aside class="lg:col-span-3">
+        <div class="sticky top-24 space-y-6">
+          <div class="p-4 rounded-lg border border-stone-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm text-sm">
+            <h2 class="font-serif font-bold text-base text-zinc-900 dark:text-white mb-3">Contents</h2>
+            <nav class="space-y-2">
+              <a href="#quickstart" class="block text-zinc-700 dark:text-zinc-300 hover:text-emerald-600 dark:hover:text-emerald-400">1. Quick Start</a>
+              <a href="#cli" class="block text-zinc-700 dark:text-zinc-300 hover:text-emerald-600 dark:hover:text-emerald-400">2. Headless CLI Reference</a>
+              <a href="#gui" class="block text-zinc-700 dark:text-zinc-300 hover:text-emerald-600 dark:hover:text-emerald-400">3. Graphical Interface &amp; Hotkeys</a>
+              <a href="#bittorrent" class="block text-zinc-700 dark:text-zinc-300 hover:text-emerald-600 dark:hover:text-emerald-400">4. BitTorrent &amp; Trackers</a>
+              <a href="#categories" class="block text-zinc-700 dark:text-zinc-300 hover:text-emerald-600 dark:hover:text-emerald-400">5. Category Auto-Sorting</a>
+              <a href="#extension" class="block text-zinc-700 dark:text-zinc-300 hover:text-emerald-600 dark:hover:text-emerald-400">6. Browser Extension Bridge</a>
+              <a href="#checksums" class="block text-zinc-700 dark:text-zinc-300 hover:text-emerald-600 dark:hover:text-emerald-400">7. Cryptographic Checksums</a>
+              <a href="#automation" class="block text-zinc-700 dark:text-zinc-300 hover:text-emerald-600 dark:hover:text-emerald-400">8. Post-Download Automation</a>
+            </nav>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Center / Right Documentation Content -->
+      <article class="lg:col-span-9 prose-ruby">
+
+        <!-- 1. Quick Start -->
+        <section id="quickstart" class="mb-12">
+          <h1 class="text-3xl sm:text-4xl font-serif font-bold text-zinc-900 dark:text-white border-b border-stone-200 dark:border-zinc-800 pb-3 mb-6">
+            User Manual &amp; Guide
+          </h1>
+          <p class="text-zinc-700 dark:text-zinc-300 text-base leading-relaxed mb-4">
+            Shusha is a modern multi-protocol download manager wrapping <code class="font-mono text-sm px-1 rounded bg-stone-200 dark:bg-zinc-800">aria2c</code>. It gives you raw 16-connection HTTP/HTTPS/FTP segmentation, BitTorrent peer aggregation, Metalink mirror balancing, and real-time WebSocket push updates.
+          </p>
+
+          <div class="bg-zinc-900 rounded-lg p-4 font-mono text-xs text-zinc-200 border border-zinc-800 shadow-sm mb-6">
+            <div class="text-zinc-500 mb-2"># Install with uv (recommended)</div>
+            <div><span class="text-emerald-400">$</span> uv tool install shusha</div>
+            <div class="text-zinc-500 my-2"># Launch GUI or CLI directly</div>
+            <div><span class="text-emerald-400">$</span> shusha --gui</div>
+            <div><span class="text-emerald-400">$</span> shusha add https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-12.9.0-amd64-netinst.iso</div>
+          </div>
+        </section>
+
+        <!-- 2. CLI Reference -->
+        <section id="cli" class="mb-12">
+          <h2 class="text-2xl font-serif font-bold text-zinc-900 dark:text-white mb-4">
+            2. Headless CLI Reference
+          </h2>
+          <p class="text-zinc-700 dark:text-zinc-300 text-sm mb-4">
+            Manage downloads, daemon lifecycle, and diagnostic tools directly from your terminal or shell scripts.
+          </p>
+
+          <div class="space-y-4">
+            <div class="p-4 rounded-lg border border-stone-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+              <div class="font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">shusha add &lt;URL&gt; [--out &lt;name&gt;] [--split &lt;n&gt;] [--dir &lt;path&gt;]</div>
+              <p class="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
+                Submits a new download URL, Magnet URI, or path to a local <code class="font-mono">.torrent</code> file.
+              </p>
+            </div>
+
+            <div class="p-4 rounded-lg border border-stone-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+              <div class="font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">shusha list [--status active|waiting|stopped|all]</div>
+              <p class="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
+                Lists all queue items with GID, progress, size, transfer speed, and status.
+              </p>
+            </div>
+
+            <div class="p-4 rounded-lg border border-stone-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+              <div class="font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">shusha pause &lt;GID|all&gt; / shusha resume &lt;GID|all&gt; / shusha remove &lt;GID&gt; [-f]</div>
+              <p class="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
+                Controls queue playback. Passing <code class="font-mono">-f</code> to remove deletes incomplete disk files.
+              </p>
+            </div>
+
+            <div class="p-4 rounded-lg border border-stone-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+              <div class="font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">shusha daemon [start|stop|restart|status]</div>
+              <p class="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
+                Controls the background <code class="font-mono">aria2c --enable-rpc</code> daemon process.
+              </p>
+            </div>
+
+            <div class="p-4 rounded-lg border border-stone-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+              <div class="font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">shusha torrent create &lt;source&gt; [--output &lt;file.torrent&gt;] [--piece-size &lt;bytes&gt;]</div>
+              <p class="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
+                Creates standard <code class="font-mono">.torrent</code> metadata and outputs a <code class="font-mono">magnet:?xt=urn:btih:...</code> URI.
+              </p>
+            </div>
+
+            <div class="p-4 rounded-lg border border-stone-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+              <div class="font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">shusha hash &lt;file&gt; [--algo md5|sha1|sha256|sha512|crc32|all]</div>
+              <p class="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
+                Calculates cryptographic file hashes directly in the console.
+              </p>
+            </div>
+
+            <div class="p-4 rounded-lg border border-stone-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+              <div class="font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">shusha probe &lt;URL1&gt; [&lt;URL2&gt;...]</div>
+              <p class="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
+                Benchmarks latency (TTFB) and HTTP range support across download mirrors.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. BitTorrent & Trackers -->
+        <section id="bittorrent" class="mb-12">
+          <h2 class="text-2xl font-serif font-bold text-zinc-900 dark:text-white mb-4">
+            3. BitTorrent &amp; Tracker Management
+          </h2>
+          <p class="text-zinc-700 dark:text-zinc-300 text-sm mb-4 leading-relaxed">
+            Shusha includes a built-in tracker scraper syncing with updated public tracker repositories. In the <strong>Settings &rarr; BitTorrent &amp; Trackers</strong> tab, you can enable auto-sync, adjust max peers per torrent (100+), enable DHT/PEX, and configure seed ratio limits.
+          </p>
+        </section>
+
+        <!-- 4. Browser Extension -->
+        <section id="extension" class="mb-12">
+          <h2 class="text-2xl font-serif font-bold text-zinc-900 dark:text-white mb-4">
+            4. Browser WebExtension Integration
+          </h2>
+          <p class="text-zinc-700 dark:text-zinc-300 text-sm mb-4 leading-relaxed">
+            The bundled Manifest V3 browser extension allows 1-click download handoff from Chrome, Firefox, Edge, and Brave directly to Shusha.
+          </p>
+          <div class="bg-stone-100 dark:bg-zinc-900 rounded-lg p-4 text-xs font-mono text-zinc-700 dark:text-zinc-300 border border-stone-200 dark:border-zinc-800">
+            1. Open chrome://extensions or about:debugging in Firefox.<br>
+            2. Enable "Developer mode".<br>
+            3. Click "Load unpacked" and select the <code class="text-emerald-600 font-bold">extensions/</code> directory in the Shusha repo.<br>
+            4. Right-click any link or video and select "Download with Shusha"!
+          </div>
+        </section>
+
+      </article>
+    </div>
+  </main>
+
+  <footer class="border-t border-stone-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 py-8 mt-16 text-xs text-zinc-500">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+      <span>Shusha Documentation • Published under MIT License</span>
+      <div class="flex space-x-4">
+        <a href="index.html" class="hover:underline">Home</a>
+        <a href="webui.html" class="hover:underline">Web UI</a>
+        <a href="api.html" class="hover:underline">API Reference</a>
       </div>
     </div>
-  </nav>
-
-  <main class="max-w-4xl mx-auto px-4 py-12">
-    <h1 class="text-4xl font-extrabold mb-4">Shusha User Manual</h1>
-    <p class="text-gray-600 dark:text-gray-400 mb-8">Everything you need to know to get the most out of Shusha on Linux, macOS, and Windows.</p>
-
-    <!-- Section 1 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-3">1. Installation & Requirements</h2>
-      <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Shusha requires Python 3.10+ and <code>aria2c</code> installed on your system.</p>
-      <div class="space-y-3">
-        <div class="p-4 bg-gray-100 dark:bg-gray-900 rounded-lg text-xs font-mono">
-          <span class="text-gray-400"># Ubuntu / Debian</span><br>
-          sudo apt install aria2 python3-tk<br>
-          pip install shusha
-        </div>
-        <div class="p-4 bg-gray-100 dark:bg-gray-900 rounded-lg text-xs font-mono">
-          <span class="text-gray-400"># Arch Linux</span><br>
-          sudo pacman -S aria2 tk<br>
-          pip install shusha
-        </div>
-        <div class="p-4 bg-gray-100 dark:bg-gray-900 rounded-lg text-xs font-mono">
-          <span class="text-gray-400"># macOS (Homebrew)</span><br>
-          brew install aria2 python-tk<br>
-          pip install shusha
-        </div>
-      </div>
-    </section>
-
-    <!-- Section 2 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-3">2. Batch Pattern Sequences</h2>
-      <p class="text-sm text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
-        Click <strong>Batch</strong> on the toolbar to add multiple files at once. You can use numeric range brackets like <code>[01-20]</code> or alphabetic ranges like <code>[a-z]</code>:
-      </p>
-      <div class="p-4 bg-gray-100 dark:bg-gray-900 rounded-lg text-xs font-mono text-emerald-600 dark:text-emerald-400">
-        https://example.com/archive_vol[01-08].part<br>
-        https://cdn.photos.org/gallery/img_[a-d].jpg
-      </div>
-    </section>
-
-    <!-- Section 3 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-3">3. Task Inspector & Piece Map</h2>
-      <p class="text-sm text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
-        Double click any download or select it and click <strong>Details</strong> to open the full Inspector Window. Here you can monitor live transfer speeds, inspect individual BitTorrent pieces on the canvas grid, review connected peer IPs, and tweak speed limits.
-      </p>
-    </section>
-
-    <!-- Section 4 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-3">4. Keyboard Shortcuts</h2>
-      <div class="border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden text-sm">
-        <table class="w-full text-left">
-          <thead class="bg-gray-100 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
-            <tr><th class="p-3 font-semibold">Shortcut</th><th class="p-3 font-semibold">Action</th></tr>
-          </thead>
-          <tbody class="divide-y divide-gray-200 dark:divide-gray-800">
-            <tr><td class="p-3 font-mono font-bold text-emerald-500">Ctrl + N / Cmd + N</td><td class="p-3">Open Add URL dialog</td></tr>
-            <tr><td class="p-3 font-mono font-bold text-emerald-500">Ctrl + B / Cmd + B</td><td class="p-3">Open Batch Add dialog</td></tr>
-            <tr><td class="p-3 font-mono font-bold text-emerald-500">Space</td><td class="p-3">Pause / Resume selected download</td></tr>
-            <tr><td class="p-3 font-mono font-bold text-emerald-500">Delete</td><td class="p-3">Remove selected download</td></tr>
-            <tr><td class="p-3 font-mono font-bold text-emerald-500">Ctrl + R</td><td class="p-3">Force refresh queue table</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-  </main>
+  </footer>
 </body>
 </html>
