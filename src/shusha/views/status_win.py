@@ -34,11 +34,15 @@ class DownloadMeter(ttk.Meter):
 
     @property
     def used_var(self):
-        return getattr(self, "amount_used_var", getattr(self, "amountusedvar", None))
+        if hasattr(self, "amount_used_var"):
+            return self.amount_used_var
+        return getattr(self, "amountusedvar", None)
 
     @property
     def total_var(self):
-        return getattr(self, "amount_total_var", getattr(self, "amounttotalvar", None))
+        if hasattr(self, "amount_total_var"):
+            return self.amount_total_var
+        return getattr(self, "amounttotalvar", None)
 
     def start(self):
         self.paused.set(False)

@@ -59,7 +59,7 @@ class Client:
         self.server_uri = f"http://{self.remote.host}:{self.remote.port}/rpc"
         # Create a transport with timeout
         transport = xmlrpc.client.Transport()
-        transport.timeout = 10.0
+        transport.timeout = 10.0  # ty: ignore[unresolved-attribute]
         self.server = xmlrpc.client.ServerProxy(
             self.server_uri, allow_none=True, transport=transport
         )
@@ -130,7 +130,7 @@ class Client:
         except xmlrpc.client.Fault as e:
             self._handle_xmlrpc_error(e)
             raise XMLRPCClientException(e.faultCode, e.faultString) from e
-        except socket.timeout as e:
+        except TimeoutError as e:
             logger.log(
                 f"Connection timeout to {self.server_uri}. "
                 f"The aria2 RPC server is not responding.",

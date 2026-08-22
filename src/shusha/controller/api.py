@@ -1,11 +1,10 @@
-"""
-Aria2 API.
+"""Aria2 API Controller.
 
-This module defines the ShushaAPI class, which makes use of a XML-RPC client to
-provide higher-level methods to interact easily with a remote aria2c process to
-manage downloads.
+This module defines the `ShushaAPI` class, which interacts with an aria2c process via
+XML-RPC / JSON-RPC to provide high-level download management, queue control, option
+modification, and statistics querying.
 
-The Aria2 XML-RPC Client API documentation can be found at:
+The Aria2 XML-RPC Client API reference can be found at:
 https://aria2.github.io/manual/en/html/aria2c.html#rpc-interface
 """
 
@@ -24,17 +23,14 @@ from shusha.models.structs_downloads import Download
 from shusha.models.structs_options import Options
 from shusha.models.structs_stats import Stats
 
-OptionsType = Options | dict
+OptionsType = Options | dict[str, Any]
 OperationResult = bool | XMLRPCClientException
 
 logger = LoggerService(logger_name="ShushaAPI")
 
 
 class ShushaAPI:
-    """
-    A class that provides higher-level methods to interact with a remote aria2c
-    process to manage downloads.
-    """
+    """High-level API client for managing aria2 downloads and daemon operations."""
 
     def __init__(
         self,
@@ -44,7 +40,17 @@ class ShushaAPI:
         host: str | None = None,
         port: int | None = None,
         secret: str | None = None,
-    ):
+    ) -> None:
+        """Initialize the ShushaAPI instance.
+
+        Args:
+            daemon: Optional Daemon instance. If None, created using configuration.
+            client: Optional Client instance. If None, created from Daemon.
+            db: Optional ShushaDB instance for session persistence.
+            host: Optional host address override for aria2 RPC.
+            port: Optional port number override for aria2 RPC.
+            secret: Optional secret token override for aria2 RPC authentication.
+        """
         settings = AppSettings()
         cfg_host = host or settings.get_aria2_host()
         cfg_port = port or settings.get_aria2_port()
@@ -54,48 +60,55 @@ class ShushaAPI:
         self.client = client or Client(self.remote, secret=cfg_secret)
         self.db = db or ShushaDB(filename="shusha.db")
 
-    def __str__(self):
+    def __str__(self) -> str:
+        """Return human-readable string representation of the API instance."""
         return f"ShushaAPI(client={self.client}, db={self.db})"
 
-    def start_server(self):
-        """Start the Aria2 server."""
+    def start_server(self) -> int | None:
+        """Start the background Aria2 daemon server.
+
+        Returns:
+            The process PID if started successfully, or None if already running or remote.
+        """
         pid = self.remote.start_server()
         logger.log(f"Aria2 server started with PID: {pid}")
         return pid
 
-    def stop_server(self):
+    def stop_server(self) -> None:
+        """Stop the background Aria2 daemon server."""
         self.remote.stop_server()
         logger.log("Aria2 server stopped.")
 
-    def get_download(self, gid) -> Download:
-        """Get a Download object from the database.
+    def get_download(self, gid: str) -> Download:
+        """Get a Download object representing the specified GID.
 
-        Parameters:
-            gid: The GID of the download.
+        Args:
+            gid: The unique GID of the download.
 
         Returns:
-            A Download object representing the download.
+            A Download instance representing the download status and metadata.
         """
         download = self.download_status(gid)
-
         return download
 
     def get_downloads(self, gids: list[str] | None = None) -> list[Download]:
-        """Get all downloads from the database.
+        """Retrieve downloads from the daemon.
+
+        Args:
+            gids: Optional list of GIDs to fetch. If None, fetches active, waiting,
+                and stopped downloads.
 
         Returns:
-            A list of Download objects representing the downloads.
+            A list of Download objects matching the requested GIDs or all current downloads.
         """
-        # self.db.get_downloads()
-
-        downloads = []
+        downloads: list[Download] = []
 
         if gids:
             for gid in gids:
                 download = self.download_status(gid)
                 downloads.append(download)
         else:
-            structs = []
+            structs: list[Download] = []
             structs.extend(self.active_downloads())
             structs.extend(self.waiting_downloads())
             structs.extend(self.stopped_downloads())
@@ -111,17 +124,17 @@ class ShushaAPI:
         options: OptionsType | None = None,
         position: int | None = None,
     ) -> list[Download]:
-        """Add a download.
+        """Add a new download from a list of mirror URIs.
 
-        Parameters:
-            uri: The URI of the download.
-            options: A dictionary of options to be passed to the aria2c process.
-            position: The position in the queue where the download should be added.
+        Args:
+            uri: List of mirror URIs pointing to the same file.
+            options: Optional dictionary or Options object of download configuration.
+            position: Optional position in the queue (0-indexed).
 
         Returns:
-            A list of Download objects representing the downloads added.
+            A list containing the newly created Download object, or empty list on error.
         """
-        new_downloads = []
+        new_downloads: list[Download] = []
 
         if options is None:
             options = {}
@@ -147,18 +160,15 @@ class ShushaAPI:
         options: OptionsType | None = None,
         position: int | None = None,
     ) -> Download | None:
-        """
-        Add a download with a URL (or more).
+        """Add a download from one or more URIs.
 
-        Parameters:
-            uris: A list of URIs that point to the same resource.
-            options: An instance of the `Options` class or a dictionary
-                    containing aria2c options to create the download with.
-            position: The position where to insert the new download in the queue. Start at 0 (top).
+        Args:
+            uris: List of URIs pointing to the resource to download.
+            options: Optional Options object or dict of aria2 options.
+            position: Optional 0-indexed position where the download should be placed.
 
         Returns:
-            The newly created download object. Returns None if an error occurred.
-
+            The newly created Download object, or None if the request failed.
         """
         if options is None:
             options = {}
@@ -172,10 +182,10 @@ class ShushaAPI:
             logger.log(f"Download added with GID: {gid}")
             if gid:
                 return self.get_download(gid)
-            else:
-                return None
+            return None
         except XMLRPCClientException as e:
             logger.log(f"Error adding URI: {e}", level="error")
+            return None
 
     def add_magnet(
         self,
@@ -183,22 +193,23 @@ class ShushaAPI:
         options: OptionsType | None = None,
         position: int | None = None,
     ) -> list[Download]:
-        """Add a magnet link.
+        """Add a download using a BitTorrent Magnet URI.
 
-        Parameters:
-            magnet: The magnet link.
-            options: A dictionary of options to be passed to the aria2c process.
-            position: The position in the queue where the download should be added.
+        Args:
+            magnet: The magnet link string.
+            options: Optional dictionary or Options object for download configuration.
+            position: Optional queue position.
 
         Returns:
-            A list of Download objects representing the downloads added.
+            A list containing the created Download object, or empty on failure.
         """
-        new_downloads = []
+        new_downloads: list[Download] = []
 
         try:
             gid = self.client.add_magnet(magnet, options, position)
             logger.log(f"Magnet link added with GID: {gid}")
-            new_downloads.append(self.get_download(gid))
+            if gid:
+                new_downloads.append(self.get_download(gid))
 
         except XMLRPCClientException as e:
             logger.log(f"Error adding magnet link: {e}", level="error")
@@ -211,24 +222,25 @@ class ShushaAPI:
         options: OptionsType | None = None,
         position: int | None = None,
     ) -> list[Download]:
-        """Add a torrent.
+        """Add a BitTorrent download from a `.torrent` file path.
 
-        Parameters:
-            torrent: The torrent file.
-            options: A dictionary of options to be passed to the aria2c process.
-            position: The position in the queue where the download should be added.
+        Args:
+            torrent: Path to the local .torrent file.
+            options: Optional dictionary or Options object.
+            position: Optional queue insertion index.
 
         Returns:
-            A list of Download objects representing the downloads added.
+            A list containing the created Download object, or empty list on error.
         """
-        new_downloads = []
+        new_downloads: list[Download] = []
 
         try:
             gid = self.client.add_torrent(torrent, options, position)
             logger.log(f"Torrent added with GID: {gid}")
-            dl = self.get_download(gid)
-            if dl:
-                new_downloads.append(dl)
+            if gid:
+                dl = self.get_download(gid)
+                if dl:
+                    new_downloads.append(dl)
 
         except XMLRPCClientException as e:
             logger.log(f"Error adding torrent: {e}", level="error")
@@ -241,8 +253,17 @@ class ShushaAPI:
         options: OptionsType | None = None,
         position: int | None = None,
     ) -> list[Download]:
-        """Add a metalink download."""
-        new_downloads = []
+        """Add a Metalink download from a `.metalink` or `.meta4` file path.
+
+        Args:
+            metalink: Path to the local metalink file.
+            options: Optional dictionary or Options object.
+            position: Optional queue insertion index.
+
+        Returns:
+            A list of Download objects created by the metalink descriptor.
+        """
+        new_downloads: list[Download] = []
 
         try:
             gids = self.client.add_metalink(metalink, options, position)
@@ -267,14 +288,14 @@ class ShushaAPI:
         downloads: list[Download],
         clean: bool = False,
     ) -> list[OperationResult]:
-        """Resume failed downloads from where they left off with new GIDs.
+        """Resume failed downloads by adding new URI tasks and removing failed entries.
 
-        Parameters:
-            downloads: The list of downloads to remove.
-            clean: Whether to remove the aria2 control file as well.
+        Args:
+            downloads: List of Download instances to retry.
+            clean: Whether to delete associated aria2 control files.
 
         Returns:
-            Success or failure of the operation for each given download.
+            List of operation results (True on success, XMLRPCClientException on failure).
         """
         result: list[OperationResult] = []
 
@@ -286,11 +307,11 @@ class ShushaAPI:
             except IndexError:
                 continue
             try:
-                new_download_gid = self.add_uris([uri], download.options)
+                new_download = self.add_uris([uri], download.options)
             except XMLRPCClientException as error:
                 result.append(error)
             else:
-                if not new_download_gid:
+                if not new_download:
                     continue
 
                 self.remove(download.gid)
@@ -301,17 +322,17 @@ class ShushaAPI:
     def remove(
         self, gid: str, force: bool = False, files: bool = False
     ) -> list[Download]:
-        """Remove a download.
+        """Remove a download from the aria2 queue.
 
-        Parameters:
-            gid: The GID of the download.
-            force: True to force removal of the download.
-            files: True to delete associated files from disk.
+        Args:
+            gid: The unique GID of the download to remove.
+            force: If True, forces removal without waiting for daemon handshake.
+            files: If True, deletes downloaded files from local storage.
 
         Returns:
-            A list of Download objects representing the downloads removed.
+            A list containing the removed Download object, or empty on failure.
         """
-        removed_downloads = []
+        removed_downloads: list[Download] = []
 
         try:
             download = self.get_download(gid)
@@ -335,20 +356,24 @@ class ShushaAPI:
         return removed_downloads
 
     def unpause_all(self) -> list[Download]:
-        """Alias for resume_all."""
+        """Resume all paused downloads (alias for `resume_all`).
+
+        Returns:
+            List of active downloads after resumption.
+        """
         return self.resume_all()
 
     def pause(self, gid: str, force: bool = False) -> list[Download]:
-        """Pause a download.
+        """Pause an active download.
 
-        Parameters:
-            gid: The GID of the download.
-            force: True to force pause of the download.
+        Args:
+            gid: Unique GID of the download to pause.
+            force: If True, forces immediate pause without waiting for cleanup.
 
         Returns:
-            A list of Download objects representing the downloads paused.
+            List containing the paused Download instance.
         """
-        paused_downloads = []
+        paused_downloads: list[Download] = []
 
         try:
             self.client.force_pause(gid) if force else self.client.pause(gid)
@@ -361,12 +386,12 @@ class ShushaAPI:
         return paused_downloads
 
     def pause_all(self) -> list[Download]:
-        """Pause all downloads.
+        """Pause all active downloads across the daemon.
 
         Returns:
-            A list of Download objects representing the downloads paused.
+            List of all current downloads.
         """
-        paused_downloads = []
+        paused_downloads: list[Download] = []
 
         try:
             self.client.pause_all()
@@ -379,15 +404,15 @@ class ShushaAPI:
         return paused_downloads
 
     def resume(self, gid: str) -> list[Download]:
-        """Resume a download.
+        """Resume a paused download.
 
-        Parameters:
-            gid: The GID of the download.
+        Args:
+            gid: Unique GID of the download to resume.
 
         Returns:
-            A list of Download objects representing the downloads resumed.
+            List containing the resumed Download instance.
         """
-        resumed_downloads = []
+        resumed_downloads: list[Download] = []
 
         try:
             self.client.unpause(gid)
@@ -400,12 +425,12 @@ class ShushaAPI:
         return resumed_downloads
 
     def resume_all(self) -> list[Download]:
-        """Resume all downloads.
+        """Resume all paused downloads across the daemon.
 
         Returns:
-            A list of Download objects representing the downloads resumed.
+            List of all current downloads.
         """
-        resumed_downloads = []
+        resumed_downloads: list[Download] = []
 
         try:
             self.client.unpause_all()
@@ -418,26 +443,26 @@ class ShushaAPI:
         return resumed_downloads
 
     def move(self, download: Download, pos: int) -> int:
-        """Move a download in the queue, relatively to its current position.
+        """Move a download in the queue relative to its current position.
 
-        Parameters:
-            download: The download object to move.
-            pos: The relative position (1 to move down, -1 to move up, -2 to move up two times, etc.).
+        Args:
+            download: The Download instance to move.
+            pos: Relative offset (positive moves down, negative moves up).
 
         Returns:
-            The new position of the download.
+            The resulting 0-indexed queue position.
         """
         return self.client.change_position(download.gid, pos, "POS_CUR")
 
     def move_to(self, download: Download, pos: int) -> int:
-        """Move a download in the queue, with absolute positioning.
+        """Move a download to an absolute position in the queue.
 
-        Parameters:
-            download: The download object to move.
-            pos: The absolute position in the queue where to move the download. 0 for top, -1 for bottom.
+        Args:
+            download: The Download instance to move.
+            pos: Absolute target position (0 for top, negative for offset from end).
 
         Returns:
-            The new position of the download.
+            The resulting 0-indexed queue position.
         """
         if pos < 0:
             how = "POS_END"
@@ -447,61 +472,62 @@ class ShushaAPI:
         return self.client.change_position(download.gid, pos, how)
 
     def move_up(self, download: Download, pos: int = 1) -> int:
-        """Move a download up in the queue.
+        """Move a download up towards the top of the queue.
 
-        Parameters:
-            download: The download object to move.
-            pos: Number of times to move up. With negative values, will move down (use move or move_down instead).
+        Args:
+            download: The Download instance to move.
+            pos: Number of positions to move up (default 1).
 
         Returns:
-            The new position of the download.
+            The resulting 0-indexed queue position.
         """
         return self.client.change_position(download.gid, -pos, "POS_CUR")
 
     def move_down(self, download: Download, pos: int = 1) -> int:
-        """Move a download down in the queue.
+        """Move a download down towards the bottom of the queue.
 
-        Parameters:
-            download: The download object to move.
-            pos: Number of times to move down. With negative values, will move up (use move or move_up instead).
+        Args:
+            download: The Download instance to move.
+            pos: Number of positions to move down (default 1).
 
         Returns:
-            The new position of the download.
+            The resulting 0-indexed queue position.
         """
         return self.client.change_position(download.gid, pos, "POS_CUR")
 
     def move_to_top(self, download: Download) -> int:
-        """Move a download to the top of the queue.
+        """Move a download directly to the top of the queue.
 
-        Parameters:
-            download: The download object to move.
+        Args:
+            download: The Download instance to move.
 
         Returns:
-            The new position of the download.
+            The resulting 0-indexed queue position (0).
         """
         return self.client.change_position(download.gid, 0, "POS_SET")
 
     def move_to_bottom(self, download: Download) -> int:
-        """Move a download to the bottom of the queue.
+        """Move a download directly to the bottom of the queue.
 
-        Parameters:
-            download: The download object to move.
+        Args:
+            download: The Download instance to move.
 
         Returns:
-            The new position of the download.
+            The resulting 0-indexed queue position.
         """
         return self.client.change_position(download.gid, 0, "POS_END")
 
     def purge(self) -> list[Download]:
-        """Purge completed and removed downloads from the database.
+        """Purge completed, stopped, and removed download records from database and daemon.
 
         Returns:
-            A list of Download objects representing the downloads purged.
+            List of remaining active/waiting downloads.
         """
-        purged_downloads = []
+        purged_downloads: list[Download] = []
 
         try:
             self.db.purge()
+            self.client.purge_download_result()
             logger.log("Completed and removed downloads purged.")
             purged_downloads.extend(self.get_downloads())
 
@@ -511,16 +537,16 @@ class ShushaAPI:
         return purged_downloads
 
     def download_status(self, gid: str, keys: list[str] | None = None) -> Download:
-        """Get a struct of the download status.
+        """Query detailed download status for a single GID.
 
         Args:
-            gid: The GID of the download.
-            keys: The keys of the struct to be returned.
+            gid: Unique GID of the download.
+            keys: Optional list of status keys to return (e.g. ['status', 'totalLength']).
 
         Returns:
-            A Download object representing the download.
+            A Download instance containing the queried properties.
         """
-        struct = {}
+        struct: dict[str, Any] = {}
 
         try:
             status = self.client.tell_status(gid, keys)
@@ -536,18 +562,17 @@ class ShushaAPI:
         return Download(self, struct=struct)
 
     def active_downloads(self) -> list[Download]:
-        """Get all active downloads.
+        """Fetch all currently active downloads.
 
         Returns:
-            A list of Download objects representing the active downloads.
+            List of active Download instances.
         """
-        active_downloads = []
+        active_downloads: list[Download] = []
 
         try:
             active = self.client.tell_active()
 
             if active:
-                # logger.log(f"Active downloads retrieved: {active}")
                 active_downloads.extend([Download(self, struct) for struct in active])
         except XMLRPCClientException as e:
             logger.log(f"Error getting active downloads: {e}", level="error")
@@ -555,18 +580,17 @@ class ShushaAPI:
         return active_downloads
 
     def waiting_downloads(self) -> list[Download]:
-        """Get all waiting downloads.
+        """Fetch all waiting (queued/paused) downloads.
 
         Returns:
-            A list of Download objects representing the waiting downloads.
+            List of waiting Download instances.
         """
-        waiting_downloads = []
+        waiting_downloads: list[Download] = []
 
         try:
             waiting = self.client.tell_waiting(0, 1000)
 
             if waiting:
-                # logger.log(f"Waiting downloads retrieved: {waiting}")
                 waiting_downloads.extend([Download(self, struct) for struct in waiting])
         except XMLRPCClientException as e:
             logger.log(f"Error getting waiting downloads: {e}", level="error")
@@ -574,18 +598,17 @@ class ShushaAPI:
         return waiting_downloads
 
     def stopped_downloads(self) -> list[Download]:
-        """Get all stopped downloads.
+        """Fetch all stopped (completed/failed/removed) downloads.
 
         Returns:
-            A list of Download objects representing the stopped downloads.
+            List of stopped Download instances.
         """
-        stopped_downloads = []
+        stopped_downloads: list[Download] = []
 
         try:
             stopped = self.client.tell_stopped(0, 1000)
 
             if stopped:
-                # logger.log(f"Stopped downloads retrieved: {stopped}")
                 stopped_downloads.extend([Download(self, struct) for struct in stopped])
         except XMLRPCClientException as e:
             logger.log(f"Error getting stopped downloads: {e}", level="error")
@@ -593,16 +616,15 @@ class ShushaAPI:
         return stopped_downloads
 
     def get_options(self, downloads: list[Download]) -> list[Options]:
-        """Get options for each of the given downloads.
+        """Retrieve the configuration options for a list of downloads.
 
-        Parameters:
-            downloads: The list of downloads to get the options of.
+        Args:
+            downloads: List of Download objects to fetch options for.
 
         Returns:
-            Options object for each given download.
+            List of Options instances corresponding to each download.
         """
-        # Note: batch/multicall candidate
-        options = []
+        options: list[Options] = []
         for download in downloads:
             options.append(
                 Options(self, self.client.get_option(download.gid), download)
@@ -610,33 +632,30 @@ class ShushaAPI:
         return options
 
     def get_global_options(self) -> Options:
-        """Get the global options.
+        """Retrieve the daemon-wide global options.
 
         Returns:
-            The global aria2c options.
+            An Options object containing global daemon settings.
         """
         return Options(self, self.client.get_global_option())
 
     def set_options(
         self, options: OptionsType, downloads: list[Download]
     ) -> list[bool]:
-        """Set options for specific downloads.
+        """Apply option modifications to specific downloads.
 
-        Parameters:
-            options: An instance of the [`Options`] class or a dictionary
-                containing aria2c options to create the download with.
-            downloads: The list of downloads to set the options for.
+        Args:
+            options: Dictionary or Options object with modified options.
+            downloads: List of Download targets.
 
         Returns:
-            Success or failure of the operation for changing options for each
-            given download.
+            List of booleans indicating success for each download.
         """
         client_options = (
             options.get_struct() if isinstance(options, Options) else options
         )
 
-        # Note: batch/multicall candidate
-        results = []
+        results: list[bool] = []
         for download in downloads:
             results.append(
                 self.client.change_option(download.gid, client_options) == "OK"
@@ -644,15 +663,13 @@ class ShushaAPI:
         return results
 
     def set_global_options(self, options: OptionsType) -> bool:
-        """Set global options.
+        """Apply option modifications globally to the daemon.
 
-        Parameters:
-            options: An instance of the [`Options`][aria2p.options.Options]
-                    class or a dictionary containing aria2c options to create
-                    the download with.
+        Args:
+            options: Dictionary or Options object with modified global options.
 
         Returns:
-            Success or failure of the operation for changing global options.
+            True if applied successfully, False otherwise.
         """
         client_options = (
             options.get_struct() if isinstance(options, Options) else options
@@ -661,7 +678,11 @@ class ShushaAPI:
         return self.client.change_global_option(client_options) == "OK"
 
     def get_stats(self) -> Stats:
-        """Get the stats of the remote aria2c process."""
+        """Query daemon global transfer statistics and active task counts.
+
+        Returns:
+            A Stats object containing download/upload speeds and connection counts.
+        """
         try:
             raw = self.client.get_global_stat()
             return Stats.from_dict(raw) if hasattr(Stats, "from_dict") else Stats(raw)
@@ -670,7 +691,14 @@ class ShushaAPI:
             return Stats.from_dict({}) if hasattr(Stats, "from_dict") else Stats({})
 
     def get_peers(self, gid: str) -> list[dict[str, Any]]:
-        """Retrieve live connected BitTorrent peers for a download."""
+        """Retrieve connected BitTorrent peers for a download task.
+
+        Args:
+            gid: Unique GID of the torrent download.
+
+        Returns:
+            List of peer information dictionaries (IP, port, client, speed).
+        """
         try:
             peers = self.client.get_peers(gid)
             return peers if isinstance(peers, list) else []
@@ -679,7 +707,14 @@ class ShushaAPI:
             return []
 
     def get_servers(self, gid: str) -> list[dict[str, Any]]:
-        """Retrieve live connected HTTP/FTP/Metalink servers for a download."""
+        """Retrieve mirror server connection statistics for a download task.
+
+        Args:
+            gid: Unique GID of the download.
+
+        Returns:
+            List of server connection dictionaries (URI, current speed).
+        """
         try:
             servers = self.client.get_servers(gid)
             return servers if isinstance(servers, list) else []
@@ -695,7 +730,18 @@ class ShushaAPI:
         add_uris: list[str] | None = None,
         position: int | None = None,
     ) -> list[int]:
-        """Dynamically add or remove mirror URIs for an active download."""
+        """Dynamically add or remove mirror URIs for an active download.
+
+        Args:
+            gid: Unique GID of the download.
+            file_index: 1-based index of the target file within the download.
+            del_uris: Optional list of URI strings to remove.
+            add_uris: Optional list of URI strings to append.
+            position: Optional index to insert new URIs at.
+
+        Returns:
+            A 2-element list `[deleted_count, added_count]`.
+        """
         try:
             res = self.client.change_uri(
                 gid, file_index, del_uris or [], add_uris or [], position
@@ -711,7 +757,16 @@ class ShushaAPI:
         max_download: str | None = None,
         max_upload: str | None = None,
     ) -> bool:
-        """Set download/upload speed limits on a specific download."""
+        """Adjust maximum download and upload speed limits for a specific task.
+
+        Args:
+            gid: Unique GID of the download.
+            max_download: Speed limit string (e.g. '500K', '2M', '0' for unlimited).
+            max_upload: Upload speed limit string.
+
+        Returns:
+            True if the limits were successfully updated, False otherwise.
+        """
         options: dict[str, str] = {}
         if max_download is not None:
             options["max-download-limit"] = max_download
@@ -730,16 +785,16 @@ class ShushaAPI:
         downloads: list[Download],
         force: bool = False,
     ) -> list[bool]:
-        """Remove downloaded files.
+        """Remove downloaded files and directories from local disk.
 
-        Parameters:
-            downloads:  the list of downloads for which to remove files.
-            force: Whether to remove files even if download is not complete.
+        Args:
+            downloads: List of Download instances whose files should be deleted.
+            force: If True, delete even if download status is incomplete.
 
         Returns:
-            Success or failure of the operation for each given download.
+            List of booleans representing removal success for each download.
         """
-        results = []
+        results: list[bool] = []
         for download in downloads:
             if download.is_complete or force:
                 for path in download.root_files_paths:
@@ -775,23 +830,22 @@ class ShushaAPI:
         to_directory: str | Path,
         force: bool = False,
     ) -> list[bool]:
-        """Move downloaded files to another directory.
+        """Move completed download files to a target destination directory.
 
-        Parameters:
-            downloads:  the list of downloads for which to move files.
-            to_directory: The target directory to move files to.
-            force: Whether to move files even if download is not complete.
+        Args:
+            downloads: List of Download objects whose files should be moved.
+            to_directory: Destination directory path.
+            force: If True, move files even if download is incomplete.
 
         Returns:
-            Success or failure of the operation for each given download.
+            List of booleans representing move success for each download.
         """
         if isinstance(to_directory, str):
             to_directory = Path(to_directory)
 
-        # raises FileExistsError when target is already a file
         to_directory.mkdir(parents=True, exist_ok=True)
 
-        results = []
+        results: list[bool] = []
         for download in downloads:
             if download.is_complete or force:
                 for path in download.root_files_paths:
@@ -807,23 +861,22 @@ class ShushaAPI:
         to_directory: str | Path,
         force: bool = False,
     ) -> list[bool]:
-        """Copy downloaded files to another directory.
+        """Copy completed download files to a target destination directory.
 
-        Parameters:
-            downloads:  the list of downloads for which to move files.
-            to_directory: The target directory to copy files into.
-            force: Whether to move files even if download is not complete.
+        Args:
+            downloads: List of Download objects whose files should be copied.
+            to_directory: Destination directory path.
+            force: If True, copy files even if download is incomplete.
 
         Returns:
-            Success or failure of the operation for each given download.
+            List of booleans representing copy success for each download.
         """
         if isinstance(to_directory, str):
             to_directory = Path(to_directory)
 
-        # raises FileExistsError when target is already a file
         to_directory.mkdir(parents=True, exist_ok=True)
 
-        results = []
+        results: list[bool] = []
         for download in downloads:
             if download.is_complete or force:
                 for path in download.root_files_paths:

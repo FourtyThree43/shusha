@@ -1,4 +1,3 @@
-import contextlib
 import tempfile
 import unittest
 from pathlib import Path
@@ -13,12 +12,10 @@ from shusha.views.settings_win import SettingsWindow
 
 class TestSettingsWindowAndConfig(unittest.TestCase):
     def setUp(self):
-        with contextlib.suppress(Exception):
-            ttk.Style.instance = None
+        pass
 
     def tearDown(self):
-        with contextlib.suppress(Exception):
-            ttk.Style.instance = None
+        pass
 
     def test_dump_toml(self):
         data = {
@@ -53,17 +50,20 @@ class TestSettingsWindowAndConfig(unittest.TestCase):
             self.assertIn("6800", content)
 
     def test_app_settings_setters(self):
-        settings = AppSettings()
-        settings.set_download_dir("/tmp/test_dl")
-        self.assertEqual(settings.get_download_dir(), "/tmp/test_dl")
+        with tempfile.TemporaryDirectory() as tmpdir:
+            from unittest.mock import patch
+            with patch("shusha.models.utilities.user_config_dir", return_value=tmpdir):
+                settings = AppSettings()
+                settings.set_download_dir("/tmp/test_dl")
+                self.assertEqual(settings.get_download_dir(), "/tmp/test_dl")
 
-        settings.set_logs_dir("/tmp/test_logs")
-        self.assertEqual(settings.get_logs_dir(), "/tmp/test_logs")
+                settings.set_logs_dir("/tmp/test_logs")
+                self.assertEqual(settings.get_logs_dir(), "/tmp/test_logs")
 
-        settings.set_aria2_config(host="192.168.1.50", port=6801, secret="supertoken")
-        self.assertEqual(settings.get_aria2_host(), "192.168.1.50")
-        self.assertEqual(settings.get_aria2_port(), 6801)
-        self.assertEqual(settings.get_aria2_secret(), "supertoken")
+                settings.set_aria2_config(host="192.168.1.50", port=6801, secret="supertoken")
+                self.assertEqual(settings.get_aria2_host(), "192.168.1.50")
+                self.assertEqual(settings.get_aria2_port(), 6801)
+                self.assertEqual(settings.get_aria2_secret(), "supertoken")
 
     def test_settings_window_headless(self):
         try:

@@ -87,9 +87,12 @@ class TestShushaDB(unittest.TestCase):
             self.db.save()
 
         new_db_instance = ShushaDB(self.filename)
-        new_db_instance.load()
-        retrieved_document = new_db_instance.retrieve("test_id")
-        self.assertEqual(retrieved_document, document)
+        try:
+            new_db_instance.load()
+            retrieved_document = new_db_instance.retrieve("test_id")
+            self.assertEqual(retrieved_document, document)
+        finally:
+            new_db_instance.close()
 
     def test_complex_query(self):
         with self.db:

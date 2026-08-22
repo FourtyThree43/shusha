@@ -43,17 +43,19 @@ class Aria2Gui(ttk.Frame):
     :param master: The parent widget.
     """
 
-    def __init__(self, master):
+    def __init__(self, master, api: Api | None = None):
         """
         Initializes the main application window and sets up various components and attributes.
 
         :param master: The parent widget.
+        :param api: Optional ShushaAPI instance.
         """
         super().__init__(master, padding=10)
         self.pack(fill=tk.BOTH, expand=tk.YES)
 
-        self.api = Api()
-        self.start_server()
+        self.api = api or Api()
+        if api is None:
+            self.start_server()
         self.download_gid = None
 
         self.downloads_map: dict[str, Download] = {}

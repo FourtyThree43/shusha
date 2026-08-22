@@ -78,7 +78,10 @@ class SettingsWindow(ttk.Toplevel):
 
         self.download_dir_var = tk.StringVar(value=str(default_dl))
         self.logs_dir_var = tk.StringVar(value=str(default_log))
-        self.theme_var = tk.StringVar(value=user_config.get("theme", "bootstrap-dark"))
+        raw_theme = user_config.get("theme", "bootstrap-dark")
+        if raw_theme in ("darkly", "default"):
+            raw_theme = "bootstrap-dark"
+        self.theme_var = tk.StringVar(value=raw_theme)
         self.notify_on_complete_var = tk.BooleanVar(
             value=bool(user_config.get("notify_on_complete", True))
         )

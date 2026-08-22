@@ -1,6 +1,7 @@
 import contextlib
 import tkinter as tk
 import unittest
+from unittest.mock import MagicMock
 
 import ttkbootstrap as ttk
 
@@ -9,12 +10,10 @@ from shusha.views.app import Aria2Gui, relative_to_assets
 
 class TestGuiSmoke(unittest.TestCase):
     def setUp(self):
-        with contextlib.suppress(Exception):
-            ttk.Style.instance = None
+        pass
 
     def tearDown(self):
-        with contextlib.suppress(Exception):
-            ttk.Style.instance = None
+        pass
 
     def test_relative_to_assets(self):
         asset_path = relative_to_assets("icons8-add-64.png")
@@ -44,12 +43,13 @@ class TestGuiSmoke(unittest.TestCase):
         try:
             root.iconbitmap(str(ICON_PATH))
         except Exception:
-            icon_png = (
-                OUTPUT_PATH / "resources" / "assets" / "icons8-bittorrent-new-64.png"
-            )
-            if icon_png.exists():
-                img = tk.PhotoImage(file=str(icon_png))
-                root.iconphoto(True, img)
+            with contextlib.suppress(Exception):
+                icon_png = (
+                    OUTPUT_PATH / "resources" / "assets" / "icons8-bittorrent-new-64.png"
+                )
+                if icon_png.exists():
+                    img = tk.PhotoImage(file=str(icon_png))
+                    root.iconphoto(True, img)
 
         root.destroy()
 
@@ -61,7 +61,9 @@ class TestGuiSmoke(unittest.TestCase):
         except Exception:
             self.skipTest("No display available for Aria2Gui test")
 
-        app = Aria2Gui(root)
+        mock_api = MagicMock()
+        mock_api.client = MagicMock()
+        app = Aria2Gui(root, api=mock_api)
         self.assertIsNotNone(app.dt)
         self.assertIsNotNone(app.category_combo)
         self.assertIn("Download Speed", app.stats_vars)

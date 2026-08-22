@@ -1,4 +1,3 @@
-import contextlib
 import unittest
 from unittest.mock import MagicMock
 
@@ -10,12 +9,10 @@ from shusha.views.uri_win import UriManagerWindow
 
 class TestStatusAndUriWindows(unittest.TestCase):
     def setUp(self):
-        with contextlib.suppress(Exception):
-            ttk.Style.instance = None
+        pass
 
     def tearDown(self):
-        with contextlib.suppress(Exception):
-            ttk.Style.instance = None
+        pass
 
     def test_status_window_headless(self):
         try:

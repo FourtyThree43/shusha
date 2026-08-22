@@ -1,4 +1,3 @@
-import contextlib
 import tempfile
 import unittest
 from pathlib import Path
@@ -14,17 +13,15 @@ from shusha.views.torrent_win import TorrentFilesWindow
 
 class TestTorrentFeatures(unittest.TestCase):
     def setUp(self):
-        with contextlib.suppress(Exception):
-            ttk.Style.instance = None
+        pass
 
     def tearDown(self):
-        with contextlib.suppress(Exception):
-            ttk.Style.instance = None
+        pass
 
     def test_api_add_torrent(self):
         mock_client = MagicMock()
         mock_client.add_torrent.return_value = "torrent123"
-        api = ShushaAPI(client=mock_client)
+        api = ShushaAPI(client=mock_client, db=MagicMock(), daemon=MagicMock())
 
         with tempfile.NamedTemporaryFile(suffix=".torrent") as f:
             f.write(b"d8:announce16:http://fake.torrent13:announce-liste")
@@ -35,7 +32,7 @@ class TestTorrentFeatures(unittest.TestCase):
     def test_api_add_metalink(self):
         mock_client = MagicMock()
         mock_client.add_metalink.return_value = "metalink123"
-        api = ShushaAPI(client=mock_client)
+        api = ShushaAPI(client=mock_client, db=MagicMock(), daemon=MagicMock())
 
         with tempfile.NamedTemporaryFile(suffix=".metalink") as f:
             f.write(b"<metalink></metalink>")
