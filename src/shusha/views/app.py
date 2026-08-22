@@ -28,6 +28,7 @@ from shusha.models.utilities import (
 from shusha.models.webhook_server import WebhookServer
 from shusha.views.add_win import AddWindow
 from shusha.views.batch_add_win import BatchAddWindow
+from shusha.views.checksum_win import ChecksumWindow
 from shusha.views.create_torrent_win import CreateTorrentWindow
 from shusha.views.inspector_win import DownloadInspectorWindow
 from shusha.views.settings_win import SettingsWindow
@@ -395,6 +396,9 @@ class Aria2Gui(ttk.Frame):
         self.context_menu.add_command(
             label="Manage Mirrors & URIs...", command=self.open_uri_manager
         )
+        self.context_menu.add_command(
+            label="Verify File Checksum / Hash...", command=self.open_selected_checksum
+        )
         self.context_menu.add_separator()
         daemon_sub = tk.Menu(self.context_menu, tearoff=0)
         daemon_sub.add_command(label="Start Daemon", command=self.start_aria2_daemon)
@@ -603,6 +607,14 @@ class Aria2Gui(ttk.Frame):
         def handle_created(t_path: Path, magnet: str):
             self.show_toast(f"Created Torrent: {t_path.name}")
         CreateTorrentWindow(master=self, on_created=handle_created)
+
+    def open_selected_checksum(self):
+        """Open file checksum and integrity verifier for selected download."""
+        dl = self.get_selected_download()
+        file_path = ""
+        if dl and dl.files:
+            file_path = str(dl.files[0].path)
+        ChecksumWindow(master=self, initial_file=file_path)
 
     def download_thread(self, uri, options: dict):
         """Start a download from URI or torrent file in a separate thread."""

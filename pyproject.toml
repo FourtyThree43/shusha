@@ -40,7 +40,7 @@ Issues = "https://github.com/FourtyThree43/shusha/issues"
 Source = "https://github.com/FourtyThree43/shusha"
 
 [project.scripts]
-shusha = "shusha.ShushaDM:main"
+shusha = "shusha.cli:main"
 
 [project.gui-scripts]
 shusha-gui = "shusha.ShushaDM:main"

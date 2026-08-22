@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Shusha Download Manager Integration",
+  "version": "1.0.0",
+  "description": "Send links, media, and torrents directly to Shusha Download Manager with 1 click.",
+  "permissions": [
+    "contextMenus",
+    "activeTab",
+    "storage"
+  ],
+  "host_permissions": [
+    "http://127.0.0.1:6810/*",
+    "http://localhost:6810/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Shusha Download Manager"
+  }
+}

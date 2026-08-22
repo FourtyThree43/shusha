@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Shusha DM</title>
+  <style>
+    body {
+      width: 320px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      padding: 12px;
+      background-color: #1e222d;
+      color: #f1f5f9;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #334155;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+    }
+    .title {
+      font-weight: 700;
+      font-size: 14px;
+      color: #00bc8c;
+    }
+    .badge {
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: #0f172a;
+    }
+    .badge.online { color: #00bc8c; }
+    .badge.offline { color: #ef4444; }
+    .input-group {
+      margin-bottom: 10px;
+    }
+    input[type="text"] {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px;
+      border: 1px solid #334155;
+      background: #0f172a;
+      color: #fff;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    button {
+      width: 100%;
+      padding: 8px;
+      border: none;
+      border-radius: 4px;
+      background: #00bc8c;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    button:hover {
+      background: #009d75;
+    }
+    #status {
+      font-size: 11px;
+      margin-top: 8px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="title">Shusha DM</div>
+    <div id="badge" class="badge">Checking...</div>
+  </div>
+  <div class="input-group">
+    <input type="text" id="urlInput" placeholder="Paste download URL or Magnet link...">
+  </div>
+  <button id="addBtn">Download with Shusha</button>
+  <div id="status"></div>
+  <script src="popup.js"></script>
+</body>
+</html>
