@@ -33,6 +33,23 @@ class TestShushaAPI(unittest.TestCase):
         self.api.stop_server()
         self.mock_daemon.stop_server.assert_called_once()
 
+    def test_daemon_management_methods(self):
+        self.mock_daemon.start_server.return_value = 1234
+        self.mock_daemon.restart_server.return_value = 5678
+        self.mock_client.is_server_reachable.return_value = True
+
+        pid_start = self.api.start_server()
+        self.assertEqual(pid_start, 1234)
+
+        self.api.stop_server()
+        self.mock_daemon.stop_server.assert_called_once()
+
+        pid_restart = self.api.restart_server()
+        self.assertEqual(pid_restart, 5678)
+
+        self.assertTrue(self.api.is_server_running())
+        self.assertTrue(self.api.reconnect())
+
     def test_get_download_and_get_downloads(self):
         self.mock_client.tell_status.return_value = {
             "gid": "gid1",

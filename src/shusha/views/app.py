@@ -224,6 +224,23 @@ class Aria2Gui(ttk.Frame):
         sett_btn.pack(side=tk.RIGHT, padx=(0, 1), pady=1)
         ToolTip(sett_btn, text="Open settings", bootstyle="warning")
 
+        daemon_menu_btn = ttk.Menubutton(
+            master=opts_row,
+            text="Daemon",
+            image="settings",
+            width=8,
+            bootstyle="outline-info",
+        )
+        daemon_menu = tk.Menu(daemon_menu_btn, tearoff=0)
+        daemon_menu.add_command(label="▶ Start Daemon", command=self.start_aria2_daemon)
+        daemon_menu.add_command(label="⏹ Stop Daemon", command=self.stop_aria2_daemon)
+        daemon_menu.add_command(label="🔄 Restart Daemon", command=self.restart_aria2_daemon)
+        daemon_menu.add_separator()
+        daemon_menu.add_command(label="🔌 Reconnect RPC / WS", command=self.reconnect_aria2_daemon)
+        daemon_menu_btn["menu"] = daemon_menu
+        daemon_menu_btn.pack(side=tk.RIGHT, padx=(0, 1), pady=1)
+        ToolTip(daemon_menu_btn, text="Aria2 Daemon lifecycle (Start / Stop / Reconnect)", bootstyle="info")
+
         logs_btn = ttk.Button(
             master=opts_row,
             text="Logs",
@@ -317,6 +334,14 @@ class Aria2Gui(ttk.Frame):
         self.context_menu.add_command(
             label="Manage Mirrors & URIs...", command=self.open_uri_manager
         )
+        self.context_menu.add_separator()
+        daemon_sub = tk.Menu(self.context_menu, tearoff=0)
+        daemon_sub.add_command(label="Start Daemon", command=self.start_aria2_daemon)
+        daemon_sub.add_command(label="Stop Daemon", command=self.stop_aria2_daemon)
+        daemon_sub.add_command(label="Restart Daemon", command=self.restart_aria2_daemon)
+        daemon_sub.add_separator()
+        daemon_sub.add_command(label="Reconnect RPC", command=self.reconnect_aria2_daemon)
+        self.context_menu.add_cascade(label="Aria2 Daemon", menu=daemon_sub)
 
     def show_context_menu(self, event):
         """Display context menu on right-click."""
@@ -405,6 +430,16 @@ class Aria2Gui(ttk.Frame):
         sett_btn.pack(side=tk.LEFT, padx=(1, 0), pady=1)
         ToolTip(sett_btn, text="Open settings dialog", bootstyle="warning")
 
+        self.daemon_status_var = tk.StringVar(value="🟢 Daemon: Ready")
+        self.daemon_status_btn = ttk.Button(
+            master=opts_row,
+            textvariable=self.daemon_status_var,
+            command=self.reconnect_aria2_daemon,
+            bootstyle="link",
+        )
+        self.daemon_status_btn.pack(side=tk.LEFT, padx=12, pady=1)
+        ToolTip(self.daemon_status_btn, text="Click to test / reconnect Aria2 daemon", bootstyle="info")
+
         # Static label structure with StringVars to prevent memory leaks
         self.stats_frame = tk.Frame(opts_row)
         self.stats_frame.pack(side=tk.RIGHT, padx=10, pady=5)
@@ -450,8 +485,12 @@ class Aria2Gui(ttk.Frame):
         try:
             global_stats = self.api.get_stats()
             self.update_stats_frame(global_stats)
+            if hasattr(self, "daemon_status_var"):
+                self.daemon_status_var.set("🟢 Daemon: Connected")
         except Exception as e:
             logger.log(f"Stats polling notice: {e}", level="debug")
+            if hasattr(self, "daemon_status_var"):
+                self.daemon_status_var.set("🔴 Daemon: Offline (Click to Reconnect)")
         finally:
             self.after(1000, self.get_stats)
 
@@ -864,6 +903,73 @@ class Aria2Gui(ttk.Frame):
         """Method to stop all downloads."""
         logger.log("Stopping downloads...")
         self._thread(self.api.pause_all)
+
+    def start_aria2_daemon(self):
+        """Start the Aria2 background daemon process."""
+        def _bg():
+            try:
+                pid = self.api.start_server()
+                if pid:
+                    self.show_toast(f"Aria2 daemon started (PID: {pid})")
+                else:
+                    self.show_toast("Aria2 daemon is already running")
+                self.reconnect_aria2_daemon()
+            except Exception as e:
+                logger.log(f"Error starting daemon: {e}", level="error")
+                self.show_toast(f"Failed to start daemon: {e}")
+
+        self._thread(_bg)
+
+    def stop_aria2_daemon(self):
+        """Stop the Aria2 background daemon process."""
+        def _bg():
+            try:
+                self.api.stop_server()
+                self.show_toast("Aria2 daemon stopped")
+                if hasattr(self, "daemon_status_var"):
+                    self.daemon_status_var.set("🔴 Daemon: Stopped")
+            except Exception as e:
+                logger.log(f"Error stopping daemon: {e}", level="error")
+                self.show_toast(f"Failed to stop daemon: {e}")
+
+        self._thread(_bg)
+
+    def restart_aria2_daemon(self):
+        """Restart the Aria2 background daemon process."""
+        def _bg():
+            try:
+                self.show_toast("Restarting Aria2 daemon...")
+                pid = self.api.restart_server()
+                if pid:
+                    self.show_toast(f"Aria2 daemon restarted (PID: {pid})")
+                else:
+                    self.show_toast("Aria2 daemon restarted")
+                self.refresh_downloads_table()
+            except Exception as e:
+                logger.log(f"Error restarting daemon: {e}", level="error")
+                self.show_toast(f"Failed to restart daemon: {e}")
+
+        self._thread(_bg)
+
+    def reconnect_aria2_daemon(self):
+        """Reconnect RPC client and WebSocket stream to the Aria2 daemon."""
+        def _bg():
+            try:
+                is_up = self.api.reconnect()
+                if is_up:
+                    self.show_toast("Connected to Aria2 daemon")
+                    if hasattr(self, "daemon_status_var"):
+                        self.daemon_status_var.set("🟢 Daemon: Connected")
+                    self.refresh_downloads_table()
+                else:
+                    self.show_toast("Cannot connect to Aria2 daemon (offline)")
+                    if hasattr(self, "daemon_status_var"):
+                        self.daemon_status_var.set("🔴 Daemon: Offline (Click to Reconnect)")
+            except Exception as e:
+                logger.log(f"Error reconnecting to daemon: {e}", level="error")
+                self.show_toast(f"Connection failed: {e}")
+
+        self._thread(_bg)
 
     def start_server(self):
         """Method to start the Aria2 server."""

@@ -112,13 +112,51 @@ class ShushaAPI:
             The process PID if started successfully, or None if already running or remote.
         """
         pid = self.remote.start_server()
+        if hasattr(self, "ws_client") and self.ws_client:
+            self.ws_client.connect()
         logger.log(f"Aria2 server started with PID: {pid}")
         return pid
 
     def stop_server(self) -> None:
         """Stop the background Aria2 daemon server."""
+        if hasattr(self, "ws_client") and self.ws_client:
+            self.ws_client.close()
         self.remote.stop_server()
         logger.log("Aria2 server stopped.")
+
+    def restart_server(self) -> int | None:
+        """Restart the background Aria2 daemon server and reconnect RPC.
+
+        Returns:
+            The process PID if started successfully, or None.
+        """
+        if hasattr(self, "ws_client") and self.ws_client:
+            self.ws_client.close()
+        pid = self.remote.restart_server()
+        self.reconnect()
+        logger.log(f"Aria2 server restarted with PID: {pid}")
+        return pid
+
+    def is_server_running(self) -> bool:
+        """Check if the aria2 daemon server is reachable and listening.
+
+        Returns:
+            True if daemon is actively listening on RPC port, False otherwise.
+        """
+        return self.client.is_server_reachable()
+
+    def reconnect(self) -> bool:
+        """Reconnect RPC client and WebSocket event stream to the daemon.
+
+        Returns:
+            True if connection re-established, False otherwise.
+        """
+        self.client._last_reachability_check = None
+        self.client._last_reachable = None
+        is_up = self.client.is_server_reachable()
+        if is_up and hasattr(self, "ws_client") and self.ws_client:
+            self.ws_client.connect()
+        return is_up
 
     def get_download(self, gid: str) -> Download:
         """Get a Download object representing the specified GID.

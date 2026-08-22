@@ -271,6 +271,19 @@ class TestAppActions(unittest.TestCase):
             self.app.show_toast("Test notification")
             mock_toast.assert_called_once()
 
+    def test_daemon_actions_and_status(self):
+        self.mock_api.start_server.return_value = 1111
+        self.mock_api.restart_server.return_value = 2222
+        self.mock_api.reconnect.return_value = True
+
+        self.app.start_aria2_daemon()
+        self.app.stop_aria2_daemon()
+        self.app.restart_aria2_daemon()
+        self.app.reconnect_aria2_daemon()
+
+        self.assertIsNotNone(self.app.daemon_status_var)
+        self.assertIsNotNone(self.app.daemon_status_btn)
+
 
 if __name__ == "__main__":
     unittest.main()
