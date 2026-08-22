@@ -181,8 +181,9 @@ class TestAppActions(unittest.TestCase):
     def test_open_windows_and_dialogs(self):
         with (
             patch("shusha.views.app.AddWindow") as mock_add_win,
+            patch("shusha.views.app.BatchAddWindow") as mock_batch_win,
             patch("shusha.views.app.UriManagerWindow") as mock_uri_win,
-            patch("shusha.views.app.DownloadWindow") as mock_dl_win,
+            patch("shusha.views.app.DownloadInspectorWindow") as mock_insp_win,
             patch("shusha.views.app.TorrentFilesWindow") as mock_tor_win,
             patch("shusha.views.app.SettingsWindow") as mock_set_win,
             patch("shusha.views.app.open_path_in_file_manager") as mock_open_path,
@@ -196,11 +197,14 @@ class TestAppActions(unittest.TestCase):
                 self.app.open_toplevel()
                 mock_add_win.assert_called_once()
 
+                self.app.open_batch_add()
+                mock_batch_win.assert_called_once()
+
                 self.app.open_uri_manager()
                 mock_uri_win.assert_called_once()
 
                 self.app.open_selected_details()
-                mock_dl_win.assert_called_once()
+                mock_insp_win.assert_called_once()
 
                 self.app.open_selective_files()
                 mock_tor_win.assert_called_once()

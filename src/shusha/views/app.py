@@ -22,6 +22,8 @@ from shusha.models.utilities import (
     user_log_dir,
 )
 from shusha.views.add_win import AddWindow
+from shusha.views.batch_add_win import BatchAddWindow
+from shusha.views.inspector_win import DownloadInspectorWindow
 from shusha.views.settings_win import SettingsWindow
 from shusha.views.status_win import DownloadWindow
 from shusha.views.torrent_win import TorrentFilesWindow
@@ -94,7 +96,24 @@ class Aria2Gui(ttk.Frame):
         self.create_bottom_bar()
         self.create_context_menu()
 
+        # Connect WebSocket notifications if supported
+        if hasattr(self.api, "connect_ws"):
+            try:
+                if self.api.connect_ws():
+                    self.api.on_event("*", self._on_aria2_ws_event)
+            except Exception:
+                pass
+
         self.after(1000, self.get_stats)
+
+    def _on_aria2_ws_event(self, event_name: str, params: dict[str, Any]) -> None:
+        """Handle incoming real-time push notification from aria2 daemon."""
+        gid = str(params.get("gid", ""))
+        if "Complete" in event_name:
+            self.show_toast(f"Download Finished: {gid}")
+        elif "Error" in event_name:
+            self.show_toast(f"Download Error: {gid}")
+        self.refresh_downloads_table()
 
     def create_buttonbar(self):
         """
@@ -116,6 +135,17 @@ class Aria2Gui(ttk.Frame):
         )
         add_btn.pack(side=tk.LEFT, padx=(1, 0), pady=1)
         ToolTip(add_btn, text="Add new download", bootstyle="warning")
+
+        batch_btn = ttk.Button(
+            master=opts_row,
+            text="Batch",
+            image="add-download",
+            command=self.open_batch_add,
+            width=8,
+            bootstyle="outline-dark",
+        )
+        batch_btn.pack(side=tk.LEFT, padx=(1, 0), pady=1)
+        ToolTip(batch_btn, text="Batch Add URLs & Pattern ranges", bootstyle="info")
 
         start_btn = ttk.Button(
             master=opts_row,
@@ -745,12 +775,19 @@ class Aria2Gui(ttk.Frame):
             self.clipboard_append(info)
             self.show_toast(f"Copied: {info}")
 
+    def open_batch_add(self):
+        """Open smart batch URL addition dialog."""
+        def _handle_batch(urls: list[str], options: dict[str, Any]):
+            for url in urls:
+                self.download_thread(url, options)
+
+        BatchAddWindow(master=self, callback=_handle_batch)
+
     def open_selected_details(self):
-        """Open detailed live status meter dialog for selected download."""
+        """Open detailed live status inspector dialog for selected download."""
         dl = self.get_selected_download()
         if dl:
-            dw = DownloadWindow(api=self.api)
-            dw.update_stats_frame(dl)
+            DownloadInspectorWindow(master=self, api=self.api, download=dl)
         else:
             DownloadWindow(api=self.api)
 

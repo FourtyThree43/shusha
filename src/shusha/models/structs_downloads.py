@@ -307,10 +307,6 @@ class Download:
         return f"{self.upload_length} B"
 
     @property
-    def bitfield(self) -> str | None:
-        return self._struct.get("bitfield")
-
-    @property
     def download_speed(self) -> int:
         return int(self._struct.get("downloadSpeed", 0) or 0)
 
@@ -339,14 +335,6 @@ class Download:
     @property
     def seeder(self) -> bool:
         return bool_or_value(self._struct.get("seeder", False))
-
-    @property
-    def piece_length(self) -> int:
-        return int(self._struct.get("pieceLength", 0) or 0)
-
-    @property
-    def num_pieces(self) -> int:
-        return int(self._struct.get("numPieces", 0) or 0)
 
     @property
     def connections(self) -> int:
@@ -388,6 +376,49 @@ class Download:
         if self._bittorrent is None and "bittorrent" in self._struct:
             self._bittorrent = BitTorrent(self._struct["bittorrent"])
         return self._bittorrent
+
+    @property
+    def bitfield(self) -> str:
+        """Hex-encoded bitfield of completed pieces."""
+        return str(self._struct.get("bitfield", "") or "")
+
+    @property
+    def num_pieces(self) -> int:
+        """Total number of pieces in the download."""
+        return int(self._struct.get("numPieces", 0) or 0)
+
+    @property
+    def piece_length(self) -> int:
+        """Byte length of each piece."""
+        return int(self._struct.get("pieceLength", 0) or 0)
+
+    @property
+    def pieces_bool_array(self) -> list[bool]:
+        """Decode the hex bitfield into an array of boolean flags for each piece."""
+        hex_str = self.bitfield
+        if not hex_str:
+            if self.is_complete and self.num_pieces > 0:
+                return [True] * self.num_pieces
+            return [False] * max(0, self.num_pieces)
+
+        bits: list[bool] = []
+        for char in hex_str:
+            try:
+                val = int(char, 16)
+                for shift in (3, 2, 1, 0):
+                    bits.append(bool((val >> shift) & 1))
+            except ValueError:
+                continue
+
+        if self.num_pieces > 0:
+            return bits[: self.num_pieces]
+        return bits
+
+    @property
+    def num_completed_pieces(self) -> int:
+        """Number of verified/completed pieces."""
+        arr = self.pieces_bool_array
+        return sum(1 for b in arr if b)
 
     @property
     def verified_length(self) -> int:

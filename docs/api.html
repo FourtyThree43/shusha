@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{ darkMode: true, selectedTab: 'python' }" :class="{ 'dark': darkMode }">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Reference - Shusha Download Manager</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: { brand: { 500: '#00bc8c', 600: '#00a379' } }
+        }
+      }
+    }
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 min-h-screen font-sans antialiased transition-colors duration-200">
+  <!-- Nav -->
+  <nav class="border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="index.html" class="flex items-center space-x-3">
+        <span class="text-2xl">⚡</span>
+        <span class="text-xl font-bold bg-gradient-to-r from-emerald-500 to-teal-400 bg-clip-text text-transparent">Shusha</span>
+      </a>
+      <div class="flex items-center space-x-6">
+        <a href="index.html" class="text-sm text-gray-600 dark:text-gray-400 hover:text-emerald-500">Home</a>
+        <a href="about.html" class="text-sm text-gray-600 dark:text-gray-400 hover:text-emerald-500">About</a>
+        <a href="api.html" class="text-sm font-semibold text-emerald-500">API Reference</a>
+        <a href="manual.html" class="text-sm text-gray-600 dark:text-gray-400 hover:text-emerald-500">User Manual</a>
+        <button @click="darkMode = !darkMode" class="p-2 rounded-lg bg-gray-200 dark:bg-gray-800">
+          <span x-show="!darkMode">🌙</span>
+          <span x-show="darkMode">☀️</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-5xl mx-auto px-4 py-12">
+    <div class="mb-8">
+      <h1 class="text-3xl font-extrabold mb-2">API & RPC Reference</h1>
+      <p class="text-gray-600 dark:text-gray-400">Complete guide for interacting with ShushaAPI, WebSocket events, and aria2 JSON-RPC methods.</p>
+    </div>
+
+    <!-- Language Selector -->
+    <div class="flex space-x-2 border-b border-gray-200 dark:border-gray-800 mb-8 pb-2">
+      <button @click="selectedTab = 'python'" :class="selectedTab === 'python' ? 'border-b-2 border-emerald-500 text-emerald-500 font-semibold' : 'text-gray-500'" class="px-4 py-2 text-sm transition">Python API</button>
+      <button @click="selectedTab = 'websocket'" :class="selectedTab === 'websocket' ? 'border-b-2 border-emerald-500 text-emerald-500 font-semibold' : 'text-gray-500'" class="px-4 py-2 text-sm transition">WebSocket Events</button>
+      <button @click="selectedTab = 'jsonrpc'" :class="selectedTab === 'jsonrpc' ? 'border-b-2 border-emerald-500 text-emerald-500 font-semibold' : 'text-gray-500'" class="px-4 py-2 text-sm transition">JSON-RPC 2.0</button>
+    </div>
+
+    <!-- Python API Tab -->
+    <div x-show="selectedTab === 'python'" class="space-y-8">
+      <div class="p-6 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm">
+        <h3 class="text-lg font-bold text-emerald-500 mb-2">ShushaAPI.add_uris(uris, options=None)</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Adds one or more HTTP/HTTPS/FTP or Magnet URIs to the download queue.</p>
+        <pre class="p-4 bg-gray-100 dark:bg-gray-950 rounded-lg text-xs font-mono overflow-x-auto text-emerald-600 dark:text-emerald-400"><code>from shusha.controller.api import ShushaAPI
+
+api = ShushaAPI()
+download = api.add_uris(
+    ["https://releases.ubuntu.com/24.04/ubuntu-24.04-desktop-amd64.iso"],
+    options={"dir": "/home/user/Downloads", "split": "16", "max-connection-per-server": "16"}
+)
+print("Added Download GID:", download.gid)</code></pre>
+      </div>
+
+      <div class="p-6 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm">
+        <h3 class="text-lg font-bold text-emerald-500 mb-2">ShushaAPI.add_batch_urls(text_or_urls, options=None)</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Parses multi-line text with pattern sequence expansion brackets (e.g. <code>[01-10]</code>) and dispatches downloads.</p>
+        <pre class="p-4 bg-gray-100 dark:bg-gray-950 rounded-lg text-xs font-mono overflow-x-auto text-emerald-600 dark:text-emerald-400"><code>batch_text = """
+http://example.com/assets/archive_part[01-05].rar
+magnet:?xt=urn:btih:3b245504d603a1a6b0805342c3cd3ef10f9b6e23
+"""
+downloads = api.add_batch_urls(batch_text)
+print(f"Dispatched {len(downloads)} tasks!")</code></pre>
+      </div>
+
+      <div class="p-6 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm">
+        <h3 class="text-lg font-bold text-emerald-500 mb-2">ShushaAPI.on_event(event_name, callback)</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Registers a real-time event listener for asynchronous daemon notifications.</p>
+        <pre class="p-4 bg-gray-100 dark:bg-gray-950 rounded-lg text-xs font-mono overflow-x-auto text-emerald-600 dark:text-emerald-400"><code>def handle_completion(event_name, data):
+    print("Download completed! GID:", data.get("gid"))
+
+api.connect_ws()
+api.on_event("aria2.onDownloadComplete", handle_completion)</code></pre>
+      </div>
+    </div>
+
+    <!-- WebSocket Events Tab -->
+    <div x-show="selectedTab === 'websocket'" class="space-y-6">
+      <div class="p-6 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm">
+        <h3 class="text-lg font-bold mb-3">Supported Real-Time Notification Frames</h3>
+        <div class="space-y-3 text-sm">
+          <div class="flex items-start space-x-3"><span class="px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-600 font-mono text-xs">aria2.onDownloadStart</span> <span class="text-gray-600 dark:text-gray-400">Dispatched when a download begins executing.</span></div>
+          <div class="flex items-start space-x-3"><span class="px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-950 text-amber-600 font-mono text-xs">aria2.onDownloadPause</span> <span class="text-gray-600 dark:text-gray-400">Dispatched when a download is paused.</span></div>
+          <div class="flex items-start space-x-3"><span class="px-2 py-0.5 rounded bg-rose-100 dark:bg-rose-950 text-rose-600 font-mono text-xs">aria2.onDownloadStop</span> <span class="text-gray-600 dark:text-gray-400">Dispatched when a download is aborted or removed.</span></div>
+          <div class="flex items-start space-x-3"><span class="px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-950 text-blue-600 font-mono text-xs">aria2.onDownloadComplete</span> <span class="text-gray-600 dark:text-gray-400">Dispatched when HTTP/FTP download finishes and passes hash checks.</span></div>
+          <div class="flex items-start space-x-3"><span class="px-2 py-0.5 rounded bg-purple-100 dark:bg-purple-950 text-purple-600 font-mono text-xs">aria2.onBtDownloadComplete</span> <span class="text-gray-600 dark:text-gray-400">Dispatched when BitTorrent payload completes downloading.</span></div>
+          <div class="flex items-start space-x-3"><span class="px-2 py-0.5 rounded bg-red-100 dark:bg-red-950 text-red-600 font-mono text-xs">aria2.onDownloadError</span> <span class="text-gray-600 dark:text-gray-400">Dispatched when a task encounters an unrecoverable network or disk error.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- JSON-RPC Tab -->
+    <div x-show="selectedTab === 'jsonrpc'" class="space-y-6">
+      <div class="p-6 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm">
+        <h3 class="text-lg font-bold mb-2">JSON-RPC 2.0 Frame Structure</h3>
+        <pre class="p-4 bg-gray-100 dark:bg-gray-950 rounded-lg text-xs font-mono overflow-x-auto text-emerald-600 dark:text-emerald-400"><code>{
+  "jsonrpc": "2.0",
+  "id": "req_101",
+  "method": "aria2.addUri",
+  "params": [
+    "token:my_secret_token",
+    ["https://example.com/file.zip"],
+    {"dir": "/downloads", "split": "8"}
+  ]
+}</code></pre>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{ darkMode: true }" :class="{ 'dark': darkMode }">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Manual - Shusha Download Manager</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: { brand: { 500: '#00bc8c', 600: '#00a379' } }
+        }
+      }
+    }
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 min-h-screen font-sans antialiased transition-colors duration-200">
+  <!-- Nav -->
+  <nav class="border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="index.html" class="flex items-center space-x-3">
+        <span class="text-2xl">⚡</span>
+        <span class="text-xl font-bold bg-gradient-to-r from-emerald-500 to-teal-400 bg-clip-text text-transparent">Shusha</span>
+      </a>
+      <div class="flex items-center space-x-6">
+        <a href="index.html" class="text-sm text-gray-600 dark:text-gray-400 hover:text-emerald-500">Home</a>
+        <a href="about.html" class="text-sm text-gray-600 dark:text-gray-400 hover:text-emerald-500">About</a>
+        <a href="api.html" class="text-sm text-gray-600 dark:text-gray-400 hover:text-emerald-500">API Reference</a>
+        <a href="manual.html" class="text-sm font-semibold text-emerald-500">User Manual</a>
+        <button @click="darkMode = !darkMode" class="p-2 rounded-lg bg-gray-200 dark:bg-gray-800">
+          <span x-show="!darkMode">🌙</span>
+          <span x-show="darkMode">☀️</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-4xl mx-auto px-4 py-12">
+    <h1 class="text-4xl font-extrabold mb-4">Shusha User Manual</h1>
+    <p class="text-gray-600 dark:text-gray-400 mb-8">Everything you need to know to get the most out of Shusha on Linux, macOS, and Windows.</p>
+
+    <!-- Section 1 -->
+    <section class="mb-12">
+      <h2 class="text-2xl font-bold mb-3">1. Installation & Requirements</h2>
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Shusha requires Python 3.10+ and <code>aria2c</code> installed on your system.</p>
+      <div class="space-y-3">
+        <div class="p-4 bg-gray-100 dark:bg-gray-900 rounded-lg text-xs font-mono">
+          <span class="text-gray-400"># Ubuntu / Debian</span><br>
+          sudo apt install aria2 python3-tk<br>
+          pip install shusha
+        </div>
+        <div class="p-4 bg-gray-100 dark:bg-gray-900 rounded-lg text-xs font-mono">
+          <span class="text-gray-400"># Arch Linux</span><br>
+          sudo pacman -S aria2 tk<br>
+          pip install shusha
+        </div>
+        <div class="p-4 bg-gray-100 dark:bg-gray-900 rounded-lg text-xs font-mono">
+          <span class="text-gray-400"># macOS (Homebrew)</span><br>
+          brew install aria2 python-tk<br>
+          pip install shusha
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2 -->
+    <section class="mb-12">
+      <h2 class="text-2xl font-bold mb-3">2. Batch Pattern Sequences</h2>
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
+        Click <strong>Batch</strong> on the toolbar to add multiple files at once. You can use numeric range brackets like <code>[01-20]</code> or alphabetic ranges like <code>[a-z]</code>:
+      </p>
+      <div class="p-4 bg-gray-100 dark:bg-gray-900 rounded-lg text-xs font-mono text-emerald-600 dark:text-emerald-400">
+        https://example.com/archive_vol[01-08].part<br>
+        https://cdn.photos.org/gallery/img_[a-d].jpg
+      </div>
+    </section>
+
+    <!-- Section 3 -->
+    <section class="mb-12">
+      <h2 class="text-2xl font-bold mb-3">3. Task Inspector & Piece Map</h2>
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
+        Double click any download or select it and click <strong>Details</strong> to open the full Inspector Window. Here you can monitor live transfer speeds, inspect individual BitTorrent pieces on the canvas grid, review connected peer IPs, and tweak speed limits.
+      </p>
+    </section>
+
+    <!-- Section 4 -->
+    <section class="mb-12">
+      <h2 class="text-2xl font-bold mb-3">4. Keyboard Shortcuts</h2>
+      <div class="border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden text-sm">
+        <table class="w-full text-left">
+          <thead class="bg-gray-100 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
+            <tr><th class="p-3 font-semibold">Shortcut</th><th class="p-3 font-semibold">Action</th></tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200 dark:divide-gray-800">
+            <tr><td class="p-3 font-mono font-bold text-emerald-500">Ctrl + N / Cmd + N</td><td class="p-3">Open Add URL dialog</td></tr>
+            <tr><td class="p-3 font-mono font-bold text-emerald-500">Ctrl + B / Cmd + B</td><td class="p-3">Open Batch Add dialog</td></tr>
+            <tr><td class="p-3 font-mono font-bold text-emerald-500">Space</td><td class="p-3">Pause / Resume selected download</td></tr>
+            <tr><td class="p-3 font-mono font-bold text-emerald-500">Delete</td><td class="p-3">Remove selected download</td></tr>
+            <tr><td class="p-3 font-mono font-bold text-emerald-500">Ctrl + R</td><td class="p-3">Force refresh queue table</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

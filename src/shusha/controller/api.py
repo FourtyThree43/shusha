@@ -14,14 +14,17 @@ import shutil
 from pathlib import Path
 from typing import Any
 
+from shusha.models.batch_parser import extract_urls
 from shusha.models.client import Client, XMLRPCClientException
 from shusha.models.daemon import Daemon
 from shusha.models.database import ShushaDB
 from shusha.models.logger import LoggerService
+from shusha.models.scheduler import BandwidthScheduler
 from shusha.models.settings import AppSettings
 from shusha.models.structs_downloads import Download
 from shusha.models.structs_options import Options
 from shusha.models.structs_stats import Stats
+from shusha.models.ws_client import Aria2WsClient
 
 OptionsType = Options | dict[str, Any]
 OperationResult = bool | XMLRPCClientException
@@ -37,6 +40,7 @@ class ShushaAPI:
         daemon: Daemon | None = None,
         client: Client | None = None,
         db: ShushaDB | None = None,
+        ws_client: Aria2WsClient | None = None,
         host: str | None = None,
         port: int | None = None,
         secret: str | None = None,
@@ -47,6 +51,7 @@ class ShushaAPI:
             daemon: Optional Daemon instance. If None, created using configuration.
             client: Optional Client instance. If None, created from Daemon.
             db: Optional ShushaDB instance for session persistence.
+            ws_client: Optional Aria2WsClient for real-time WebSocket events.
             host: Optional host address override for aria2 RPC.
             port: Optional port number override for aria2 RPC.
             secret: Optional secret token override for aria2 RPC authentication.
@@ -59,6 +64,42 @@ class ShushaAPI:
         self.remote = daemon or Daemon(host=cfg_host, port=cfg_port, secret=cfg_secret)
         self.client = client or Client(self.remote, secret=cfg_secret)
         self.db = db or ShushaDB(filename="shusha.db")
+        self.ws_client = ws_client or Aria2WsClient(host=cfg_host, port=cfg_port, secret=cfg_secret)
+        self.scheduler = BandwidthScheduler()
+
+    def connect_ws(self) -> bool:
+        """Connect WebSocket client for real-time aria2 notifications."""
+        return self.ws_client.connect()
+
+    def on_event(self, event_name: str, callback: Any) -> None:
+        """Register a callback for an aria2 notification event."""
+        self.ws_client.on(event_name, callback)
+
+    def off_event(self, event_name: str, callback: Any = None) -> None:
+        """Unregister a callback for an aria2 notification event."""
+        self.ws_client.off(event_name, callback)
+
+    def add_batch_urls(
+        self,
+        text_or_urls: str | list[str],
+        options: OptionsType | None = None,
+    ) -> list[Download]:
+        """Parse and add batch URLs in sequence.
+
+        Args:
+            text_or_urls: Multi-line text or list of URL strings.
+            options: Optional download configuration options.
+
+        Returns:
+            List of successfully added Download objects.
+        """
+        urls = extract_urls(text_or_urls) if isinstance(text_or_urls, str) else text_or_urls
+        added: list[Download] = []
+        for u in urls:
+            dl = self.add_uris([u], options=options)
+            if dl:
+                added.append(dl)
+        return added
 
     def __str__(self) -> str:
         """Return human-readable string representation of the API instance."""

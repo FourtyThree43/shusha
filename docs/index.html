@@ -1,11 +1,320 @@
 <!DOCTYPE html>
-<html>
-   <head>
-      <title>Shusha</title>
-   </head>
-   <body>
-      <h1>Welcome to Shusha the best download manager website! ⭐️</h1>
-      <p>How was your day? 🎉</p>
-      <a href="./about">Read the about page</a>
-   </body>
+<html lang="en" x-data="{ darkMode: true }" :class="{ 'dark': darkMode }">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shusha - Modern aria2 GUI Download Manager</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eefdf7',
+              500: '#00bc8c',
+              600: '#00a379',
+              700: '#008562',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 min-h-screen font-sans antialiased transition-colors duration-200">
+
+  <!-- Navigation -->
+  <nav class="border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <span class="text-2xl">⚡</span>
+        <span class="text-xl font-bold bg-gradient-to-r from-emerald-500 to-teal-400 bg-clip-text text-transparent">Shusha</span>
+        <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 font-medium">v0.1.0-dev</span>
+      </div>
+
+      <div class="flex items-center space-x-6">
+        <a href="index.html" class="text-sm font-semibold text-emerald-500">Home</a>
+        <a href="about.html" class="text-sm text-gray-600 dark:text-gray-400 hover:text-emerald-500">About</a>
+        <a href="api.html" class="text-sm text-gray-600 dark:text-gray-400 hover:text-emerald-500">API Reference</a>
+        <a href="manual.html" class="text-sm text-gray-600 dark:text-gray-400 hover:text-emerald-500">User Manual</a>
+        <a href="https://github.com/FourtyThree43/shusha" target="_blank" class="text-sm text-gray-600 dark:text-gray-400 hover:text-emerald-500 flex items-center space-x-1">
+          <span>GitHub</span>
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+        </a>
+        <button @click="darkMode = !darkMode" class="p-2 rounded-lg bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+          <span x-show="!darkMode">🌙</span>
+          <span x-show="darkMode">☀️</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="py-16 sm:py-24 text-center px-4 max-w-5xl mx-auto">
+    <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-sm font-medium mb-6">
+      <span>🚀</span>
+      <span>Next-Gen aria2 Frontend with Real-time WebSocket RPC</span>
+    </div>
+    <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight">
+      Turbocharge your downloads with <span class="bg-gradient-to-r from-emerald-500 to-teal-400 bg-clip-text text-transparent">Shusha</span>
+    </h1>
+    <p class="mt-6 text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+      The ultra-fast, cross-platform download manager wrapping aria2 with WebSocket events, live piece map visualization, dynamic public tracker aggregator, and pattern-based batch downloads.
+    </p>
+
+    <div class="mt-8 flex justify-center items-center space-x-4">
+      <a href="manual.html" class="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold shadow-lg shadow-emerald-500/25 transition">
+        Get Started
+      </a>
+      <a href="api.html" class="px-6 py-3 rounded-xl bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 font-semibold transition">
+        Explore API
+      </a>
+    </div>
+  </header>
+
+  <!-- Interactive Live Simulator Widget -->
+  <section class="max-w-6xl mx-auto px-4 py-8" x-data="downloadSimulator()">
+    <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+      <!-- Simulator Title Bar -->
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between bg-gray-50/50 dark:bg-gray-900/50">
+        <div class="flex items-center space-x-2">
+          <div class="w-3 h-3 rounded-full bg-rose-500"></div>
+          <div class="w-3 h-3 rounded-full bg-amber-500"></div>
+          <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
+          <span class="text-xs font-mono text-gray-500 dark:text-gray-400 ml-2">Shusha Live Interactive Simulator</span>
+        </div>
+        <div class="flex items-center space-x-4 text-xs font-mono text-gray-500 dark:text-gray-400">
+          <span class="text-emerald-500 font-semibold" x-text="`▼ DL: ${(totalSpeed / 1024 / 1024).toFixed(1)} MB/s`"></span>
+          <span class="text-teal-400 font-semibold" x-text="`▲ UL: ${(totalUpload / 1024 / 1024).toFixed(1)} MB/s`"></span>
+          <span x-text="`Active: ${tasks.filter(t => t.status === 'active').length}`"></span>
+        </div>
+      </div>
+
+      <!-- Action Toolbar -->
+      <div class="p-4 border-b border-gray-200 dark:border-gray-800 flex flex-wrap items-center justify-between gap-4 bg-white dark:bg-gray-900">
+        <div class="flex items-center space-x-2">
+          <button @click="addTask()" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center space-x-1">
+            <span>+</span> <span>Add URL</span>
+          </button>
+          <button @click="toggleAll()" class="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-xs font-medium" x-text="isPaused ? 'Resume All' : 'Pause All'"></button>
+          <button @click="clearFinished()" class="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-xs font-medium text-rose-500">Clear Finished</button>
+        </div>
+
+        <!-- Filter tabs -->
+        <div class="flex items-center space-x-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg text-xs">
+          <button @click="filter = 'all'" :class="filter === 'all' ? 'bg-white dark:bg-gray-700 shadow font-semibold' : 'text-gray-500'" class="px-2.5 py-1 rounded-md transition">All</button>
+          <button @click="filter = 'active'" :class="filter === 'active' ? 'bg-white dark:bg-gray-700 shadow font-semibold' : 'text-gray-500'" class="px-2.5 py-1 rounded-md transition">Active</button>
+          <button @click="filter = 'complete'" :class="filter === 'complete' ? 'bg-white dark:bg-gray-700 shadow font-semibold' : 'text-gray-500'" class="px-2.5 py-1 rounded-md transition">Completed</button>
+          <button @click="filter = 'paused'" :class="filter === 'paused' ? 'bg-white dark:bg-gray-700 shadow font-semibold' : 'text-gray-500'" class="px-2.5 py-1 rounded-md transition">Paused</button>
+        </div>
+      </div>
+
+      <!-- Task List Grid -->
+      <div class="divide-y divide-gray-200 dark:divide-gray-800 max-h-80 overflow-y-auto">
+        <template x-for="task in filteredTasks" :key="task.id">
+          <div @click="selectedTask = task" :class="selectedTask.id === task.id ? 'bg-emerald-50/50 dark:bg-emerald-950/20' : ''" class="p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer transition">
+            <div class="flex-1 pr-4">
+              <div class="flex items-center space-x-2">
+                <span class="text-sm font-semibold truncate" x-text="task.name"></span>
+                <span class="text-xs px-2 py-0.5 rounded uppercase font-bold"
+                  :class="{
+                    'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400': task.status === 'active',
+                    'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400': task.status === 'complete',
+                    'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400': task.status === 'paused'
+                  }"
+                  x-text="task.status"></span>
+              </div>
+              <!-- Progress bar -->
+              <div class="mt-2 w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2 overflow-hidden">
+                <div class="bg-gradient-to-r from-emerald-500 to-teal-400 h-2 rounded-full transition-all duration-300" :style="`width: ${task.progress}%`"></div>
+              </div>
+              <div class="mt-1 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                <span x-text="`${task.progress.toFixed(1)}% (${(task.completedSize / 1024 / 1024).toFixed(1)} MB / ${(task.totalSize / 1024 / 1024).toFixed(1)} MB)`"></span>
+                <span x-text="task.status === 'active' ? `${(task.speed / 1024 / 1024).toFixed(1)} MB/s • ETA: ${task.eta}s` : (task.status === 'complete' ? 'Done' : 'Paused')"></span>
+              </div>
+            </div>
+
+            <!-- Task controls -->
+            <div class="flex items-center space-x-2" @click.stop>
+              <button @click="toggleTask(task)" class="p-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-xs">
+                <span x-show="task.status === 'active'">⏸</span>
+                <span x-show="task.status !== 'active'">▶</span>
+              </button>
+              <button @click="removeTask(task)" class="p-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-xs text-rose-500">✕</button>
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <!-- Live Piece Map Drawer for Selected Task -->
+      <div class="p-4 border-t border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50" x-show="selectedTask">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold uppercase tracking-wider text-gray-500">Live Bitfield Piece Map</span>
+          <span class="text-xs font-mono text-emerald-500" x-text="`${selectedTask ? selectedTask.pieces.filter(p => p).length : 0} / ${selectedTask ? selectedTask.pieces.length : 0} chunks downloaded`"></span>
+        </div>
+        <div class="grid grid-cols-24 sm:grid-cols-48 gap-1">
+          <template x-for="(piece, idx) in (selectedTask ? selectedTask.pieces : [])" :key="idx">
+            <div class="h-3 rounded-sm transition-colors duration-150" :class="piece ? 'bg-emerald-500 shadow-sm shadow-emerald-500/50' : 'bg-gray-300 dark:bg-gray-800'"></div>
+          </template>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Grid -->
+  <section class="max-w-7xl mx-auto px-4 py-20">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl font-extrabold sm:text-4xl">Engineering Highlights</h2>
+      <p class="mt-4 text-lg text-gray-600 dark:text-gray-400">Built for power users, developers, and media archivers.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="p-6 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm hover:border-emerald-500/50 transition">
+        <div class="text-3xl mb-4">⚡</div>
+        <h3 class="text-xl font-bold mb-2">WebSocket Push Engine</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+          Zero-delay asynchronous notification bus. State changes, completion events, and speed telemetry stream in real time over JSON-RPC 2.0 without polling lag.
+        </p>
+      </div>
+
+      <div class="p-6 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm hover:border-emerald-500/50 transition">
+        <div class="text-3xl mb-4">🧩</div>
+        <h3 class="text-xl font-bold mb-2">Visual Piece Map</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+          Bitfield chunk matrix displays piece-by-piece verified download progress. Inspect individual chunks, verification state, and piece hashes in real time.
+        </p>
+      </div>
+
+      <div class="p-6 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm hover:border-emerald-500/50 transition">
+        <div class="text-3xl mb-4">🌐</div>
+        <h3 class="text-xl font-bold mb-2">Public Tracker Aggregator</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+          Auto-syncs with daily updated public BitTorrent tracker lists (inspired by Motrix), maximizing peer discovery and download acceleration on magnet links.
+        </p>
+      </div>
+
+      <div class="p-6 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm hover:border-emerald-500/50 transition">
+        <div class="text-3xl mb-4">🔢</div>
+        <h3 class="text-xl font-bold mb-2">Smart Pattern Sequences</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+          Enter range patterns like <code>http://site.com/ep[01-24].mp4</code> to instantly batch-add series, archives, or split segments with clipboard monitoring.
+        </p>
+      </div>
+
+      <div class="p-6 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm hover:border-emerald-500/50 transition">
+        <div class="text-3xl mb-4">⏱️</div>
+        <h3 class="text-xl font-bold mb-2">Bandwidth Scheduler</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+          Configure automated time-window throttling profiles (e.g. daytime limits for work hours, unlimited bandwidth overnight) with zero manual intervention.
+        </p>
+      </div>
+
+      <div class="p-6 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm hover:border-emerald-500/50 transition">
+        <div class="text-3xl mb-4">🖥️</div>
+        <h3 class="text-xl font-bold mb-2">Cross-Platform Modern UI</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+          Crisp High-DPI vector SVG icons and native system tray integrations across Linux (Wayland/X11), macOS (Retina), and Windows 10/11.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-gray-200 dark:border-gray-800 py-8 text-center text-xs text-gray-500">
+    <p>Shusha Download Manager • Open Source under MIT License • Google Deepmind Pair Programming</p>
+  </footer>
+
+  <!-- Alpine.js Simulator Script -->
+  <script>
+    function downloadSimulator() {
+      return {
+        filter: 'all',
+        isPaused: false,
+        tasks: [
+          { id: 1, name: 'Ubuntu-24.04-desktop-amd64.iso', status: 'active', totalSize: 6144000000, completedSize: 3686400000, speed: 12582912, progress: 60.0, eta: 195, pieces: Array(48).fill(false).map((_, i) => i < 29) },
+          { id: 2, name: 'Blender-4.2-linux-x64.tar.xz', status: 'active', totalSize: 524288000, completedSize: 419430400, speed: 4194304, progress: 80.0, eta: 25, pieces: Array(48).fill(false).map((_, i) => i < 38) },
+          { id: 3, name: 'Python-3.14-source.tar.gz', status: 'complete', totalSize: 26214400, completedSize: 26214400, speed: 0, progress: 100.0, eta: 0, pieces: Array(48).fill(true) }
+        ],
+        selectedTask: null,
+        get totalSpeed() {
+          return this.tasks.reduce((acc, t) => acc + (t.status === 'active' ? t.speed : 0), 0);
+        },
+        get totalUpload() {
+          return Math.floor(this.totalSpeed * 0.15);
+        },
+        get filteredTasks() {
+          if (this.filter === 'all') return this.tasks;
+          return this.tasks.filter(t => t.status === this.filter);
+        },
+        init() {
+          this.selectedTask = this.tasks[0];
+          setInterval(() => {
+            if (this.isPaused) return;
+            this.tasks.forEach(t => {
+              if (t.status === 'active') {
+                t.completedSize = Math.min(t.totalSize, t.completedSize + t.speed);
+                t.progress = (t.completedSize / t.totalSize) * 100;
+                const donePieces = Math.floor((t.progress / 100) * t.pieces.length);
+                t.pieces = t.pieces.map((_, idx) => idx < donePieces);
+                if (t.completedSize >= t.totalSize) {
+                  t.status = 'complete';
+                  t.speed = 0;
+                }
+              }
+            });
+          }, 1000);
+        },
+        addTask() {
+          const id = Date.now();
+          const newTask = {
+            id,
+            name: `Sample-Asset-Archive-part[${this.tasks.length + 1}].zip`,
+            status: 'active',
+            totalSize: 314572800,
+            completedSize: 0,
+            speed: 5242880,
+            progress: 0.0,
+            eta: 60,
+            pieces: Array(48).fill(false)
+          };
+          this.tasks.unshift(newTask);
+          this.selectedTask = newTask;
+        },
+        toggleTask(task) {
+          if (task.status === 'active') {
+            task.status = 'paused';
+            task.speed = 0;
+          } else if (task.status === 'paused') {
+            task.status = 'active';
+            task.speed = 4194304;
+          }
+        },
+        toggleAll() {
+          this.isPaused = !this.isPaused;
+          this.tasks.forEach(t => {
+            if (this.isPaused && t.status === 'active') t.status = 'paused';
+            else if (!this.isPaused && t.status === 'paused') t.status = 'active';
+          });
+        },
+        removeTask(task) {
+          this.tasks = this.tasks.filter(t => t.id !== task.id);
+          if (this.selectedTask && this.selectedTask.id === task.id) {
+            this.selectedTask = this.tasks[0] || null;
+          }
+        },
+        clearFinished() {
+          this.tasks = this.tasks.filter(t => t.status !== 'complete');
+          if (this.selectedTask && this.selectedTask.status === 'complete') {
+            this.selectedTask = this.tasks[0] || null;
+          }
+        }
+      };
+    }
+  </script>
+</body>
 </html>
