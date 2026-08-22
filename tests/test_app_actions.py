@@ -200,6 +200,10 @@ class TestAppActions(unittest.TestCase):
                 self.app.open_batch_add()
                 mock_batch_win.assert_called_once()
 
+                with patch("shusha.views.app.CreateTorrentWindow") as mock_ct_win:
+                    self.app.open_create_torrent()
+                    mock_ct_win.assert_called_once()
+
                 self.app.open_uri_manager()
                 mock_uri_win.assert_called_once()
 
@@ -283,6 +287,27 @@ class TestAppActions(unittest.TestCase):
 
         self.assertIsNotNone(self.app.daemon_status_var)
         self.assertIsNotNone(self.app.daemon_status_btn)
+
+    def test_clipboard_and_webhook_and_category_filtering(self):
+        with patch.object(self.app, "show_toast") as mock_toast:
+            self.app._on_clipboard_url("https://example.com/movie.mp4")
+            mock_toast.assert_called_once()
+
+        with patch.object(self.app, "download_thread") as mock_dl_thread:
+            self.app._on_webhook_download({
+                "url": "https://example.com/package.zip",
+                "filename": "archive.zip",
+                "headers": {"User-Agent": "CustomAgent/1.0"},
+            })
+            mock_dl_thread.assert_called_once_with(
+                "https://example.com/package.zip",
+                {"out": "archive.zip", "user-agent": "CustomAgent/1.0"},
+            )
+
+        # Test category selection
+        self.app.category_combo.set("Videos")
+        self.app.on_category_changed()
+        self.assertEqual(self.app.active_category, "Videos")
 
 
 if __name__ == "__main__":

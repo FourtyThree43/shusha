@@ -1,312 +1,194 @@
+"""Add Download Dialog for URLs, Torrents, and Metalinks.
+
+Supports:
+- Multi-line URL entry with live category auto-detection.
+- Category folder routing (Videos, Audio, Archives, Documents, Programs, Images).
+- Checksum verification (sha-256, md5).
+- Advanced connection splits, renaming, custom User-Agent, Referer, Cookies, and Proxy.
+"""
+
+from __future__ import annotations
+
 import pathlib
 import tkinter as tk
 from tkinter import filedialog
 from tkinter.filedialog import askdirectory
+from typing import Any
 
 import ttkbootstrap as ttk
 
+from shusha.models.category_manager import CategoryManager
 from shusha.models.utilities import download_dir
 
 DEFAULT_DIR = download_dir()
-
-
-class CustomNotebook(ttk.Frame):
-    def __init__(self, master=None, **kwargs):
-        super().__init__(master, **kwargs)
-        self.notebook = ttk.Notebook(self)
-        self.notebook.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
-
-    def add_page(self, page_name="New Page"):
-        new_page = ttk.Frame(self.notebook)
-        self.notebook.add(new_page, text=page_name)
-        return new_page
+CATEGORIES = ["Auto-Detect", "Video", "Audio", "Archive", "Document", "Software", "Image", "Other"]
 
 
 class AddWindow(ttk.Toplevel):
-    def __init__(self, callback):
-        super().__init__(callback)
-        self.title("Add Download")
-        self.geometry("720x380")
-        self.resizable(False, False)
+    """Modern modal dialog for adding new single or multi-URL downloads."""
+
+    def __init__(self, callback: Any) -> None:
+        super().__init__(
+            title="Add Download - Shusha",
+            size=(760, 520),
+            resizable=(True, True),
+        )
+        self.minsize(640, 440)
         self.config(padx=15, pady=15)
-
         self.callback = callback
-        # create notebook
-        add_dl_notebook = ttk.Notebook(self)
-        add_dl_notebook.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
-        # application variables
-        _path = DEFAULT_DIR
-        _rename = ""
-        _split = 8
-
-        self.path_var = ttk.StringVar(value=str(_path))
+        # Form variables
+        self.path_var = ttk.StringVar(value=str(DEFAULT_DIR))
         self.torrent_file_var = ttk.StringVar(value="")
-        self.checkbox_var = tk.BooleanVar(value=False)
-        self.rename_var = ttk.StringVar(value=_rename)
-        self.split_var = ttk.IntVar(value=_split)
+        self.category_var = ttk.StringVar(value="Auto-Detect")
+        self.rename_var = ttk.StringVar(value="")
+        self.split_var = ttk.IntVar(value=8)
+        self.checksum_var = ttk.StringVar(value="")
+        self.user_agent_var = ttk.StringVar(value="")
+        self.referer_var = ttk.StringVar(value="")
+        self.header_var = ttk.StringVar(value="")
+        self.proxy_var = ttk.StringVar(value="")
 
-        self.create_page_frames(add_dl_notebook)
-        self.create_url_page(add_dl_notebook)
-        self.create_torrent_page(add_dl_notebook)
-        self.create_schedule_page(add_dl_notebook)
+        # Notebook container
+        self.notebook = ttk.Notebook(self)
+        self.notebook.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
-    def create_page_frames(self, notebook):
-        """Create notebook pages"""
-        # URL Page
-        self.url_page = ttk.Frame(notebook)
-        notebook.add(self.url_page, text="URL")
+        self._build_url_page()
+        self._build_torrent_page()
+        self._build_advanced_page()
 
-        # Torrent Page
-        self.torrent_page = ttk.Frame(notebook)
-        notebook.add(self.torrent_page, text="Torrent")
+    def _build_url_page(self) -> None:
+        """Create URL download page."""
+        page = ttk.Frame(self.notebook, padding=10)
+        self.notebook.add(page, text="URL Download")
 
-        # Schedule Page
-        self.schedule_page = ttk.Frame(notebook)
-        notebook.add(self.schedule_page, text="Schedule")
+        # URLs text input
+        url_row = ttk.Frame(page)
+        url_row.pack(fill=tk.BOTH, expand=True, pady=(0, 8))
 
-    def create_url_page(self, notebook):
-        """Create URL page"""
-        #  header for Url and Options
-        url_page = notebook.nametowidget(notebook.tabs()[0])
+        ttk.Label(url_row, text="Download URLs (one per line):").pack(anchor=tk.W, pady=(0, 2))
+        self.urls = ttk.ScrolledText(url_row, wrap=tk.WORD, height=4)
+        self.urls.pack(fill=tk.BOTH, expand=True)
+        self.urls.bind("<KeyRelease>", self._on_url_text_change)
 
-        url_row = ttk.Frame(url_page)
-        url_row.pack(fill=tk.X, expand=tk.YES)
-        url_lbl = ttk.Label(url_row, text="URLs:", width=5)
-        url_lbl.pack(side=tk.LEFT, padx=(15, 0))
-        self.urls = ttk.ScrolledText(
-            url_row,
-            wrap=tk.WORD,
-            width=97,
-            height=6,
-        )
-        self.urls.pack(side=tk.LEFT, expand=True, padx=5, pady=5)
+        # Options Container
+        opt_lf = ttk.Labelframe(page, text="Download Options & Category", padding=10)
+        opt_lf.pack(fill=tk.X, pady=(0, 10))
 
-        # header and labelframe option container
-        option_lf = ttk.Labelframe(url_page, text="File Download Options")
-        option_lf.pack(
-            fill=tk.BOTH,
-            expand=tk.YES,
-            padx=5,
-            ipady=30,
-            anchor=tk.N,
-        )
+        grid = ttk.Frame(opt_lf)
+        grid.pack(fill=tk.X)
 
-        # rename row
-        rename_row = ttk.Frame(option_lf)
-        rename_row.pack(fill=tk.X, expand=tk.YES)
+        # Category
+        ttk.Label(grid, text="Category:").grid(row=0, column=0, sticky=tk.W, pady=3)
+        cat_combo = ttk.Combobox(grid, textvariable=self.category_var, values=CATEGORIES, width=14, state="readonly")
+        cat_combo.grid(row=0, column=1, sticky=tk.W, pady=3, padx=(5, 15))
+        cat_combo.bind("<<ComboboxSelected>>", self._on_category_selected)
 
-        checkbox = ttk.Checkbutton(
-            rename_row,
-            variable=self.checkbox_var,
-            command=lambda: self.on_checkbox_click(
-                self.checkbox_var,
-                self.rename_ent1,
-            ),
-            bootstyle="warning",
-        )
-        checkbox.pack(side=tk.LEFT, padx=(15, 0))
+        # Splits
+        ttk.Label(grid, text="Splits:").grid(row=0, column=2, sticky=tk.W, pady=3)
+        ttk.Spinbox(grid, textvariable=self.split_var, from_=1, to=64, width=5).grid(row=0, column=3, sticky=tk.W, pady=3, padx=5)
 
-        rename_lbl = ttk.Label(rename_row, text="Rename:", width=8)
-        rename_lbl.pack(side=tk.LEFT, padx=(15, 0))
-        self.rename_ent1 = ttk.Entry(
-            rename_row,
-            textvariable=self.rename_var,
-            bootstyle="warning",
-        )
-        self.rename_ent1.pack(side=tk.LEFT, fill=tk.X, expand=tk.YES, padx=5)
+        # Rename
+        ttk.Label(grid, text="Rename File:").grid(row=1, column=0, sticky=tk.W, pady=3)
+        ttk.Entry(grid, textvariable=self.rename_var, width=30).grid(row=1, column=1, columnspan=3, sticky=tk.EW, pady=3, padx=5)
 
-        splits_lbl = ttk.Label(rename_row, text="Splits:", width=8)
-        splits_lbl.pack(side=tk.LEFT, padx=(15, 0))
-        splits_spinbox = ttk.Spinbox(
-            rename_row,
-            textvariable=self.split_var,
-            from_=1,
-            to=64,
-            width=3,
-            bootstyle="warning",
-        )
-        splits_spinbox.pack(side=tk.LEFT, padx=(0, 15))
+        # Checksum
+        ttk.Label(grid, text="Checksum (sha-256=...):").grid(row=2, column=0, sticky=tk.W, pady=3)
+        ttk.Entry(grid, textvariable=self.checksum_var, width=30).grid(row=2, column=1, columnspan=3, sticky=tk.EW, pady=3, padx=5)
 
-        # path row
-        path_row = ttk.Frame(option_lf)
-        path_row.pack(fill=tk.X, expand=tk.YES)
-        path_lbl = ttk.Label(path_row, text="Save to:", width=8)
-        path_lbl.pack(side=tk.LEFT, padx=(15, 0))
-        path_ent = ttk.Entry(
-            path_row,
-            textvariable=self.path_var,
-            bootstyle="warning",
-        )
-        path_ent.pack(side=tk.LEFT, fill=tk.X, expand=tk.YES, padx=5)
+        # Destination folder
+        path_row = ttk.Frame(opt_lf)
+        path_row.pack(fill=tk.X, pady=(6, 0))
+        ttk.Label(path_row, text="Save to:").pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Entry(path_row, textvariable=self.path_var).pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
+        ttk.Button(path_row, text="Browse...", command=self._on_browse, bootstyle="secondary-outline").pack(side=tk.RIGHT)
 
-        browse_btn = ttk.Button(
-            master=path_row,
-            text="Browse",
-            command=self.on_browse,
-            width=8,
-            bootstyle="warning",
-        )
-        browse_btn.pack(side=tk.LEFT, padx=5)
+        # Bottom buttons
+        btn_bar = ttk.Frame(page)
+        btn_bar.pack(fill=tk.X, side=tk.BOTTOM)
+        ttk.Button(btn_bar, text="Cancel", command=self.destroy, bootstyle="secondary", width=10).pack(side=tk.RIGHT, padx=(5, 0))
+        ttk.Button(btn_bar, text="Download", command=self._submit_urls, bootstyle="success", width=12).pack(side=tk.RIGHT)
 
-        # submit row
-        submit_row = ttk.Frame(url_page)
-        submit_row.pack(fill=tk.X, expand=tk.YES, pady=(20, 0))
+    def _build_torrent_page(self) -> None:
+        """Create Torrent / Metalink page."""
+        page = ttk.Frame(self.notebook, padding=10)
+        self.notebook.add(page, text="Torrent / Metalink")
 
-        submit_btn = ttk.Button(
-            master=submit_row,
-            text="Submit",
-            command=lambda: self.submit(),
-            width=8,
-            bootstyle="success",
-        )
-        submit_btn.pack(side=tk.RIGHT, padx=5)
+        t_row = ttk.Frame(page)
+        t_row.pack(fill=tk.X, pady=(10, 15))
 
-        cancel_btn = ttk.Button(
-            master=submit_row,
-            text="Cancel",
-            command=lambda: self.destroy(),
-            width=8,
-            bootstyle="danger",
-        )
-        cancel_btn.pack(side=tk.RIGHT, padx=5)
+        ttk.Label(t_row, text="File:").pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Entry(t_row, textvariable=self.torrent_file_var).pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
+        ttk.Button(t_row, text="Browse...", command=self._on_browse_torrent, bootstyle="info-outline").pack(side=tk.RIGHT)
 
-    def create_torrent_page(self, notebook):
-        """Create Torrent page"""
-        torrent_page = notebook.nametowidget(notebook.tabs()[1])
+        opt_lf = ttk.Labelframe(page, text="Save Location", padding=10)
+        opt_lf.pack(fill=tk.X, pady=(0, 15))
 
-        torrent_row = ttk.Frame(torrent_page)
-        torrent_row.pack(fill=tk.X, expand=tk.YES, pady=(10, 5))
+        path_row = ttk.Frame(opt_lf)
+        path_row.pack(fill=tk.X)
+        ttk.Label(path_row, text="Save to:").pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Entry(path_row, textvariable=self.path_var).pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
+        ttk.Button(path_row, text="Browse...", command=self._on_browse, bootstyle="secondary-outline").pack(side=tk.RIGHT)
 
-        torrent_lbl = ttk.Label(torrent_row, text="Torrent File:", width=12)
-        torrent_lbl.pack(side=tk.LEFT, padx=(15, 0))
-        self.torrent_ent = ttk.Entry(
-            torrent_row,
-            textvariable=self.torrent_file_var,
-            bootstyle="warning",
-        )
-        self.torrent_ent.pack(
-            side=tk.LEFT,
-            fill=tk.X,
-            expand=tk.YES,
-            padx=5,
-        )
+        btn_bar = ttk.Frame(page)
+        btn_bar.pack(fill=tk.X, side=tk.BOTTOM)
+        ttk.Button(btn_bar, text="Cancel", command=self.destroy, bootstyle="secondary", width=10).pack(side=tk.RIGHT, padx=(5, 0))
+        ttk.Button(btn_bar, text="Start Torrent", command=self._submit_torrent, bootstyle="success", width=14).pack(side=tk.RIGHT)
 
-        browse_t_btn = ttk.Button(
-            torrent_row,
-            text="Browse...",
-            command=self.on_browse_torrent,
-            bootstyle="warning-outline",
-            width=10,
-        )
-        browse_t_btn.pack(side=tk.LEFT, padx=(0, 15))
+    def _build_advanced_page(self) -> None:
+        """Create Advanced HTTP / Network options page."""
+        page = ttk.Frame(self.notebook, padding=10)
+        self.notebook.add(page, text="Advanced Network")
 
-        # header and labelframe option container
-        option_lf = ttk.Labelframe(torrent_page, text="Torrent Download Options")
-        option_lf.pack(
-            fill=tk.BOTH,
-            expand=tk.YES,
-            padx=5,
-            ipady=10,
-            anchor=tk.N,
-        )
+        lf = ttk.Labelframe(page, text="HTTP Headers & Proxies", padding=10)
+        lf.pack(fill=tk.BOTH, expand=True)
 
-        # path row
-        path_row = ttk.Frame(option_lf)
-        path_row.pack(fill=tk.X, expand=tk.YES, pady=5)
+        grid = ttk.Frame(lf)
+        grid.pack(fill=tk.X)
 
-        path_lbl = ttk.Label(path_row, text="Save to:", width=8)
-        path_lbl.pack(side=tk.LEFT, padx=(15, 0))
-        path_ent = ttk.Entry(
-            path_row,
-            textvariable=self.path_var,
-            bootstyle="warning",
-        )
-        path_ent.pack(side=tk.LEFT, fill=tk.X, expand=tk.YES, padx=5)
+        fields = [
+            ("User-Agent:", self.user_agent_var),
+            ("Referer:", self.referer_var),
+            ("Custom Header (Key: Value):", self.header_var),
+            ("Proxy (e.g. http://127.0.0.1:8080):", self.proxy_var),
+        ]
 
-        browse_btn = ttk.Button(
-            master=path_row,
-            text="Browse",
-            command=self.on_browse,
-            width=8,
-            bootstyle="warning",
-        )
-        browse_btn.pack(side=tk.LEFT, padx=5)
+        for idx, (lbl_text, var) in enumerate(fields):
+            ttk.Label(grid, text=lbl_text).grid(row=idx, column=0, sticky=tk.W, pady=4)
+            ttk.Entry(grid, textvariable=var, width=40).grid(row=idx, column=1, sticky=tk.EW, pady=4, padx=5)
 
-        # submit row
-        submit_row = ttk.Frame(torrent_page)
-        submit_row.pack(fill=tk.X, expand=tk.YES, pady=(10, 0))
+        grid.columnconfigure(1, weight=1)
 
-        submit_btn = ttk.Button(
-            master=submit_row,
-            text="Submit",
-            command=self.submit_torrent,
-            width=8,
-            bootstyle="success",
-        )
-        submit_btn.pack(side=tk.RIGHT, padx=5)
+    def _on_url_text_change(self, event: Any = None) -> None:
+        """Auto-detect category from first URL in text area."""
+        if self.category_var.get() != "Auto-Detect":
+            return
 
-        cancel_btn = ttk.Button(
-            master=submit_row,
-            text="Cancel",
-            command=self.destroy,
-            width=8,
-            bootstyle="danger",
-        )
-        cancel_btn.pack(side=tk.RIGHT, padx=5)
+        lines = self.urls.get("1.0", tk.END).strip().split("\n")
+        first_url = lines[0].strip() if lines else ""
+        if first_url:
+            detected_cat = CategoryManager.get_category(first_url)
+            if detected_cat != "Other":
+                target_dir = CategoryManager.get_category_directory(DEFAULT_DIR, detected_cat, auto_subfolder=True)
+                self.path_var.set(str(target_dir))
 
-    def create_schedule_page(self, notebook):
-        """Create Schedule page"""
-        schedule_page = notebook.nametowidget(notebook.tabs()[2])
-        schedule_row = ttk.Frame(schedule_page)
-        schedule_row.pack(fill=tk.X, expand=tk.YES)
-        schedule_lbl = ttk.Label(schedule_row, text="Schedule", width=8)
-        schedule_lbl.pack(side=tk.LEFT, padx=(15, 0))
-        schedule_ent = ttk.Entry(schedule_row)
-        schedule_ent.pack(side=tk.LEFT, fill=tk.X, expand=tk.YES, padx=5)
+    def _on_category_selected(self, event: Any = None) -> None:
+        """Update destination path when category is manually selected."""
+        cat = self.category_var.get()
+        if cat != "Auto-Detect":
+            target_dir = CategoryManager.get_category_directory(DEFAULT_DIR, cat, auto_subfolder=True)
+            self.path_var.set(str(target_dir))
 
-        add_btn = ttk.Button(
-            master=schedule_row,
-            text="Add",
-            command=lambda: print("add schedule"),
-            width=8,
-        )
-        add_btn.pack(side=tk.LEFT, padx=5)
-
-    def on_browse(self):
-        """Callback for directory browse"""
-        path = askdirectory(title="Browse directory")
+    def _on_browse(self) -> None:
+        path = askdirectory(title="Select Download Directory", initialdir=self.path_var.get())
         if path:
             self.path_var.set(path)
 
-    def parse_lines_to_stringvars(self):
-        content = self.urls.get("1.0", tk.END).strip()
-        if content:
-            lines = content.split("\n")
-            var_list = [ttk.StringVar(value=line) for line in lines]
-            return var_list
-
-    def submit(self):
-        """Callback for submit button"""
-        uris = self.parse_lines_to_stringvars()
-        dpath = pathlib.Path(self.path_var.get())
-        split = self.split_var.get()
-        rename = self.rename_var.get()
-
-        opts = {"dir": str(dpath), "split": split, "out": rename}
-
-        if uris:
-            self.callback(uris, opts)
-
-        self.destroy()
-
-    def on_browse_torrent(self):
-        """Callback to browse for .torrent and .metalink files."""
+    def _on_browse_torrent(self) -> None:
         file_path = filedialog.askopenfilename(
             title="Select Torrent or Metalink file",
             filetypes=[
-                ("Torrent files", "*.torrent"),
-                ("Metalink files", "*.metalink"),
+                ("Torrent / Metalink files", "*.torrent;*.metalink"),
                 ("All files", "*.*"),
             ],
             parent=self,
@@ -314,8 +196,42 @@ class AddWindow(ttk.Toplevel):
         if file_path:
             self.torrent_file_var.set(file_path)
 
-    def submit_torrent(self):
-        """Callback to submit torrent file download."""
+    def _submit_urls(self) -> None:
+        content = self.urls.get("1.0", tk.END).strip()
+        if not content:
+            self.destroy()
+            return
+
+        lines = [line.strip() for line in content.split("\n") if line.strip()]
+        var_list = [ttk.StringVar(value=line) for line in lines]
+        dpath = pathlib.Path(self.path_var.get())
+        split = self.split_var.get()
+        rename = self.rename_var.get().strip()
+        checksum = self.checksum_var.get().strip()
+
+        opts: dict[str, Any] = {
+            "dir": str(dpath),
+            "split": split,
+        }
+        if rename:
+            opts["out"] = rename
+        if checksum:
+            opts["checksum"] = checksum
+        if self.user_agent_var.get().strip():
+            opts["user-agent"] = self.user_agent_var.get().strip()
+        if self.referer_var.get().strip():
+            opts["referer"] = self.referer_var.get().strip()
+        if self.header_var.get().strip():
+            opts["header"] = self.header_var.get().strip()
+        if self.proxy_var.get().strip():
+            opts["all-proxy"] = self.proxy_var.get().strip()
+
+        if var_list:
+            self.callback(var_list, opts)
+
+        self.destroy()
+
+    def _submit_torrent(self) -> None:
         t_path = self.torrent_file_var.get().strip()
         dpath = pathlib.Path(self.path_var.get())
         opts = {"dir": str(dpath)}
@@ -323,14 +239,10 @@ class AddWindow(ttk.Toplevel):
             self.callback([ttk.StringVar(value=t_path)], opts)
         self.destroy()
 
-    def on_checkbox_click(self, checkbox_var, entry_box):
-        if checkbox_var.get():
-            entry_box.config(state=tk.NORMAL)
-        else:
-            entry_box.config(state=tk.DISABLED)
+    def submit(self) -> None:
+        """Alias for submit_urls."""
+        self._submit_urls()
 
-
-if __name__ == "__main__":
-    root = ttk.Window(themename="bootstrap-dark", position=(900, 100))
-    app = AddWindow(callback=lambda u, o: None)
-    root.mainloop()
+    def submit_torrent(self) -> None:
+        """Alias for submit_torrent."""
+        self._submit_torrent()

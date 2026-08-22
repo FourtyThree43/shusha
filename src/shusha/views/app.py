@@ -13,7 +13,10 @@ import ttkbootstrap as ttk
 from ttkbootstrap import TableRow, Tableview, ToastNotification, ToolTip
 
 from shusha.controller.api import ShushaAPI as Api
+from shusha.models.category_manager import CategoryManager
+from shusha.models.clipboard_watcher import ClipboardWatcher
 from shusha.models.logger import LoggerService
+from shusha.models.post_actions import PostActions
 from shusha.models.structs_downloads import Download
 from shusha.models.structs_stats import Stats
 from shusha.models.svg_assets import get_svg_tk_image
@@ -22,8 +25,10 @@ from shusha.models.utilities import (
     send_desktop_notification,
     user_log_dir,
 )
+from shusha.models.webhook_server import WebhookServer
 from shusha.views.add_win import AddWindow
 from shusha.views.batch_add_win import BatchAddWindow
+from shusha.views.create_torrent_win import CreateTorrentWindow
 from shusha.views.inspector_win import DownloadInspectorWindow
 from shusha.views.settings_win import SettingsWindow
 from shusha.views.status_win import DownloadWindow
@@ -105,6 +110,13 @@ class Aria2Gui(ttk.Frame):
                 if tk_img:
                     self.svg_icons[icon_k] = tk_img
 
+        # Initialize Clipboard Watcher and Webhook Server
+        self.clipboard_watcher = ClipboardWatcher(on_url_detected=self._on_clipboard_url)
+        self.clipboard_watcher.start()
+
+        self.webhook_server = WebhookServer(port=6810, on_download_received=self._on_webhook_download)
+        self.webhook_server.start()
+
         self.create_buttonbar()
         self.create_table_view()
         self.create_bottom_bar()
@@ -120,11 +132,35 @@ class Aria2Gui(ttk.Frame):
 
         self.after(1000, self.get_stats)
 
+    def _on_clipboard_url(self, url: str) -> None:
+        """Handle downloadable URL captured by clipboard monitor."""
+        logger.log(f"Clipboard download link captured: {url}", level="info")
+        self.show_toast(f"Captured URL: {url[:36]}...")
+
+    def _on_webhook_download(self, payload: dict[str, Any]) -> None:
+        """Handle incoming download dispatched by browser extension or webhook."""
+        url = str(payload.get("url") or payload.get("uri") or "").strip()
+        if not url:
+            return
+        options: dict[str, Any] = {}
+        if "dir" in payload:
+            options["dir"] = payload["dir"]
+        if "filename" in payload or "out" in payload:
+            options["out"] = payload.get("filename") or payload.get("out")
+        if "headers" in payload and isinstance(payload["headers"], dict):
+            for k, v in payload["headers"].items():
+                if k.lower() == "user-agent":
+                    options["user-agent"] = str(v)
+                elif k.lower() == "referer":
+                    options["referer"] = str(v)
+        self.download_thread(url, options)
+
     def _on_aria2_ws_event(self, event_name: str, params: dict[str, Any]) -> None:
         """Handle incoming real-time push notification from aria2 daemon."""
         gid = str(params.get("gid", ""))
         if "Complete" in event_name:
             self.show_toast(f"Download Finished: {gid}")
+            PostActions.play_alert_sound()
         elif "Error" in event_name:
             self.show_toast(f"Download Error: {gid}")
         self.refresh_downloads_table()
@@ -160,6 +196,17 @@ class Aria2Gui(ttk.Frame):
         )
         batch_btn.pack(side=tk.LEFT, padx=(1, 0), pady=1)
         ToolTip(batch_btn, text="Batch Add URLs & Pattern ranges", bootstyle="info")
+
+        torrent_btn = ttk.Button(
+            master=opts_row,
+            text="New Torrent",
+            image="add-download",
+            command=self.open_create_torrent,
+            width=10,
+            bootstyle="outline-dark",
+        )
+        torrent_btn.pack(side=tk.LEFT, padx=(1, 0), pady=1)
+        ToolTip(torrent_btn, text="Create .torrent file & Magnet Link", bootstyle="info")
 
         start_btn = ttk.Button(
             master=opts_row,
@@ -387,6 +434,12 @@ class Aria2Gui(ttk.Frame):
             "Waiting",
             "Error",
             "Inactive",
+            "Videos",
+            "Audio",
+            "Archives",
+            "Documents",
+            "Software",
+            "Images",
         ]
 
         self.category_combo = ttk.Combobox(
@@ -544,6 +597,12 @@ class Aria2Gui(ttk.Frame):
                 self.download_thread(uri, options)
 
         AddWindow(callback=handle_result)
+
+    def open_create_torrent(self):
+        """Open the CreateTorrentWindow modal dialog."""
+        def handle_created(t_path: Path, magnet: str):
+            self.show_toast(f"Created Torrent: {t_path.name}")
+        CreateTorrentWindow(master=self, on_created=handle_created)
 
     def download_thread(self, uri, options: dict):
         """Start a download from URI or torrent file in a separate thread."""
@@ -780,6 +839,18 @@ class Aria2Gui(ttk.Frame):
                     return bool(d.has_failed)
                 if cat == "inactive":
                     return bool(d.is_paused or d.is_complete or d.has_failed)
+                if cat in ("videos", "video"):
+                    return CategoryManager.get_category(d.name or "") == "Video"
+                if cat in ("audio", "music"):
+                    return CategoryManager.get_category(d.name or "") == "Audio"
+                if cat in ("archives", "archive"):
+                    return CategoryManager.get_category(d.name or "") == "Archive"
+                if cat in ("documents", "document"):
+                    return CategoryManager.get_category(d.name or "") == "Document"
+                if cat in ("software", "programs", "applications"):
+                    return CategoryManager.get_category(d.name or "") == "Software"
+                if cat in ("images", "image", "photos"):
+                    return CategoryManager.get_category(d.name or "") == "Image"
                 return True
 
             filtered = [d for d in downloads if matches(d, self.active_category)]
@@ -1014,6 +1085,10 @@ class Aria2Gui(ttk.Frame):
     def cleanup(self):
         """Method to perform cleanup operations."""
         logger.log("Performing cleanup...")
+        if hasattr(self, "clipboard_watcher") and self.clipboard_watcher:
+            self.clipboard_watcher.stop()
+        if hasattr(self, "webhook_server") and self.webhook_server:
+            self.webhook_server.stop()
         try:
             if hasattr(self.api, "client") and hasattr(self.api.client, "save_session"):
                 self.api.client.save_session()
