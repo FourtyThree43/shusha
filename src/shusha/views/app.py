@@ -16,6 +16,7 @@ from shusha.controller.api import ShushaAPI as Api
 from shusha.models.logger import LoggerService
 from shusha.models.structs_downloads import Download
 from shusha.models.structs_stats import Stats
+from shusha.models.svg_assets import get_svg_tk_image
 from shusha.models.utilities import (
     open_path_in_file_manager,
     send_desktop_notification,
@@ -90,6 +91,19 @@ class Aria2Gui(ttk.Frame):
             if _path.exists():
                 with contextlib.suppress(Exception):
                     self.photoimages.append(ttk.PhotoImage(name=key, file=str(_path)))
+
+        # Build vector SVG icon cache
+        self.svg_icons: dict[str, Any] = {}
+        for icon_k in (
+            "add", "start", "pause", "stop", "restart", "reconnect", "remove",
+            "refresh", "settings", "logs", "folder", "link", "torrent", "speed",
+            "pieces", "peers", "servers", "up", "down", "clear", "copy", "batch",
+            "dot-online", "dot-offline", "dot-warning"
+        ):
+            with contextlib.suppress(Exception):
+                tk_img = get_svg_tk_image(icon_k, size=16, color=self.colors.primary)
+                if tk_img:
+                    self.svg_icons[icon_k] = tk_img
 
         self.create_buttonbar()
         self.create_table_view()
@@ -430,10 +444,13 @@ class Aria2Gui(ttk.Frame):
         sett_btn.pack(side=tk.LEFT, padx=(1, 0), pady=1)
         ToolTip(sett_btn, text="Open settings dialog", bootstyle="warning")
 
-        self.daemon_status_var = tk.StringVar(value="🟢 Daemon: Ready")
+        self.daemon_status_var = tk.StringVar(value=" Daemon: Ready")
+        dot_img = self.svg_icons.get("dot-online")
         self.daemon_status_btn = ttk.Button(
             master=opts_row,
             textvariable=self.daemon_status_var,
+            image=dot_img if dot_img else "",
+            compound=tk.LEFT if dot_img else tk.NONE,
             command=self.reconnect_aria2_daemon,
             bootstyle="link",
         )
@@ -485,12 +502,18 @@ class Aria2Gui(ttk.Frame):
         try:
             global_stats = self.api.get_stats()
             self.update_stats_frame(global_stats)
-            if hasattr(self, "daemon_status_var"):
-                self.daemon_status_var.set("🟢 Daemon: Connected")
+            if hasattr(self, "daemon_status_btn"):
+                dot_img = self.svg_icons.get("dot-online")
+                if dot_img:
+                    self.daemon_status_btn.config(image=dot_img, compound=tk.LEFT)
+                self.daemon_status_var.set(" Daemon: Connected")
         except Exception as e:
             logger.log(f"Stats polling notice: {e}", level="debug")
-            if hasattr(self, "daemon_status_var"):
-                self.daemon_status_var.set("🔴 Daemon: Offline (Click to Reconnect)")
+            if hasattr(self, "daemon_status_btn"):
+                dot_img = self.svg_icons.get("dot-offline")
+                if dot_img:
+                    self.daemon_status_btn.config(image=dot_img, compound=tk.LEFT)
+                self.daemon_status_var.set(" Daemon: Offline (Click to Reconnect)")
         finally:
             self.after(1000, self.get_stats)
 
@@ -926,8 +949,11 @@ class Aria2Gui(ttk.Frame):
             try:
                 self.api.stop_server()
                 self.show_toast("Aria2 daemon stopped")
-                if hasattr(self, "daemon_status_var"):
-                    self.daemon_status_var.set("🔴 Daemon: Stopped")
+                if hasattr(self, "daemon_status_btn"):
+                    dot_img = self.svg_icons.get("dot-offline")
+                    if dot_img:
+                        self.daemon_status_btn.config(image=dot_img, compound=tk.LEFT)
+                    self.daemon_status_var.set(" Daemon: Stopped")
             except Exception as e:
                 logger.log(f"Error stopping daemon: {e}", level="error")
                 self.show_toast(f"Failed to stop daemon: {e}")
@@ -958,13 +984,19 @@ class Aria2Gui(ttk.Frame):
                 is_up = self.api.reconnect()
                 if is_up:
                     self.show_toast("Connected to Aria2 daemon")
-                    if hasattr(self, "daemon_status_var"):
-                        self.daemon_status_var.set("🟢 Daemon: Connected")
+                    if hasattr(self, "daemon_status_btn"):
+                        dot_img = self.svg_icons.get("dot-online")
+                        if dot_img:
+                            self.daemon_status_btn.config(image=dot_img, compound=tk.LEFT)
+                        self.daemon_status_var.set(" Daemon: Connected")
                     self.refresh_downloads_table()
                 else:
                     self.show_toast("Cannot connect to Aria2 daemon (offline)")
-                    if hasattr(self, "daemon_status_var"):
-                        self.daemon_status_var.set("🔴 Daemon: Offline (Click to Reconnect)")
+                    if hasattr(self, "daemon_status_btn"):
+                        dot_img = self.svg_icons.get("dot-offline")
+                        if dot_img:
+                            self.daemon_status_btn.config(image=dot_img, compound=tk.LEFT)
+                        self.daemon_status_var.set(" Daemon: Offline (Click to Reconnect)")
             except Exception as e:
                 logger.log(f"Error reconnecting to daemon: {e}", level="error")
                 self.show_toast(f"Connection failed: {e}")

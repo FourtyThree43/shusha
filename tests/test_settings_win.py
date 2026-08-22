@@ -11,12 +11,6 @@ from shusha.views.settings_win import SettingsWindow
 
 
 class TestSettingsWindowAndConfig(unittest.TestCase):
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
-
     def test_dump_toml(self):
         data = {
             "aria2": {
@@ -78,8 +72,16 @@ class TestSettingsWindowAndConfig(unittest.TestCase):
         win = SettingsWindow(master=root, api=mock_api, on_saved=mock_callback)
         self.assertIsInstance(win, ttk.Toplevel)
 
-        # Test value modification and save
-        win.max_concurrent_var.set("10")
+        # Test value modifications across all tabs
+        win.max_concurrent_var.set("12")
+        win.file_alloc_var.set("prealloc")
+        win.disk_cache_var.set("64M")
+        win.enable_scheduler_var.set(True)
+        win.sched_start_hour_var.set("8")
+        win.sched_end_hour_var.set("20")
+        win.enable_dht_var.set(True)
+        win.enable_pex_var.set(True)
+
         win._save_and_apply()
 
         # Verify callback was called
