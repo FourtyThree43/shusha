@@ -3,17 +3,21 @@ Settings and Preferences Dialog for Shusha 2.
 Multi-tab configuration: General, Connection, Downloads, Categories.
 """
 
+import contextlib
 import tkinter as tk
+from pathlib import Path
 from tkinter import filedialog, messagebox
 from typing import ClassVar
 
 import ttkbootstrap as tb
+from platformdirs import user_config_dir
 
 from shusha.application.use_cases.category_use_cases import CategoryDTO
 from shusha.domain.identifiers import CategoryId
 from shusha.infrastructure.configuration.settings_store import AppSettings
 from shusha.presentation.app_context import AppContext
 from shusha.presentation.components.base import BaseDialog, BaseFrame
+from shusha.security.secrets import SecretStore
 
 
 class SettingsDialog(BaseDialog):
@@ -177,6 +181,14 @@ class SettingsDialog(BaseDialog):
         )
         btn_browse_exe.grid(row=3, column=2, pady=4)
 
+        lbl_secret = tb.Label(parent, text="RPC Secret:")
+        lbl_secret.grid(row=4, column=0, sticky="w", pady=4)
+        self.txt_secret = tb.Entry(parent, show="*")
+        secrets_path = Path(user_config_dir("shusha", "Shusha")) / "secrets.json"
+        secret_store = SecretStore(secrets_path)
+        self.txt_secret.insert(0, secret_store.get_or_generate_rpc_secret())
+        self.txt_secret.grid(row=4, column=1, sticky="ew", padx=6, pady=4)
+
     def _setup_downloads_tab(self, parent: BaseFrame) -> None:
         parent.columnconfigure(1, weight=1)
 
@@ -336,11 +348,19 @@ class SettingsDialog(BaseDialog):
 
         self.ctx.settings_store.save_settings(new_settings)
 
-        # Update runtime limits on daemon
-        self.ctx.set_queue_limits_uc.execute(
-            max_concurrent_downloads=max_act,
-            max_download_speed=f"{dl_lim}" if dl_lim > 0 else "0",
-            max_upload_speed=f"{ul_lim}" if ul_lim > 0 else "0",
-        )
+        # Save RPC secret
+        new_secret = self.txt_secret.get().strip()
+        if new_secret:
+            secrets_path = Path(user_config_dir("shusha", "Shusha")) / "secrets.json"
+            secret_store = SecretStore(secrets_path)
+            secret_store.set("aria2_rpc_secret", new_secret)
+
+        # Update runtime limits on daemon (gracefully if daemon is active)
+        with contextlib.suppress(Exception):
+            self.ctx.set_queue_limits_uc.execute(
+                max_concurrent_downloads=max_act,
+                max_download_speed=f"{dl_lim}" if dl_lim > 0 else "0",
+                max_upload_speed=f"{ul_lim}" if ul_lim > 0 else "0",
+            )
 
         self.destroy()

@@ -3,6 +3,7 @@ Typed JSON-RPC 2.0 Transport Client for aria2.
 Uses standard library urllib.request with robust error mapping.
 """
 
+import contextlib
 import json
 import urllib.error
 import urllib.request
@@ -67,6 +68,24 @@ class JsonRpcTransport:
             with urllib.request.urlopen(req, timeout=self.timeout) as resp:
                 resp_bytes = resp.read()
         except urllib.error.HTTPError as e:
+            err_body = b""
+            with contextlib.suppress(Exception):
+                err_body = e.read()
+            if err_body:
+                with contextlib.suppress(Exception):
+                    err_json = json.loads(err_body.decode("utf-8"))
+                    if isinstance(err_json, dict) and "error" in err_json:
+                        err_info = err_json["error"]
+                        err_msg = str(err_info.get("message", e.reason))
+                        err_code = int(err_info.get("code", e.code))
+                        if "Unauthorized" in err_msg or e.code in (401, 403):
+                            raise Aria2AuthenticationError(
+                                f"Authentication failed: {err_msg}", code=err_code
+                            ) from e
+                        raise Aria2ConnectionError(
+                            f"HTTP error from aria2 daemon ({err_code}): {err_msg}",
+                            code=err_code,
+                        ) from e
             if e.code in (401, 403):
                 raise Aria2AuthenticationError(
                     "Authentication failed: invalid RPC secret", code=e.code
