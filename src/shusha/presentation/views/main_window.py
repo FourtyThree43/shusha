@@ -6,12 +6,10 @@ Coordinates menu, toolbar, sidebar navigation, download table, and status bar.
 import contextlib
 import tkinter as tk
 from collections.abc import Sequence
-from pathlib import Path
-from tkinter import filedialog, messagebox, ttk
+from tkinter import messagebox, ttk
 
 import ttkbootstrap as tb
 
-from shusha.application.use_cases.download_use_cases import AddDownloadRequest
 from shusha.domain.download import Download
 from shusha.domain.identifiers import DownloadId
 from shusha.domain.statistics import GlobalStatistics
@@ -21,6 +19,11 @@ from shusha.presentation.components.sidebar import AppSidebar
 from shusha.presentation.components.status_bar import AppStatusBar
 from shusha.presentation.components.toolbar import AppToolbar
 from shusha.presentation.dispatcher import UiDispatcher
+from shusha.presentation.views.add_download_dialog import AddDownloadDialog
+from shusha.presentation.views.batch_add_dialog import BatchAddDialog
+from shusha.presentation.views.create_torrent_dialog import CreateTorrentDialog
+from shusha.presentation.views.inspector_dialog import InspectorDialog
+from shusha.presentation.views.settings_dialog import SettingsDialog
 
 
 class MainWindow(tb.Window):
@@ -61,6 +64,22 @@ class MainWindow(tb.Window):
             accelerator="Ctrl+O",
             command=self._on_add_torrent_clicked,
         )
+        menu_file.add_command(
+            label="Batch Add URLs...",
+            accelerator="Ctrl+B",
+            command=self._on_batch_add_clicked,
+        )
+        menu_file.add_separator()
+        menu_file.add_command(
+            label="Create Torrent...",
+            command=self._on_create_torrent_clicked,
+        )
+        menu_file.add_separator()
+        menu_file.add_command(
+            label="Settings...",
+            accelerator="Ctrl+,",
+            command=self._on_settings_clicked,
+        )
         menu_file.add_separator()
         menu_file.add_command(label="Exit", accelerator="Ctrl+Q", command=self.quit)
         menubar.add_cascade(label="File", menu=menu_file)
@@ -85,6 +104,8 @@ class MainWindow(tb.Window):
         # Shortcuts
         self.bind("<Control-n>", lambda _: self._on_add_url_clicked())
         self.bind("<Control-o>", lambda _: self._on_add_torrent_clicked())
+        self.bind("<Control-b>", lambda _: self._on_batch_add_clicked())
+        self.bind("<Control-comma>", lambda _: self._on_settings_clicked())
         self.bind("<Control-q>", lambda _: self.quit())
         self.bind("<Delete>", lambda _: self._on_remove_clicked())
 
@@ -192,37 +213,16 @@ class MainWindow(tb.Window):
 
     # User Actions
     def _on_add_url_clicked(self) -> None:
-        # Prompt for download URL
-        dialog = tb.dialogs.Querybox.get_string(
-            title="Add URL",
-            prompt="Enter HTTP/HTTPS/FTP/SFTP/Magnet URL:",
-            parent=self,
-        )
-        if dialog and dialog.strip():
-            url = dialog.strip()
-
-            def perform_add() -> None:
-                self.ctx.add_download_uc.execute(AddDownloadRequest(uris=[url]))
-
-            self.dispatcher.run_in_background(perform_add)
+        AddDownloadDialog(parent=self, ctx=self.ctx)
 
     def _on_add_torrent_clicked(self) -> None:
-        filepath = filedialog.askopenfilename(
-            title="Select Torrent File",
-            filetypes=[("Torrent Files", "*.torrent"), ("All Files", "*.*")],
-            parent=self,
-        )
-        if filepath:
-            torrent_path = Path(filepath)
-            if torrent_path.exists():
-                content = torrent_path.read_bytes()
+        AddDownloadDialog(parent=self, ctx=self.ctx)
 
-                def perform_add() -> None:
-                    self.ctx.add_download_uc.execute(
-                        AddDownloadRequest(torrent_bytes=content)
-                    )
+    def _on_batch_add_clicked(self) -> None:
+        BatchAddDialog(parent=self, ctx=self.ctx)
 
-                self.dispatcher.run_in_background(perform_add)
+    def _on_create_torrent_clicked(self) -> None:
+        CreateTorrentDialog(parent=self)
 
     def _on_resume_clicked(self) -> None:
         selected = self.table.get_selected_ids()
@@ -271,10 +271,10 @@ class MainWindow(tb.Window):
             self.dispatcher.run_in_background(perform_remove)
 
     def _on_inspect_download(self, download_id: DownloadId) -> None:
-        pass  # In Epic 8, we attach the full Inspector dialog
+        InspectorDialog(parent=self, ctx=self.ctx, download_id=download_id)
 
     def _on_settings_clicked(self) -> None:
-        pass  # In Epic 8, we attach the full Settings dialog
+        SettingsDialog(parent=self, ctx=self.ctx)
 
     def _show_about(self) -> None:
         messagebox.showinfo(

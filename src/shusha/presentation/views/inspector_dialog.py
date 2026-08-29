@@ -2,10 +2,8 @@
 Download Inspector Dialog with multi-tab inspection (General, Files, Piece Map, Peers, Servers, Options).
 """
 
-import math
 import tkinter as tk
-from pathlib import Path
-from tkinter import messagebox, ttk
+from tkinter import messagebox
 
 import ttkbootstrap as tb
 

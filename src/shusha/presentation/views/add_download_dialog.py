@@ -5,7 +5,7 @@ Add Download Dialog with progressive disclosure (Basic, Advanced, Expert) for Sh
 import tkinter as tk
 from collections.abc import Callable
 from pathlib import Path
-from tkinter import filedialog, messagebox, ttk
+from tkinter import filedialog, messagebox
 
 import ttkbootstrap as tb
 
