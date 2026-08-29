@@ -1,0 +1,2279 @@
+{
+  "source_modules": [
+    {
+      "path": "src/shusha/ShushaDM.py",
+      "loc": 77,
+      "classes": [],
+      "functions": [
+        "cleanup",
+        "main",
+        "on_close"
+      ],
+      "total_functions": 3,
+      "imports": [
+        "pathlib.Path",
+        "shusha.models.logger.LoggerService",
+        "shusha.views.app.Aria2Gui",
+        "time",
+        "ttkbootstrap"
+      ],
+      "has_tk": true,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "src/shusha/__about__.py",
+      "loc": 4,
+      "classes": [],
+      "functions": [],
+      "total_functions": 0,
+      "imports": [],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "src/shusha/__init__.py",
+      "loc": 3,
+      "classes": [],
+      "functions": [],
+      "total_functions": 0,
+      "imports": [],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "src/shusha/__main__.py",
+      "loc": 18,
+      "classes": [],
+      "functions": [],
+      "total_functions": 0,
+      "imports": [
+        "pathlib.Path",
+        "shusha.ShushaDM",
+        "sys"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "src/shusha/cli.py",
+      "loc": 245,
+      "classes": [],
+      "functions": [
+        "build_parser",
+        "handle_cli",
+        "main"
+      ],
+      "total_functions": 3,
+      "imports": [
+        "__future__.annotations",
+        "argparse",
+        "hashlib",
+        "pathlib.Path",
+        "shusha.ShushaDM.main",
+        "shusha.__about__.__version__",
+        "shusha.controller.api.ShushaAPI",
+        "shusha.models.mirror_prober.MirrorProber",
+        "shusha.models.torrent_creator.TorrentCreator",
+        "sys",
+        "typing.Any",
+        "zlib"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": true,
+      "has_any": true
+    },
+    {
+      "path": "src/shusha/controller/__init__.py",
+      "loc": 3,
+      "classes": [],
+      "functions": [],
+      "total_functions": 0,
+      "imports": [],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "src/shusha/controller/api.py",
+      "loc": 970,
+      "classes": [
+        "ShushaAPI"
+      ],
+      "functions": [
+        "__init__",
+        "connect_ws",
+        "on_event",
+        "off_event",
+        "add_batch_urls",
+        "__str__",
+        "start_server",
+        "stop_server",
+        "restart_server",
+        "is_server_running"
+      ],
+      "total_functions": 48,
+      "imports": [
+        "__future__.annotations",
+        "pathlib.Path",
+        "shusha.models.batch_parser.extract_urls",
+        "shusha.models.client.Client",
+        "shusha.models.client.XMLRPCClientException",
+        "shusha.models.daemon.Daemon",
+        "shusha.models.database.ShushaDB",
+        "shusha.models.logger.LoggerService",
+        "shusha.models.scheduler.BandwidthScheduler",
+        "shusha.models.settings.AppSettings",
+        "shusha.models.structs_downloads.Download",
+        "shusha.models.structs_options.Options",
+        "shusha.models.structs_stats.Stats",
+        "shusha.models.ws_client.Aria2WsClient",
+        "shutil",
+        "typing.Any"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": true,
+      "has_aria2": true,
+      "has_any": true
+    },
+    {
+      "path": "src/shusha/models/__init__.py",
+      "loc": 3,
+      "classes": [],
+      "functions": [],
+      "total_functions": 0,
+      "imports": [],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "src/shusha/models/batch_parser.py",
+      "loc": 120,
+      "classes": [],
+      "functions": [
+        "extract_urls",
+        "expand_pattern_url",
+        "is_downloadable_url"
+      ],
+      "total_functions": 3,
+      "imports": [
+        "__future__.annotations",
+        "re",
+        "urllib.parse.urlparse"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "src/shusha/models/category_manager.py",
+      "loc": 118,
+      "classes": [
+        "CategoryManager"
+      ],
+      "functions": [
+        "get_category",
+        "get_category_directory"
+      ],
+      "total_functions": 2,
+      "imports": [
+        "__future__.annotations",
+        "pathlib.Path",
+        "urllib.parse.urlparse"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "src/shusha/models/client.py",
+      "loc": 463,
+      "classes": [
+        "XMLRPCClientException",
+        "Client"
+      ],
+      "functions": [
+        "__init__",
+        "__str__",
+        "__bool__",
+        "__init__",
+        "__str__",
+        "__repr__",
+        "_build_request_params",
+        "_call_method",
+        "_handle_xmlrpc_error",
+        "is_server_reachable"
+      ],
+      "total_functions": 47,
+      "imports": [
+        "shusha.models.daemon.Daemon",
+        "shusha.models.logger.LoggerService",
+        "socket",
+        "time",
+        "typing.Any",
+        "unittest.mock",
+        "urllib.parse.urlparse",
+        "xmlrpc.client"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": true,
+      "has_any": true
+    },
+    {
+      "path": "src/shusha/models/clipboard_watcher.py",
+      "loc": 130,
+      "classes": [
+        "ClipboardWatcher"
+      ],
+      "functions": [
+        "__init__",
+        "start",
+        "stop",
+        "pause",
+        "resume",
+        "is_running",
+        "_get_clipboard_text",
+        "_run_loop",
+        "is_downloadable_url"
+      ],
+      "total_functions": 9,
+      "imports": [
+        "__future__.annotations",
+        "collections.abc.Callable",
+        "re",
+        "shusha.models.logger.LoggerService",
+        "threading",
+        "time",
+        "tkinter",
+        "typing.Any"
+      ],
+      "has_tk": true,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": true
+    },
+    {
+      "path": "src/shusha/models/daemon.py",
+      "loc": 239,
+      "classes": [
+        "Daemon"
+      ],
+      "functions": [
+        "__init__",
+        "__str__",
+        "__repr__",
+        "_get_version",
+        "aria2c_exists",
+        "is_port_open",
+        "_build_command",
+        "_start_server_process",
+        "start_server",
+        "stop_server"
+      ],
+      "total_functions": 11,
+      "imports": [
+        "pathlib.Path",
+        "platform",
+        "shusha.models.logger.LoggerService",
+        "shusha.models.utilities.user_data_dir",
+        "shutil",
+        "socket",
+        "subprocess",
+        "time"
+      ],
+      "has_tk": false,
+      "has_subprocess": true,
+      "has_sqlite": false,
+      "has_aria2": true,
+      "has_any": false
+    },
+    {
+      "path": "src/shusha/models/database.py",
+      "loc": 1023,
+      "classes": [
+        "Condition",
+        "Field",
+        "Query",
+        "ShushaDB",
+        "MySmallDBError",
+        "InsertionError",
+        "UpdateError",
+        "RemovalError",
+        "TransactionError",
+        "TableManagementError",
+        "TableNotFoundError",
+        "PersistenceError",
+        "SaveError",
+        "LoadError",
+        "DropTableError",
+        "DropAllTablesError"
+      ],
+      "functions": [
+        "where",
+        "__init__",
+        "__or__",
+        "__and__",
+        "__invert__",
+        "__init__",
+        "__eq__",
+        "__ne__",
+        "__gt__",
+        "__ge__"
+      ],
+      "total_functions": 70,
+      "imports": [
+        "__future__.annotations",
+        "shelve",
+        "shusha.models.logger.LoggerService",
+        "shusha.models.utilities.data_dir",
+        "sys",
+        "threading",
+        "typing.Any",
+        "uuid"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": true,
+      "has_aria2": false,
+      "has_any": true
+    },
+    {
+      "path": "src/shusha/models/logger.py",
+      "loc": 115,
+      "classes": [
+        "LoggerService"
+      ],
+      "functions": [
+        "__init__",
+        "_ensure_log_directory",
+        "_setup_handlers",
+        "log"
+      ],
+      "total_functions": 4,
+      "imports": [
+        "logging",
+        "logging.handlers.RotatingFileHandler",
+        "pathlib.Path",
+        "shusha.models.utilities.log_dir"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "src/shusha/models/media_extractor.py",
+      "loc": 125,
+      "classes": [
+        "StreamQuality",
+        "MediaExtractor"
+      ],
+      "functions": [
+        "resolution_label",
+        "is_m3u8",
+        "parse_master_playlist",
+        "parse_media_segments"
+      ],
+      "total_functions": 4,
+      "imports": [
+        "__future__.annotations",
+        "dataclasses.dataclass",
+        "re",
+        "shusha.models.logger.LoggerService",
+        "urllib.parse.urljoin"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "src/shusha/models/mirror_prober.py",
+      "loc": 136,
+      "classes": [
+        "MirrorProbeResult",
+        "MirrorProber"
+      ],
+      "functions": [
+        "host",
+        "probe_single_mirror",
+        "probe_mirrors"
+      ],
+      "total_functions": 3,
+      "imports": [
+        "__future__.annotations",
+        "concurrent.futures",
+        "dataclasses.dataclass",
+        "shusha.models.logger.LoggerService",
+        "time",
+        "urllib.parse.urlparse",
+        "urllib.request"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "src/shusha/models/post_actions.py",
+      "loc": 125,
+      "classes": [
+        "PostActions"
+      ],
+      "functions": [
+        "play_alert_sound",
+        "execute_completion_command",
+        "shutdown_system",
+        "sleep_system"
+      ],
+      "total_functions": 4,
+      "imports": [
+        "__future__.annotations",
+        "pathlib.Path",
+        "platform",
+        "shusha.models.logger.LoggerService",
+        "shutil",
+        "subprocess",
+        "winsound"
+      ],
+      "has_tk": false,
+      "has_subprocess": true,
+      "has_sqlite": true,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "src/shusha/models/scheduler.py",
+      "loc": 115,
+      "classes": [
+        "ScheduleRule",
+        "BandwidthScheduler"
+      ],
+      "functions": [
+        "is_active",
+        "__init__",
+        "add_rule",
+        "evaluate",
+        "to_dict_list",
+        "from_dict_list"
+      ],
+      "total_functions": 6,
+      "imports": [
+        "__future__.annotations",
+        "dataclasses.dataclass",
+        "datetime",
+        "shusha.models.logger.LoggerService",
+        "typing.Any"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": true
+    },
+    {
+      "path": "src/shusha/models/settings.py",
+      "loc": 88,
+      "classes": [
+        "AppSettings"
+      ],
+      "functions": [
+        "__init__",
+        "get_aria2_config",
+        "get_aria2_host",
+        "get_aria2_port",
+        "get_aria2_secret",
+        "set_aria2_config",
+        "get_aria2_options",
+        "get_aria2_http_options",
+        "get_download_dir",
+        "set_download_dir"
+      ],
+      "total_functions": 14,
+      "imports": [
+        "shusha.models.utilities.load_configuration",
+        "shusha.models.utilities.save_configuration"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": true,
+      "has_any": false
+    },
+    {
+      "path": "src/shusha/models/structs_downloads.py",
+      "loc": 490,
+      "classes": [
+        "BitTorrent",
+        "File",
+        "Download"
+      ],
+      "functions": [
+        "__init__",
+        "__str__",
+        "announce_list",
+        "comment",
+        "creation_date",
+        "mode",
+        "info",
+        "__init__",
+        "__str__",
+        "__eq__"
+      ],
+      "total_functions": 82,
+      "imports": [
+        "__future__.annotations",
+        "dataclasses.dataclass",
+        "dataclasses.field",
+        "datetime.datetime",
+        "datetime.timedelta",
+        "datetime.timezone",
+        "pathlib.Path",
+        "shusha.controller.api.ShushaAPI",
+        "shusha.models.logger.LoggerService",
+        "shusha.models.structs_options.Options",
+        "shusha.models.utilities.bool_or_value",
+        "shusha.models.utilities.format_eta",
+        "shusha.models.utilities.format_size",
+        "shusha.models.utilities.format_speed",
+        "typing.Any",
+        "typing.TYPE_CHECKING"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": true,
+      "has_aria2": true,
+      "has_any": true
+    },
+    {
+      "path": "src/shusha/models/structs_options.py",
+      "loc": 113,
+      "classes": [
+        "Options"
+      ],
+      "functions": [
+        "__init__",
+        "get",
+        "set",
+        "get_struct",
+        "__getattr__",
+        "__setattr__",
+        "__getitem__",
+        "__setitem__",
+        "__contains__",
+        "__iter__"
+      ],
+      "total_functions": 12,
+      "imports": [
+        "__future__.annotations",
+        "collections.abc.Callable",
+        "collections.abc.Iterator",
+        "collections.abc.Mapping",
+        "copy.deepcopy",
+        "shusha.controller.api.ShushaAPI",
+        "shusha.models.structs_downloads.Download",
+        "shusha.models.utilities.bool_or_value",
+        "shusha.models.utilities.bool_to_str",
+        "typing.Any",
+        "typing.TYPE_CHECKING"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": true,
+      "has_any": true
+    },
+    {
+      "path": "src/shusha/models/structs_stats.py",
+      "loc": 67,
+      "classes": [
+        "Stats"
+      ],
+      "functions": [
+        "__init__",
+        "from_dict",
+        "download_speed_string",
+        "upload_speed_string"
+      ],
+      "total_functions": 4,
+      "imports": [
+        "__future__.annotations",
+        "dataclasses.dataclass",
+        "shusha.models.utilities.format_speed",
+        "typing.Any"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": true,
+      "has_any": true
+    },
+    {
+      "path": "src/shusha/models/svg_assets.py",
+      "loc": 301,
+      "classes": [],
+      "functions": [
+        "generate_svg_xml",
+        "render_vector_icon",
+        "get_svg_tk_image"
+      ],
+      "total_functions": 3,
+      "imports": [
+        "PIL.Image",
+        "PIL.ImageDraw",
+        "PIL.ImageTk",
+        "__future__.annotations"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "src/shusha/models/torrent_creator.py",
+      "loc": 163,
+      "classes": [
+        "TorrentCreator"
+      ],
+      "functions": [
+        "bencode",
+        "create_torrent_file"
+      ],
+      "total_functions": 2,
+      "imports": [
+        "__future__.annotations",
+        "hashlib",
+        "os",
+        "pathlib.Path",
+        "shusha.models.logger.LoggerService",
+        "shusha.models.tracker_service.TrackerService",
+        "typing.Any",
+        "urllib.parse.quote"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": true
+    },
+    {
+      "path": "src/shusha/models/tracker_service.py",
+      "loc": 112,
+      "classes": [
+        "TrackerService"
+      ],
+      "functions": [
+        "get_trackers",
+        "get_trackers_csv",
+        "fetch_latest_trackers_sync",
+        "fetch_latest_trackers_async",
+        "_bg"
+      ],
+      "total_functions": 5,
+      "imports": [
+        "__future__.annotations",
+        "shusha.models.logger.LoggerService",
+        "threading",
+        "time",
+        "typing.Any",
+        "typing.ClassVar",
+        "urllib.request"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": true,
+      "has_any": true
+    },
+    {
+      "path": "src/shusha/models/utilities.py",
+      "loc": 407,
+      "classes": [],
+      "functions": [
+        "download_dir",
+        "config_dir",
+        "data_dir",
+        "cache_dir",
+        "log_dir",
+        "bool_or_value",
+        "bool_to_str",
+        "sizeof_fmt",
+        "format_speed",
+        "format_size"
+      ],
+      "total_functions": 19,
+      "imports": [
+        "datetime.timedelta",
+        "importlib.metadata",
+        "os",
+        "pathlib.Path",
+        "platformdirs.user_cache_dir",
+        "platformdirs.user_config_dir",
+        "platformdirs.user_data_dir",
+        "platformdirs.user_downloads_dir",
+        "platformdirs.user_log_dir",
+        "shutil",
+        "subprocess",
+        "sys",
+        "textwrap",
+        "tomli",
+        "tomllib",
+        "typing.Any"
+      ],
+      "has_tk": false,
+      "has_subprocess": true,
+      "has_sqlite": false,
+      "has_aria2": true,
+      "has_any": true
+    },
+    {
+      "path": "src/shusha/models/webhook_server.py",
+      "loc": 147,
+      "classes": [
+        "WebhookRequestHandler",
+        "WebhookServer"
+      ],
+      "functions": [
+        "log_message",
+        "_send_json_response",
+        "do_OPTIONS",
+        "do_GET",
+        "do_POST",
+        "__init__",
+        "start",
+        "stop",
+        "is_running"
+      ],
+      "total_functions": 9,
+      "imports": [
+        "__future__.annotations",
+        "collections.abc.Callable",
+        "http.server.BaseHTTPRequestHandler",
+        "http.server.HTTPServer",
+        "json",
+        "shusha.models.logger.LoggerService",
+        "threading",
+        "typing.Any"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": true,
+      "has_any": true
+    },
+    {
+      "path": "src/shusha/models/ws_client.py",
+      "loc": 398,
+      "classes": [
+        "JsonRpcException",
+        "Aria2WsClient"
+      ],
+      "functions": [
+        "__init__",
+        "__init__",
+        "is_connected",
+        "on",
+        "off",
+        "_dispatch_event",
+        "connect",
+        "close",
+        "_send_frame",
+        "_recv_exact"
+      ],
+      "total_functions": 16,
+      "imports": [
+        "__future__.annotations",
+        "base64",
+        "collections.abc.Callable",
+        "json",
+        "os",
+        "shusha.models.logger.LoggerService",
+        "socket",
+        "struct",
+        "threading",
+        "typing.Any",
+        "urllib.error",
+        "urllib.request"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": true,
+      "has_any": true
+    },
+    {
+      "path": "src/shusha/views/__init__.py",
+      "loc": 3,
+      "classes": [],
+      "functions": [],
+      "total_functions": 0,
+      "imports": [],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "src/shusha/views/add_win.py",
+      "loc": 248,
+      "classes": [
+        "AddWindow"
+      ],
+      "functions": [
+        "__init__",
+        "_build_url_page",
+        "_build_torrent_page",
+        "_build_advanced_page",
+        "_on_url_text_change",
+        "_on_category_selected",
+        "_on_browse",
+        "_on_browse_torrent",
+        "_submit_urls",
+        "_submit_torrent"
+      ],
+      "total_functions": 12,
+      "imports": [
+        "__future__.annotations",
+        "pathlib",
+        "shusha.models.category_manager.CategoryManager",
+        "shusha.models.utilities.download_dir",
+        "tkinter",
+        "tkinter.filedialog",
+        "tkinter.filedialog.askdirectory",
+        "ttkbootstrap",
+        "typing.Any"
+      ],
+      "has_tk": true,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": true
+    },
+    {
+      "path": "src/shusha/views/app.py",
+      "loc": 1130,
+      "classes": [
+        "Aria2Gui"
+      ],
+      "functions": [
+        "relative_to_assets",
+        "__init__",
+        "_on_clipboard_url",
+        "_on_webhook_download",
+        "_on_aria2_ws_event",
+        "create_buttonbar",
+        "create_table_view",
+        "create_context_menu",
+        "show_context_menu",
+        "on_double_click_row"
+      ],
+      "total_functions": 72,
+      "imports": [
+        "collections.abc.Callable",
+        "contextlib",
+        "pathlib.Path",
+        "shusha.controller.api.ShushaAPI",
+        "shusha.models.category_manager.CategoryManager",
+        "shusha.models.clipboard_watcher.ClipboardWatcher",
+        "shusha.models.logger.LoggerService",
+        "shusha.models.post_actions.PostActions",
+        "shusha.models.structs_downloads.Download",
+        "shusha.models.structs_stats.Stats",
+        "shusha.models.svg_assets.get_svg_tk_image",
+        "shusha.models.utilities.open_path_in_file_manager",
+        "shusha.models.utilities.send_desktop_notification",
+        "shusha.models.utilities.user_log_dir",
+        "shusha.models.webhook_server.WebhookServer",
+        "shusha.views.add_win.AddWindow",
+        "shusha.views.batch_add_win.BatchAddWindow",
+        "shusha.views.checksum_win.ChecksumWindow",
+        "shusha.views.create_torrent_win.CreateTorrentWindow",
+        "shusha.views.inspector_win.DownloadInspectorWindow",
+        "shusha.views.settings_win.SettingsWindow",
+        "shusha.views.status_win.DownloadWindow",
+        "shusha.views.torrent_win.TorrentFilesWindow",
+        "shusha.views.uri_win.UriManagerWindow",
+        "threading",
+        "tkinter",
+        "ttkbootstrap",
+        "ttkbootstrap.TableRow",
+        "ttkbootstrap.Tableview",
+        "ttkbootstrap.ToastNotification",
+        "ttkbootstrap.ToolTip",
+        "typing.Any"
+      ],
+      "has_tk": true,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": true,
+      "has_any": true
+    },
+    {
+      "path": "src/shusha/views/batch_add_win.py",
+      "loc": 159,
+      "classes": [
+        "BatchAddWindow"
+      ],
+      "functions": [
+        "__init__",
+        "_build_ui",
+        "_paste_clipboard",
+        "_parse_preview",
+        "_on_submit"
+      ],
+      "total_functions": 5,
+      "imports": [
+        "__future__.annotations",
+        "collections.abc.Callable",
+        "shusha.models.batch_parser.extract_urls",
+        "shusha.models.utilities.user_downloads_dir",
+        "tkinter",
+        "ttkbootstrap",
+        "typing.Any"
+      ],
+      "has_tk": true,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": true
+    },
+    {
+      "path": "src/shusha/views/checksum_win.py",
+      "loc": 180,
+      "classes": [
+        "ChecksumWindow"
+      ],
+      "functions": [
+        "__init__",
+        "_build_ui",
+        "_browse_file",
+        "_copy_val",
+        "_start_hashing",
+        "compute_hashes_sync",
+        "_compute_bg",
+        "_check_match"
+      ],
+      "total_functions": 8,
+      "imports": [
+        "__future__.annotations",
+        "hashlib",
+        "pathlib.Path",
+        "shusha.models.logger.LoggerService",
+        "threading",
+        "tkinter",
+        "tkinter.filedialog",
+        "ttkbootstrap",
+        "typing.Any",
+        "zlib"
+      ],
+      "has_tk": true,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": true
+    },
+    {
+      "path": "src/shusha/views/create_torrent_win.py",
+      "loc": 164,
+      "classes": [
+        "CreateTorrentWindow"
+      ],
+      "functions": [
+        "__init__",
+        "_build_ui",
+        "_browse_file",
+        "_browse_folder",
+        "_copy_magnet",
+        "_create_torrent"
+      ],
+      "total_functions": 6,
+      "imports": [
+        "__future__.annotations",
+        "shusha.models.logger.LoggerService",
+        "shusha.models.torrent_creator.TorrentCreator",
+        "shusha.models.tracker_service.TrackerService",
+        "tkinter",
+        "tkinter.filedialog",
+        "ttkbootstrap",
+        "typing.Any"
+      ],
+      "has_tk": true,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": true
+    },
+    {
+      "path": "src/shusha/views/inspector_win.py",
+      "loc": 302,
+      "classes": [
+        "DownloadInspectorWindow"
+      ],
+      "functions": [
+        "__init__",
+        "_build_ui",
+        "_build_overview_tab",
+        "_build_files_tab",
+        "_refresh_files_data",
+        "_build_peers_tab",
+        "_build_servers_tab",
+        "_build_trackers_tab",
+        "_append_public_trackers",
+        "_build_options_tab"
+      ],
+      "total_functions": 13,
+      "imports": [
+        "__future__.annotations",
+        "shusha.controller.api.ShushaAPI",
+        "shusha.models.structs_downloads.Download",
+        "shusha.models.tracker_service.TrackerService",
+        "shusha.models.utilities.open_path_in_file_manager",
+        "shusha.views.piece_map.PieceMapWidget",
+        "shusha.views.speed_graph.SpeedGraphWidget",
+        "tkinter",
+        "ttkbootstrap",
+        "ttkbootstrap.Tableview",
+        "typing.Any"
+      ],
+      "has_tk": true,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": true
+    },
+    {
+      "path": "src/shusha/views/piece_map.py",
+      "loc": 125,
+      "classes": [
+        "PieceMapWidget"
+      ],
+      "functions": [
+        "__init__",
+        "update_download",
+        "redraw"
+      ],
+      "total_functions": 3,
+      "imports": [
+        "__future__.annotations",
+        "shusha.models.structs_downloads.Download",
+        "tkinter",
+        "ttkbootstrap",
+        "typing.Any"
+      ],
+      "has_tk": true,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": true,
+      "has_any": true
+    },
+    {
+      "path": "src/shusha/views/settings_win.py",
+      "loc": 656,
+      "classes": [
+        "SettingsWindow"
+      ],
+      "functions": [
+        "__init__",
+        "_build_ui",
+        "_build_general_tab",
+        "_build_performance_tab",
+        "_build_rpc_tab",
+        "_build_bittorrent_tab",
+        "_build_scheduler_tab",
+        "_fetch_trackers",
+        "_on_theme_changed",
+        "_browse_dir"
+      ],
+      "total_functions": 12,
+      "imports": [
+        "__future__.annotations",
+        "contextlib",
+        "shusha.models.logger.LoggerService",
+        "shusha.models.scheduler.ScheduleRule",
+        "shusha.models.settings.AppSettings",
+        "shusha.models.tracker_service.TrackerService",
+        "shusha.models.utilities.user_downloads_dir",
+        "shusha.models.utilities.user_log_dir",
+        "tkinter",
+        "tkinter.filedialog",
+        "ttkbootstrap",
+        "typing.Any"
+      ],
+      "has_tk": true,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": true,
+      "has_any": true
+    },
+    {
+      "path": "src/shusha/views/speed_graph.py",
+      "loc": 144,
+      "classes": [
+        "SpeedGraphWidget"
+      ],
+      "functions": [
+        "__init__",
+        "add_data_point",
+        "_format_speed",
+        "redraw",
+        "make_points"
+      ],
+      "total_functions": 5,
+      "imports": [
+        "__future__.annotations",
+        "collections",
+        "tkinter",
+        "ttkbootstrap",
+        "typing.Any"
+      ],
+      "has_tk": true,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": true
+    },
+    {
+      "path": "src/shusha/views/status_win.py",
+      "loc": 397,
+      "classes": [
+        "DownloadMeter",
+        "DownloadWindow"
+      ],
+      "functions": [
+        "__init__",
+        "used_var",
+        "total_var",
+        "start",
+        "pause",
+        "reset",
+        "__init__",
+        "_build_general_tab",
+        "_build_peers_tab",
+        "_build_servers_tab"
+      ],
+      "total_functions": 21,
+      "imports": [
+        "PIL.Image",
+        "__future__.annotations",
+        "shusha.controller.api.ShushaAPI",
+        "shusha.models.logger.LoggerService",
+        "shusha.models.structs_downloads.Download",
+        "shusha.models.utilities.format_speed",
+        "time",
+        "tkinter",
+        "ttkbootstrap",
+        "typing.Any",
+        "typing.TYPE_CHECKING"
+      ],
+      "has_tk": true,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": true,
+      "has_any": true
+    },
+    {
+      "path": "src/shusha/views/torrent_win.py",
+      "loc": 215,
+      "classes": [
+        "TorrentFilesWindow"
+      ],
+      "functions": [
+        "__init__",
+        "_populate_files",
+        "_toggle_selected_item",
+        "_toggle_selected_row",
+        "_select_all",
+        "_deselect_all",
+        "_refresh_row",
+        "_apply_selection"
+      ],
+      "total_functions": 8,
+      "imports": [
+        "__future__.annotations",
+        "shusha.controller.api.ShushaAPI",
+        "shusha.models.logger.LoggerService",
+        "shusha.models.structs_downloads.Download",
+        "shusha.models.utilities.format_size",
+        "tkinter",
+        "ttkbootstrap",
+        "typing.Any",
+        "typing.TYPE_CHECKING"
+      ],
+      "has_tk": true,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": true,
+      "has_any": true
+    },
+    {
+      "path": "src/shusha/views/uri_win.py",
+      "loc": 141,
+      "classes": [
+        "UriManagerWindow"
+      ],
+      "functions": [
+        "__init__",
+        "_build_ui",
+        "_load_uris",
+        "_on_add_uri",
+        "_on_delete_uri"
+      ],
+      "total_functions": 5,
+      "imports": [
+        "__future__.annotations",
+        "shusha.controller.api.ShushaAPI",
+        "shusha.models.logger.LoggerService",
+        "tkinter",
+        "ttkbootstrap",
+        "typing.Any",
+        "typing.TYPE_CHECKING"
+      ],
+      "has_tk": true,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": true,
+      "has_any": true
+    }
+  ],
+  "test_files": [
+    {
+      "path": "tests/__init__.py",
+      "loc": 3,
+      "classes": [],
+      "functions": [],
+      "total_functions": 0,
+      "imports": [],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "tests/test_app_actions.py",
+      "loc": 314,
+      "classes": [
+        "TestAppActions"
+      ],
+      "functions": [
+        "setUpClass",
+        "tearDownClass",
+        "setUp",
+        "tearDown",
+        "test_relative_to_assets",
+        "test_initialization_and_widgets",
+        "test_update_stats_frame",
+        "test_get_selected_downloads_and_single",
+        "test_start_and_pause_selected_downloads",
+        "test_remove_selected_download_with_and_without_files"
+      ],
+      "total_functions": 21,
+      "imports": [
+        "contextlib",
+        "pathlib.Path",
+        "shusha.controller.api.ShushaAPI",
+        "shusha.models.structs_downloads.Download",
+        "shusha.models.structs_stats.Stats",
+        "shusha.views.app.Aria2Gui",
+        "shusha.views.app.relative_to_assets",
+        "ttkbootstrap",
+        "unittest",
+        "unittest.mock.MagicMock",
+        "unittest.mock.patch"
+      ],
+      "has_tk": true,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": true,
+      "has_any": false
+    },
+    {
+      "path": "tests/test_batch_parser.py",
+      "loc": 63,
+      "classes": [
+        "TestBatchParser"
+      ],
+      "functions": [
+        "test_extract_urls_simple",
+        "test_extract_magnet_links",
+        "test_numeric_range_expansion",
+        "test_alpha_range_expansion",
+        "test_nested_range_expansion",
+        "test_is_downloadable_url"
+      ],
+      "total_functions": 6,
+      "imports": [
+        "shusha.models.batch_parser.expand_pattern_url",
+        "shusha.models.batch_parser.extract_urls",
+        "shusha.models.batch_parser.is_downloadable_url",
+        "unittest"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "tests/test_category_manager.py",
+      "loc": 53,
+      "classes": [
+        "TestCategoryManager"
+      ],
+      "functions": [
+        "test_get_category_by_extension",
+        "test_get_category_by_url",
+        "test_get_category_directory"
+      ],
+      "total_functions": 3,
+      "imports": [
+        "pathlib.Path",
+        "shusha.models.category_manager.CategoryManager",
+        "unittest"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "tests/test_checksum_win.py",
+      "loc": 45,
+      "classes": [
+        "TestChecksumWindow"
+      ],
+      "functions": [
+        "test_checksum_window_computation"
+      ],
+      "total_functions": 1,
+      "imports": [
+        "pathlib.Path",
+        "shusha.views.checksum_win.ChecksumWindow",
+        "tempfile",
+        "ttkbootstrap",
+        "unittest"
+      ],
+      "has_tk": true,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "tests/test_cli.py",
+      "loc": 91,
+      "classes": [
+        "TestCLI"
+      ],
+      "functions": [
+        "setUp",
+        "test_version_flag",
+        "test_daemon_subcommands",
+        "test_add_and_list_subcommands",
+        "test_pause_resume_remove_subcommands",
+        "test_hash_subcommand"
+      ],
+      "total_functions": 6,
+      "imports": [
+        "io",
+        "pathlib.Path",
+        "shusha.cli.build_parser",
+        "shusha.cli.handle_cli",
+        "tempfile",
+        "unittest",
+        "unittest.mock.MagicMock",
+        "unittest.mock.patch"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "tests/test_client.py",
+      "loc": 116,
+      "classes": [
+        "TestClient"
+      ],
+      "functions": [
+        "setUp",
+        "test_xmlrpc_client_exception",
+        "test_build_request_params_without_secret",
+        "test_build_request_params_with_secret",
+        "test_add_uri_success",
+        "test_add_uri_with_secret",
+        "test_remove_success",
+        "test_pause_and_unpause",
+        "test_tell_status",
+        "test_tell_status_fault_returns_empty_dict"
+      ],
+      "total_functions": 14,
+      "imports": [
+        "shusha.models.client.Client",
+        "shusha.models.client.XMLRPCClientException",
+        "shusha.models.daemon.Daemon",
+        "unittest",
+        "unittest.mock.MagicMock",
+        "xmlrpc.client"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": true,
+      "has_any": false
+    },
+    {
+      "path": "tests/test_clipboard_watcher.py",
+      "loc": 46,
+      "classes": [
+        "TestClipboardWatcher"
+      ],
+      "functions": [
+        "test_is_downloadable_url",
+        "test_clipboard_watcher_polling_and_callback",
+        "test_clipboard_watcher_pause_resume"
+      ],
+      "total_functions": 3,
+      "imports": [
+        "shusha.models.clipboard_watcher.ClipboardWatcher",
+        "time",
+        "unittest",
+        "unittest.mock.MagicMock"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "tests/test_controller_api.py",
+      "loc": 291,
+      "classes": [
+        "TestShushaAPI"
+      ],
+      "functions": [
+        "setUp",
+        "test_str_representation",
+        "test_start_stop_server",
+        "test_daemon_management_methods",
+        "test_get_download_and_get_downloads",
+        "test_add_and_add_uris",
+        "test_add_magnet_and_metalink",
+        "test_add_torrent",
+        "test_pause_and_resume",
+        "test_pause_all_and_resume_all_and_unpause_all"
+      ],
+      "total_functions": 18,
+      "imports": [
+        "pathlib.Path",
+        "shusha.controller.api.ShushaAPI",
+        "shusha.models.client.Client",
+        "shusha.models.daemon.Daemon",
+        "shusha.models.structs_downloads.Download",
+        "shusha.models.structs_options.Options",
+        "tempfile",
+        "unittest",
+        "unittest.mock.MagicMock"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": true,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "tests/test_daemon.py",
+      "loc": 42,
+      "classes": [
+        "TestDaemon"
+      ],
+      "functions": [
+        "test_daemon_init_defaults",
+        "test_build_command",
+        "test_start_and_stop_server"
+      ],
+      "total_functions": 3,
+      "imports": [
+        "shusha.models.daemon.Daemon",
+        "unittest",
+        "unittest.mock.MagicMock",
+        "unittest.mock.patch"
+      ],
+      "has_tk": false,
+      "has_subprocess": true,
+      "has_sqlite": false,
+      "has_aria2": true,
+      "has_any": false
+    },
+    {
+      "path": "tests/test_database.py",
+      "loc": 139,
+      "classes": [
+        "TestShushaDB"
+      ],
+      "functions": [
+        "setUp",
+        "tearDown",
+        "test_insert_and_retrieve",
+        "test_insert_multiple_and_all",
+        "test_update",
+        "test_remove",
+        "test_search",
+        "test_table_management",
+        "test_save_and_load",
+        "test_complex_query"
+      ],
+      "total_functions": 12,
+      "imports": [
+        "contextlib",
+        "os",
+        "shusha.models.database.Query",
+        "shusha.models.database.ShushaDB",
+        "tempfile",
+        "unittest"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": true,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "tests/test_gui_smoke.py",
+      "loc": 107,
+      "classes": [
+        "TestGuiSmoke"
+      ],
+      "functions": [
+        "setUp",
+        "tearDown",
+        "test_relative_to_assets",
+        "test_gui_smoke_or_headless",
+        "test_icon_loading_safety",
+        "test_aria2_gui_components"
+      ],
+      "total_functions": 6,
+      "imports": [
+        "contextlib",
+        "shusha.ShushaDM.ICON_PATH",
+        "shusha.ShushaDM.OUTPUT_PATH",
+        "shusha.views.app.Aria2Gui",
+        "shusha.views.app.relative_to_assets",
+        "tkinter",
+        "ttkbootstrap",
+        "unittest",
+        "unittest.mock.MagicMock"
+      ],
+      "has_tk": true,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": true,
+      "has_any": false
+    },
+    {
+      "path": "tests/test_inspector_win.py",
+      "loc": 77,
+      "classes": [
+        "TestInspectorAndBatchWindows"
+      ],
+      "functions": [
+        "setUpClass",
+        "tearDownClass",
+        "test_batch_add_window",
+        "test_inspector_window"
+      ],
+      "total_functions": 4,
+      "imports": [
+        "shusha.controller.api.ShushaAPI",
+        "shusha.models.structs_downloads.Download",
+        "shusha.views.batch_add_win.BatchAddWindow",
+        "shusha.views.inspector_win.DownloadInspectorWindow",
+        "ttkbootstrap",
+        "unittest",
+        "unittest.mock.MagicMock"
+      ],
+      "has_tk": true,
+      "has_subprocess": false,
+      "has_sqlite": true,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "tests/test_logger.py",
+      "loc": 26,
+      "classes": [
+        "TestLogger"
+      ],
+      "functions": [
+        "test_logger_service"
+      ],
+      "total_functions": 1,
+      "imports": [
+        "logging",
+        "pathlib.Path",
+        "shusha.models.logger.LoggerService",
+        "tempfile",
+        "unittest"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "tests/test_media_extractor.py",
+      "loc": 55,
+      "classes": [
+        "TestMediaExtractor"
+      ],
+      "functions": [
+        "test_is_m3u8",
+        "test_parse_master_playlist",
+        "test_parse_media_segments"
+      ],
+      "total_functions": 3,
+      "imports": [
+        "shusha.models.media_extractor.MediaExtractor",
+        "unittest"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "tests/test_mirror_prober.py",
+      "loc": 64,
+      "classes": [
+        "TestMirrorProber"
+      ],
+      "functions": [
+        "test_probe_result_dataclass",
+        "test_probe_single_mirror_success",
+        "test_probe_single_mirror_failure",
+        "test_probe_multiple_mirrors_and_sorting",
+        "_mock_probe"
+      ],
+      "total_functions": 5,
+      "imports": [
+        "shusha.models.mirror_prober.MirrorProbeResult",
+        "shusha.models.mirror_prober.MirrorProber",
+        "unittest",
+        "unittest.mock.MagicMock",
+        "unittest.mock.patch"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "tests/test_notifications.py",
+      "loc": 39,
+      "classes": [
+        "TestNotifications"
+      ],
+      "functions": [
+        "test_send_desktop_notification_linux",
+        "test_send_desktop_notification_darwin",
+        "test_send_desktop_notification_windows",
+        "test_send_desktop_notification_fallback"
+      ],
+      "total_functions": 4,
+      "imports": [
+        "shusha.models.utilities.send_desktop_notification",
+        "unittest",
+        "unittest.mock.patch"
+      ],
+      "has_tk": false,
+      "has_subprocess": true,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "tests/test_path_opening.py",
+      "loc": 61,
+      "classes": [
+        "TestPathOpening"
+      ],
+      "functions": [
+        "test_open_linux_xdg_open",
+        "test_open_linux_gio_fallback",
+        "test_open_linux_no_launcher_graceful",
+        "test_open_darwin",
+        "test_open_windows"
+      ],
+      "total_functions": 5,
+      "imports": [
+        "os",
+        "pathlib.Path",
+        "shusha.models.utilities.open_path_in_file_manager",
+        "sys",
+        "unittest",
+        "unittest.mock.MagicMock",
+        "unittest.mock.patch"
+      ],
+      "has_tk": false,
+      "has_subprocess": true,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "tests/test_peers_and_servers.py",
+      "loc": 83,
+      "classes": [
+        "TestPeersAndServers"
+      ],
+      "functions": [
+        "setUp",
+        "test_get_peers",
+        "test_get_servers",
+        "test_change_download_speed_limits",
+        "test_change_uri"
+      ],
+      "total_functions": 5,
+      "imports": [
+        "shusha.controller.api.ShushaAPI",
+        "shusha.models.client.Client",
+        "shusha.models.daemon.Daemon",
+        "unittest",
+        "unittest.mock.MagicMock"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": true,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "tests/test_piece_map.py",
+      "loc": 41,
+      "classes": [
+        "TestPieceMapWidget"
+      ],
+      "functions": [
+        "setUpClass",
+        "tearDownClass",
+        "test_piece_map_bitfield_rendering"
+      ],
+      "total_functions": 3,
+      "imports": [
+        "shusha.models.structs_downloads.Download",
+        "shusha.views.piece_map.PieceMapWidget",
+        "ttkbootstrap",
+        "unittest",
+        "unittest.mock.MagicMock"
+      ],
+      "has_tk": true,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "tests/test_post_actions.py",
+      "loc": 39,
+      "classes": [
+        "TestPostActions"
+      ],
+      "functions": [
+        "test_play_alert_sound",
+        "test_execute_completion_command",
+        "test_empty_command",
+        "test_shutdown_and_sleep_system"
+      ],
+      "total_functions": 4,
+      "imports": [
+        "shusha.models.post_actions.PostActions",
+        "unittest",
+        "unittest.mock.patch"
+      ],
+      "has_tk": false,
+      "has_subprocess": true,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "tests/test_query_syntax.py",
+      "loc": 29,
+      "classes": [
+        "TestQuerySyntax"
+      ],
+      "functions": [
+        "test_query_field",
+        "test_condition_properties",
+        "test_condition_logical_operations"
+      ],
+      "total_functions": 3,
+      "imports": [
+        "shusha.models.database.Condition",
+        "shusha.models.database.Field",
+        "shusha.models.database.Query",
+        "unittest"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "tests/test_scheduler.py",
+      "loc": 58,
+      "classes": [
+        "TestBandwidthScheduler"
+      ],
+      "functions": [
+        "test_rule_active_time",
+        "test_scheduler_evaluation_and_serialization"
+      ],
+      "total_functions": 2,
+      "imports": [
+        "datetime",
+        "shusha.models.scheduler.BandwidthScheduler",
+        "shusha.models.scheduler.ScheduleRule",
+        "unittest"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "tests/test_security.py",
+      "loc": 42,
+      "classes": [
+        "TestSecurity"
+      ],
+      "functions": [
+        "test_incomplete_download_file_protection",
+        "test_nonexistent_file_removal_safety"
+      ],
+      "total_functions": 2,
+      "imports": [
+        "pathlib.Path",
+        "shusha.controller.api.ShushaAPI",
+        "tempfile",
+        "unittest",
+        "unittest.mock.MagicMock"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "tests/test_session_persistence.py",
+      "loc": 28,
+      "classes": [
+        "TestSessionPersistence"
+      ],
+      "functions": [
+        "test_daemon_build_command_includes_session_flags",
+        "test_cleanup_saves_session"
+      ],
+      "total_functions": 2,
+      "imports": [
+        "shusha.models.daemon.Daemon",
+        "unittest",
+        "unittest.mock.MagicMock"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": true,
+      "has_any": false
+    },
+    {
+      "path": "tests/test_settings.py",
+      "loc": 34,
+      "classes": [
+        "TestSettings"
+      ],
+      "functions": [
+        "test_settings_methods"
+      ],
+      "total_functions": 1,
+      "imports": [
+        "shusha.models.settings.AppSettings",
+        "tempfile",
+        "unittest",
+        "unittest.mock.patch"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": true,
+      "has_any": false
+    },
+    {
+      "path": "tests/test_settings_win.py",
+      "loc": 93,
+      "classes": [
+        "TestSettingsWindowAndConfig"
+      ],
+      "functions": [
+        "test_dump_toml",
+        "test_save_configuration",
+        "test_app_settings_setters",
+        "test_settings_window_headless"
+      ],
+      "total_functions": 4,
+      "imports": [
+        "pathlib.Path",
+        "shusha.models.settings.AppSettings",
+        "shusha.models.utilities.dump_toml",
+        "shusha.models.utilities.save_configuration",
+        "shusha.views.settings_win.SettingsWindow",
+        "tempfile",
+        "ttkbootstrap",
+        "unittest",
+        "unittest.mock.MagicMock",
+        "unittest.mock.patch"
+      ],
+      "has_tk": true,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": true,
+      "has_any": false
+    },
+    {
+      "path": "tests/test_speed_graph.py",
+      "loc": 34,
+      "classes": [
+        "TestSpeedGraphWidget"
+      ],
+      "functions": [
+        "setUpClass",
+        "tearDownClass",
+        "test_speed_graph_data_accumulation"
+      ],
+      "total_functions": 3,
+      "imports": [
+        "shusha.views.speed_graph.SpeedGraphWidget",
+        "ttkbootstrap",
+        "unittest"
+      ],
+      "has_tk": true,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "tests/test_status_and_uri_win.py",
+      "loc": 105,
+      "classes": [
+        "TestStatusAndUriWindows"
+      ],
+      "functions": [
+        "setUp",
+        "tearDown",
+        "test_status_window_headless",
+        "test_uri_manager_window_headless"
+      ],
+      "total_functions": 4,
+      "imports": [
+        "shusha.views.status_win.DownloadWindow",
+        "shusha.views.uri_win.UriManagerWindow",
+        "ttkbootstrap",
+        "unittest",
+        "unittest.mock.MagicMock"
+      ],
+      "has_tk": true,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "tests/test_structs.py",
+      "loc": 144,
+      "classes": [
+        "TestStructs"
+      ],
+      "functions": [
+        "test_stats_struct_and_dataclass",
+        "test_stats_empty_safe_parsing",
+        "test_file_struct",
+        "test_bittorrent_struct",
+        "test_download_struct",
+        "test_download_empty_and_error_states",
+        "test_options_struct"
+      ],
+      "total_functions": 7,
+      "imports": [
+        "shusha.models.structs_downloads.BitTorrent",
+        "shusha.models.structs_downloads.Download",
+        "shusha.models.structs_downloads.File",
+        "shusha.models.structs_options.Options",
+        "shusha.models.structs_stats.Stats",
+        "unittest",
+        "unittest.mock.MagicMock"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "tests/test_svg_assets.py",
+      "loc": 44,
+      "classes": [
+        "TestSvgAssets"
+      ],
+      "functions": [
+        "test_render_all_icon_vectors",
+        "test_render_unknown_fallback",
+        "test_generate_svg_xml",
+        "test_get_svg_tk_image_and_cache"
+      ],
+      "total_functions": 4,
+      "imports": [
+        "PIL.Image",
+        "shusha.models.svg_assets.ICON_VECTORS",
+        "shusha.models.svg_assets.generate_svg_xml",
+        "shusha.models.svg_assets.get_svg_tk_image",
+        "shusha.models.svg_assets.render_vector_icon",
+        "tkinter",
+        "unittest"
+      ],
+      "has_tk": true,
+      "has_subprocess": false,
+      "has_sqlite": true,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "tests/test_torrent_creator.py",
+      "loc": 53,
+      "classes": [
+        "TestTorrentCreator"
+      ],
+      "functions": [
+        "test_bencode_primitives",
+        "test_create_single_file_torrent",
+        "test_create_multi_file_directory_torrent"
+      ],
+      "total_functions": 3,
+      "imports": [
+        "pathlib.Path",
+        "shusha.models.torrent_creator.TorrentCreator",
+        "shusha.models.torrent_creator.bencode",
+        "tempfile",
+        "unittest"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "tests/test_torrent_features.py",
+      "loc": 105,
+      "classes": [
+        "TestTorrentFeatures"
+      ],
+      "functions": [
+        "setUp",
+        "tearDown",
+        "test_api_add_torrent",
+        "test_api_add_metalink",
+        "test_torrent_files_window_headless",
+        "test_add_window_torrent_tab"
+      ],
+      "total_functions": 6,
+      "imports": [
+        "pathlib.Path",
+        "shusha.controller.api.ShushaAPI",
+        "shusha.models.structs_downloads.Download",
+        "shusha.views.add_win.AddWindow",
+        "shusha.views.torrent_win.TorrentFilesWindow",
+        "tempfile",
+        "ttkbootstrap",
+        "unittest",
+        "unittest.mock.MagicMock"
+      ],
+      "has_tk": true,
+      "has_subprocess": false,
+      "has_sqlite": true,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "tests/test_tracker_service.py",
+      "loc": 32,
+      "classes": [
+        "TestTrackerService"
+      ],
+      "functions": [
+        "test_get_trackers_fallback",
+        "test_get_trackers_csv",
+        "test_fetch_latest_trackers_sync"
+      ],
+      "total_functions": 3,
+      "imports": [
+        "shusha.models.tracker_service.DEFAULT_FALLBACK_TRACKERS",
+        "shusha.models.tracker_service.TrackerService",
+        "unittest",
+        "unittest.mock.MagicMock",
+        "unittest.mock.patch"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "tests/test_utilities.py",
+      "loc": 85,
+      "classes": [
+        "TestUtilities"
+      ],
+      "functions": [
+        "test_bool_or_value",
+        "test_bool_to_str",
+        "test_sizeof_fmt",
+        "test_format_speed",
+        "test_format_size",
+        "test_timedelta_fmt",
+        "test_format_eta",
+        "test_directories",
+        "test_get_version",
+        "test_load_configuration"
+      ],
+      "total_functions": 10,
+      "imports": [
+        "datetime.timedelta",
+        "pathlib.Path",
+        "shusha.models.utilities.bool_or_value",
+        "shusha.models.utilities.bool_to_str",
+        "shusha.models.utilities.cache_dir",
+        "shusha.models.utilities.config_dir",
+        "shusha.models.utilities.data_dir",
+        "shusha.models.utilities.download_dir",
+        "shusha.models.utilities.format_eta",
+        "shusha.models.utilities.format_size",
+        "shusha.models.utilities.format_speed",
+        "shusha.models.utilities.get_version",
+        "shusha.models.utilities.load_configuration",
+        "shusha.models.utilities.log_dir",
+        "shusha.models.utilities.sizeof_fmt",
+        "shusha.models.utilities.timedelta_fmt",
+        "tempfile",
+        "unittest",
+        "unittest.mock.patch"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": true,
+      "has_any": false
+    },
+    {
+      "path": "tests/test_webhook_server.py",
+      "loc": 63,
+      "classes": [
+        "TestWebhookServer"
+      ],
+      "functions": [
+        "setUp",
+        "tearDown",
+        "test_health_check_endpoint",
+        "test_add_download_post_endpoint"
+      ],
+      "total_functions": 4,
+      "imports": [
+        "json",
+        "shusha.models.webhook_server.WebhookServer",
+        "time",
+        "unittest",
+        "urllib.request"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": false,
+      "has_any": false
+    },
+    {
+      "path": "tests/test_ws_client.py",
+      "loc": 97,
+      "classes": [
+        "TestWsClient"
+      ],
+      "functions": [
+        "setUp",
+        "test_init_and_state",
+        "test_event_listener_registration",
+        "test_handle_notification_message",
+        "test_handle_rpc_response_message",
+        "test_http_call_success",
+        "test_http_call_error",
+        "test_multicall"
+      ],
+      "total_functions": 8,
+      "imports": [
+        "json",
+        "shusha.models.ws_client.Aria2WsClient",
+        "shusha.models.ws_client.JsonRpcException",
+        "threading",
+        "unittest",
+        "unittest.mock.MagicMock",
+        "unittest.mock.patch"
+      ],
+      "has_tk": false,
+      "has_subprocess": false,
+      "has_sqlite": false,
+      "has_aria2": true,
+      "has_any": false
+    }
+  ],
+  "total_src_loc": 10182,
+  "total_test_loc": 2841
+}
