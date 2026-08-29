@@ -56,7 +56,12 @@ class OptionRegistry:
                     break
                 current = current.parent
             if spec_path is None:
-                spec_path = Path(__file__).resolve().parents[4] / "spec" / "aria2" / "options.json"
+                spec_path = (
+                    Path(__file__).resolve().parents[4]
+                    / "spec"
+                    / "aria2"
+                    / "options.json"
+                )
 
         if not spec_path.exists():
             raise FileNotFoundError(
