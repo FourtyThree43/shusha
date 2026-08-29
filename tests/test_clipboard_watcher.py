@@ -7,13 +7,25 @@ from shusha.models.clipboard_watcher import ClipboardWatcher
 
 class TestClipboardWatcher(unittest.TestCase):
     def test_is_downloadable_url(self):
-        self.assertTrue(ClipboardWatcher.is_downloadable_url("http://example.com/file.zip"))
-        self.assertTrue(ClipboardWatcher.is_downloadable_url("https://example.com/video.mp4"))
-        self.assertTrue(ClipboardWatcher.is_downloadable_url("ftp://ftp.example.com/iso.iso"))
-        self.assertTrue(ClipboardWatcher.is_downloadable_url("magnet:?xt=urn:btih:abcdef123456"))
+        self.assertTrue(
+            ClipboardWatcher.is_downloadable_url("http://example.com/file.zip")
+        )
+        self.assertTrue(
+            ClipboardWatcher.is_downloadable_url("https://example.com/video.mp4")
+        )
+        self.assertTrue(
+            ClipboardWatcher.is_downloadable_url("ftp://ftp.example.com/iso.iso")
+        )
+        self.assertTrue(
+            ClipboardWatcher.is_downloadable_url("magnet:?xt=urn:btih:abcdef123456")
+        )
         self.assertFalse(ClipboardWatcher.is_downloadable_url("just some plain text"))
         self.assertFalse(ClipboardWatcher.is_downloadable_url(""))
-        self.assertFalse(ClipboardWatcher.is_downloadable_url("http://example.com/link with invalid spaces.zip"))
+        self.assertFalse(
+            ClipboardWatcher.is_downloadable_url(
+                "http://example.com/link with invalid spaces.zip"
+            )
+        )
 
     def test_clipboard_watcher_polling_and_callback(self):
         mock_callback = MagicMock()

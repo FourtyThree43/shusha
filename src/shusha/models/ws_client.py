@@ -114,7 +114,9 @@ class Aria2WsClient:
             try:
                 cb(event_name, params)
             except Exception as e:
-                logger.log(f"Error in event listener for {event_name}: {e}", level="error")
+                logger.log(
+                    f"Error in event listener for {event_name}: {e}", level="error"
+                )
 
     def connect(self) -> bool:
         """Establish WebSocket connection with aria2 daemon.
@@ -126,7 +128,9 @@ class Aria2WsClient:
             return True
 
         try:
-            sock = socket.create_connection((self.host, self.port), timeout=self.timeout)
+            sock = socket.create_connection(
+                (self.host, self.port), timeout=self.timeout
+            )
             # Perform WebSocket handshake
             key = base64.b64encode(os.urandom(16)).decode("ascii")
             handshake = (
@@ -148,7 +152,10 @@ class Aria2WsClient:
 
             if b" 101 " not in response:
                 sock.close()
-                logger.log(f"WebSocket handshake failed on {self.host}:{self.port}", level="debug")
+                logger.log(
+                    f"WebSocket handshake failed on {self.host}:{self.port}",
+                    level="debug",
+                )
                 return False
 
             self._sock = sock
@@ -159,7 +166,10 @@ class Aria2WsClient:
                 target=self._listen_loop, daemon=True, name="Aria2WsListener"
             )
             self._listener_thread.start()
-            logger.log(f"WebSocket connected to ws://{self.host}:{self.port}/jsonrpc", level="info")
+            logger.log(
+                f"WebSocket connected to ws://{self.host}:{self.port}/jsonrpc",
+                level="info",
+            )
             return True
 
         except Exception as e:
@@ -339,7 +349,9 @@ class Aria2WsClient:
                     return res.get("result")
 
             except Exception as ws_err:
-                logger.log(f"WS call fallback to HTTP on {method}: {ws_err}", level="debug")
+                logger.log(
+                    f"WS call fallback to HTTP on {method}: {ws_err}", level="debug"
+                )
             finally:
                 self._pending_requests.pop(req_id, None)
 
@@ -368,7 +380,9 @@ class Aria2WsClient:
                     )
                 return data.get("result")
         except urllib.error.URLError as e:
-            raise ConnectionError(f"HTTP JSON-RPC connection failed to {url}: {e}") from e
+            raise ConnectionError(
+                f"HTTP JSON-RPC connection failed to {url}: {e}"
+            ) from e
 
     def multicall(self, methods_and_params: list[tuple[str, list[Any]]]) -> list[Any]:
         """Execute multiple JSON-RPC calls in a single network batch via `system.multicall`.

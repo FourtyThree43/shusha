@@ -7,7 +7,7 @@ name = "shusha"
 dynamic = ["version"]
 description = "Shusha download manager is a GUI for aria2."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.14"
 license = "MIT"
 keywords = [
   "aria2", "aria2c", "download-manager", "downloader", "aria2-gui", "python",
@@ -20,10 +20,6 @@ authors = [
 classifiers = [
   "Development Status :: 4 - Beta",
   "Programming Language :: Python",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
-  "Programming Language :: Python :: 3.12",
-  "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
   "Programming Language :: Python :: Implementation :: CPython",
 ]
@@ -31,7 +27,6 @@ dependencies = [
   "ttkbootstrap>=1.10.1",
   "platformdirs>=4.1.0",
   "pillow>=10.0.0",
-  "tomli>=2.0.1; python_version < '3.11'",
 ]
 
 [project.urls]
@@ -85,7 +80,7 @@ exclude_lines = [
 
 [tool.ruff]
 line-length = 88
-target-version = "py310"
+target-version = "py314"
 extend-exclude = [
   "archive",
 ]

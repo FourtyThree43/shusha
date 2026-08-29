@@ -252,8 +252,7 @@ A screen does not contain application business logic.
 Create one application root:
 
 ```python
-class ShushaApplication(ttk.Window):
-    ...
+class ShushaApplication(ttk.Window): ...
 ```
 
 The root owns:
@@ -654,8 +653,7 @@ Do not call theme configuration independently from individual screens.
 Create:
 
 ```python
-class DesignTokens:
-    ...
+class DesignTokens: ...
 ```
 
 covering:

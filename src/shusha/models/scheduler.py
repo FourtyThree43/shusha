@@ -60,9 +60,7 @@ class BandwidthScheduler:
         """Add a new scheduling rule."""
         self.rules.append(rule)
 
-    def evaluate(
-        self, now: datetime.datetime | None = None
-    ) -> tuple[str, str] | None:
+    def evaluate(self, now: datetime.datetime | None = None) -> tuple[str, str] | None:
         """Evaluate active rules and return (max_download, max_upload) limits if applicable.
 
         Returns:

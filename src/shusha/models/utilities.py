@@ -8,15 +8,11 @@ import shutil
 import subprocess
 import sys
 import textwrap
+import tomllib
 from datetime import timedelta
 from importlib import metadata
 from pathlib import Path
 from typing import Any
-
-try:
-    import tomllib  # ty: ignore[unresolved-import]
-except ModuleNotFoundError:
-    import tomli as tomllib  # ty: ignore[unresolved-import]
 
 from platformdirs import (
     user_cache_dir,

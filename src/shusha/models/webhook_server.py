@@ -77,13 +77,17 @@ class WebhookRequestHandler(BaseHTTPRequestHandler):
 
             url = payload.get("url") or payload.get("uri")
             if not url:
-                self._send_json_response(400, {"error": "Missing 'url' or 'uri' parameter"})
+                self._send_json_response(
+                    400, {"error": "Missing 'url' or 'uri' parameter"}
+                )
                 return
 
             if WebhookRequestHandler._download_callback:
                 WebhookRequestHandler._download_callback(payload)
 
-            self._send_json_response(200, {"status": "success", "message": "Download queued"})
+            self._send_json_response(
+                200, {"status": "success", "message": "Download queued"}
+            )
 
         except json.JSONDecodeError:
             self._send_json_response(400, {"error": "Invalid JSON body"})
@@ -121,12 +125,20 @@ class WebhookServer:
             WebhookRequestHandler._download_callback = self.on_download_received
             self._server = HTTPServer((self.host, self.port), WebhookRequestHandler)
             self._running = True
-            self._thread = threading.Thread(target=self._server.serve_forever, daemon=True)
+            self._thread = threading.Thread(
+                target=self._server.serve_forever, daemon=True
+            )
             self._thread.start()
-            logger.log(f"Webhook server running at http://{self.host}:{self.port}/", level="info")
+            logger.log(
+                f"Webhook server running at http://{self.host}:{self.port}/",
+                level="info",
+            )
             return True
         except Exception as e:
-            logger.log(f"Failed to start webhook server on {self.host}:{self.port}: {e}", level="warning")
+            logger.log(
+                f"Failed to start webhook server on {self.host}:{self.port}: {e}",
+                level="warning",
+            )
             self._running = False
             return False
 

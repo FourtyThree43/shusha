@@ -2691,11 +2691,7 @@ shell command string
 Use:
 
 ```python
-subprocess.Popen([
-    aria2_path,
-    "--enable-rpc=true",
-    ...
-])
+subprocess.Popen([aria2_path, "--enable-rpc=true", ...])
 ```
 
 Arguments must remain separate.

@@ -36,7 +36,9 @@ class TestCategoryManager(unittest.TestCase):
             base / "Videos",
         )
         self.assertEqual(
-            CategoryManager.get_category_directory(base, "Document", auto_subfolder=True),
+            CategoryManager.get_category_directory(
+                base, "Document", auto_subfolder=True
+            ),
             base / "Documents",
         )
         self.assertEqual(

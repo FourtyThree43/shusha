@@ -46,7 +46,9 @@ class TestCLI(unittest.TestCase):
         mock_api.get_downloads.return_value = []
         mock_api_cls.return_value = mock_api
 
-        args = self.parser.parse_args(["add", "http://example.com/test.zip", "--split", "4"])
+        args = self.parser.parse_args(
+            ["add", "http://example.com/test.zip", "--split", "4"]
+        )
         self.assertEqual(handle_cli(args), 0)
         mock_api.add_uris.assert_called_once()
 

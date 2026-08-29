@@ -65,9 +65,15 @@ class TestShushaAPI(unittest.TestCase):
         self.assertEqual(len(dls), 1)
 
         # All downloads (active, waiting, stopped)
-        self.mock_client.tell_active.return_value = [{"gid": "g1", "status": "active", "files": []}]
-        self.mock_client.tell_waiting.return_value = [{"gid": "g2", "status": "waiting", "files": []}]
-        self.mock_client.tell_stopped.return_value = [{"gid": "g3", "status": "complete", "files": []}]
+        self.mock_client.tell_active.return_value = [
+            {"gid": "g1", "status": "active", "files": []}
+        ]
+        self.mock_client.tell_waiting.return_value = [
+            {"gid": "g2", "status": "waiting", "files": []}
+        ]
+        self.mock_client.tell_stopped.return_value = [
+            {"gid": "g3", "status": "complete", "files": []}
+        ]
         all_dls = self.api.get_downloads()
         self.assertEqual(len(all_dls), 3)
 
@@ -78,7 +84,9 @@ class TestShushaAPI(unittest.TestCase):
             "status": "active",
             "files": [],
         }
-        res_list = self.api.add(["http://example.com/test.zip"], options={"dir": "/tmp"})
+        res_list = self.api.add(
+            ["http://example.com/test.zip"], options={"dir": "/tmp"}
+        )
         self.assertEqual(len(res_list), 1)
         self.assertEqual(res_list[0].gid, "gid_add_test")
 
@@ -89,18 +97,30 @@ class TestShushaAPI(unittest.TestCase):
 
     def test_add_magnet_and_metalink(self):
         self.mock_client.add_magnet.return_value = "mag_gid"
-        self.mock_client.tell_status.return_value = {"gid": "mag_gid", "status": "active", "files": []}
+        self.mock_client.tell_status.return_value = {
+            "gid": "mag_gid",
+            "status": "active",
+            "files": [],
+        }
         res_mag = self.api.add_magnet("magnet:?xt=urn:btih:xyz")
         self.assertEqual(len(res_mag), 1)
 
         self.mock_client.add_metalink.return_value = ["meta_gid"]
-        self.mock_client.tell_status.return_value = {"gid": "meta_gid", "status": "active", "files": []}
+        self.mock_client.tell_status.return_value = {
+            "gid": "meta_gid",
+            "status": "active",
+            "files": [],
+        }
         res_meta = self.api.add_metalink("/path/to/meta.metalink")
         self.assertEqual(len(res_meta), 1)
 
     def test_add_torrent(self):
         self.mock_client.add_torrent.return_value = "tor_gid"
-        self.mock_client.tell_status.return_value = {"gid": "tor_gid", "status": "active", "files": []}
+        self.mock_client.tell_status.return_value = {
+            "gid": "tor_gid",
+            "status": "active",
+            "files": [],
+        }
         res = self.api.add_torrent("/path/to/sample.torrent")
         self.assertEqual(len(res), 1)
 
@@ -203,7 +223,9 @@ class TestShushaAPI(unittest.TestCase):
         res_set = self.api.set_options({"max-download-limit": "200K"}, [mock_dl])
         self.assertEqual(res_set, [True])
 
-        self.mock_client.get_global_option.return_value = {"max-concurrent-downloads": "5"}
+        self.mock_client.get_global_option.return_value = {
+            "max-concurrent-downloads": "5"
+        }
         g_opt = self.api.get_global_options()
         self.assertIsInstance(g_opt, Options)
 
@@ -215,17 +237,23 @@ class TestShushaAPI(unittest.TestCase):
         peers = self.api.get_peers("gid_peers")
         self.assertEqual(len(peers), 1)
 
-        self.mock_client.get_servers.return_value = [{"servers": [{"uri": "http://mirror.com"}]}]
+        self.mock_client.get_servers.return_value = [
+            {"servers": [{"uri": "http://mirror.com"}]}
+        ]
         servers = self.api.get_servers("gid_servers")
         self.assertEqual(len(servers), 1)
 
     def test_change_uri_and_speed_limits(self):
         self.mock_client.change_uri.return_value = [1, 1]
-        res = self.api.change_uri("gid_uri", file_index=1, del_uris=["http://old"], add_uris=["http://new"])
+        res = self.api.change_uri(
+            "gid_uri", file_index=1, del_uris=["http://old"], add_uris=["http://new"]
+        )
         self.assertEqual(res, [1, 1])
 
         self.mock_client.change_option.return_value = "OK"
-        res_limit = self.api.change_download_speed_limits("gid_limit", max_download="1M", max_upload="500K")
+        res_limit = self.api.change_download_speed_limits(
+            "gid_limit", max_download="1M", max_upload="500K"
+        )
         self.assertTrue(res_limit)
 
         self.assertTrue(self.api.change_download_speed_limits("gid_limit"))
@@ -247,7 +275,11 @@ class TestShushaAPI(unittest.TestCase):
         mock_failed.gid = "gid_fail"
 
         self.mock_client.add_uri.return_value = "gid_retried"
-        self.mock_client.tell_status.return_value = {"gid": "gid_retried", "status": "active", "files": []}
+        self.mock_client.tell_status.return_value = {
+            "gid": "gid_retried",
+            "status": "active",
+            "files": [],
+        }
         res_retry = self.api.retry_downloads([mock_failed])
         self.assertEqual(res_retry, [True])
 
@@ -282,7 +314,10 @@ class TestShushaAPI(unittest.TestCase):
             # Test remove
             mock_dl_dst = MagicMock()
             mock_dl_dst.is_complete = True
-            mock_dl_dst.root_files_paths = [Path(dst_dir) / "sample.txt", Path(dst_dir) / "subdir"]
+            mock_dl_dst.root_files_paths = [
+                Path(dst_dir) / "sample.txt",
+                Path(dst_dir) / "subdir",
+            ]
             res_rm = ShushaAPI.remove_files([mock_dl_dst], force=True)
             self.assertEqual(res_rm, [True, True])
 

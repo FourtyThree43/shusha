@@ -81,7 +81,9 @@ def expand_pattern_url(pattern_url: str) -> list[str]:
     if num_match:
         start_str, end_str = num_match.group(1), num_match.group(2)
         start, end = int(start_str), int(end_str)
-        width = len(start_str) if start_str.startswith("0") and len(start_str) > 1 else 0
+        width = (
+            len(start_str) if start_str.startswith("0") and len(start_str) > 1 else 0
+        )
 
         step = 1 if end >= start else -1
         results: list[str] = []

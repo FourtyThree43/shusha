@@ -56,7 +56,9 @@ class TestWebhookServer(unittest.TestCase):
 
         time.sleep(0.05)
         self.assertEqual(len(self.received_payloads), 1)
-        self.assertEqual(self.received_payloads[0]["url"], "https://example.com/file.zip")
+        self.assertEqual(
+            self.received_payloads[0]["url"], "https://example.com/file.zip"
+        )
 
 
 if __name__ == "__main__":

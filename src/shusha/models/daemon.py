@@ -182,14 +182,14 @@ class Daemon:
 
     def start_server(self):
         """Start the Aria2 server or reuse existing instance.
-        
+
         Returns:
             The PID of the started server, or None if a server is already running
             or if the host is remote (not localhost).
         """
         # Check if this is a remote host (not localhost/127.0.0.1)
         is_local = self.host in ("localhost", "127.0.0.1", "0.0.0.0", "::1")
-        
+
         if self.process and self.process.poll() is None:
             logger.log("Aria2 server is already running.", level="warning")
             return self.process.pid
@@ -200,7 +200,7 @@ class Daemon:
                 level="info",
             )
             return None
-        
+
         # Only start a local daemon if the host is localhost
         if not is_local:
             logger.log(

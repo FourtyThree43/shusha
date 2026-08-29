@@ -33,6 +33,7 @@ class TestSvgAssets(unittest.TestCase):
     def test_get_svg_tk_image_and_cache(self):
         try:
             import tkinter as tk
+
             root = tk.Tk()
             root.withdraw()
             photo1 = get_svg_tk_image("dot-online", size=16)

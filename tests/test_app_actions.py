@@ -52,13 +52,15 @@ class TestAppActions(unittest.TestCase):
         self.assertIsNotNone(self.app.context_menu)
 
     def test_update_stats_frame(self):
-        stats = Stats.from_dict({
-            "downloadSpeed": "1048576",
-            "uploadSpeed": "524288",
-            "numActive": "2",
-            "numWaiting": "1",
-            "numStopped": "5",
-        })
+        stats = Stats.from_dict(
+            {
+                "downloadSpeed": "1048576",
+                "uploadSpeed": "524288",
+                "numActive": "2",
+                "numWaiting": "1",
+                "numStopped": "5",
+            }
+        )
         self.app.update_stats_frame(stats)
         self.assertIn("1.00 MiB/s", self.app.stats_vars["Download Speed"].get())
         self.assertIn("512.00 KiB/s", self.app.stats_vars["Upload Speed"].get())
@@ -73,9 +75,25 @@ class TestAppActions(unittest.TestCase):
 
         with patch.object(self.app.dt, "get_rows") as mock_get_rows:
             mock_row1 = MagicMock()
-            mock_row1.values = ["file1.zip", "10 MB", "100%", "Active", "1 MB/s", "10s", "gid1"]
+            mock_row1.values = [
+                "file1.zip",
+                "10 MB",
+                "100%",
+                "Active",
+                "1 MB/s",
+                "10s",
+                "gid1",
+            ]
             mock_row2 = MagicMock()
-            mock_row2.values = ["file2.iso", "100 MB", "50%", "Active", "2 MB/s", "30s", "gid2"]
+            mock_row2.values = [
+                "file2.iso",
+                "100 MB",
+                "50%",
+                "Active",
+                "2 MB/s",
+                "30s",
+                "gid2",
+            ]
 
             mock_get_rows.return_value = [mock_row1, mock_row2]
 
@@ -123,10 +141,14 @@ class TestAppActions(unittest.TestCase):
 
         with patch.object(self.app, "get_selected_download", return_value=mock_dl):
             self.app.move_download_up()
-            self.mock_api.client.change_position.assert_called_with("gid_move", -1, "POS_CUR")
+            self.mock_api.client.change_position.assert_called_with(
+                "gid_move", -1, "POS_CUR"
+            )
 
             self.app.move_download_down()
-            self.mock_api.client.change_position.assert_called_with("gid_move", 1, "POS_CUR")
+            self.mock_api.client.change_position.assert_called_with(
+                "gid_move", 1, "POS_CUR"
+            )
 
     def test_category_matching_and_filtering(self):
         mock_active = MagicMock(spec=Download)
@@ -294,11 +316,13 @@ class TestAppActions(unittest.TestCase):
             mock_toast.assert_called_once()
 
         with patch.object(self.app, "download_thread") as mock_dl_thread:
-            self.app._on_webhook_download({
-                "url": "https://example.com/package.zip",
-                "filename": "archive.zip",
-                "headers": {"User-Agent": "CustomAgent/1.0"},
-            })
+            self.app._on_webhook_download(
+                {
+                    "url": "https://example.com/package.zip",
+                    "filename": "archive.zip",
+                    "headers": {"User-Agent": "CustomAgent/1.0"},
+                }
+            )
             mock_dl_thread.assert_called_once_with(
                 "https://example.com/package.zip",
                 {"out": "archive.zip", "user-agent": "CustomAgent/1.0"},

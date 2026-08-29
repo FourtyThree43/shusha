@@ -45,7 +45,10 @@ class TestGuiSmoke(unittest.TestCase):
         except Exception:
             with contextlib.suppress(Exception):
                 icon_png = (
-                    OUTPUT_PATH / "resources" / "assets" / "icons8-bittorrent-new-64.png"
+                    OUTPUT_PATH
+                    / "resources"
+                    / "assets"
+                    / "icons8-bittorrent-new-64.png"
                 )
                 if icon_png.exists():
                     img = tk.PhotoImage(file=str(icon_png))

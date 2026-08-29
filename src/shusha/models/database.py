@@ -395,16 +395,16 @@ class ShushaDB:
 
     def __del__(self):
         """Close the database when the instance is deleted.
-        
+
         Note: Avoid operations that might trigger ResourceWarnings during
         interpreter shutdown. Only attempt to save if we're not in shutdown.
         """
         import sys
-        
+
         # Skip during interpreter shutdown to avoid ResourceWarnings
-        if hasattr(sys, '_is_shutting_down') and sys._is_shutting_down:
+        if hasattr(sys, "_is_shutting_down") and sys._is_shutting_down:
             return
-        
+
         try:
             if not self.transaction_in_progress:
                 self.save()

@@ -101,10 +101,31 @@ class Aria2Gui(ttk.Frame):
         # Build vector SVG icon cache
         self.svg_icons: dict[str, Any] = {}
         for icon_k in (
-            "add", "start", "pause", "stop", "restart", "reconnect", "remove",
-            "refresh", "settings", "logs", "folder", "link", "torrent", "speed",
-            "pieces", "peers", "servers", "up", "down", "clear", "copy", "batch",
-            "dot-online", "dot-offline", "dot-warning"
+            "add",
+            "start",
+            "pause",
+            "stop",
+            "restart",
+            "reconnect",
+            "remove",
+            "refresh",
+            "settings",
+            "logs",
+            "folder",
+            "link",
+            "torrent",
+            "speed",
+            "pieces",
+            "peers",
+            "servers",
+            "up",
+            "down",
+            "clear",
+            "copy",
+            "batch",
+            "dot-online",
+            "dot-offline",
+            "dot-warning",
         ):
             with contextlib.suppress(Exception):
                 tk_img = get_svg_tk_image(icon_k, size=16, color=self.colors.primary)
@@ -112,10 +133,14 @@ class Aria2Gui(ttk.Frame):
                     self.svg_icons[icon_k] = tk_img
 
         # Initialize Clipboard Watcher and Webhook Server
-        self.clipboard_watcher = ClipboardWatcher(on_url_detected=self._on_clipboard_url)
+        self.clipboard_watcher = ClipboardWatcher(
+            on_url_detected=self._on_clipboard_url
+        )
         self.clipboard_watcher.start()
 
-        self.webhook_server = WebhookServer(port=6810, on_download_received=self._on_webhook_download)
+        self.webhook_server = WebhookServer(
+            port=6810, on_download_received=self._on_webhook_download
+        )
         self.webhook_server.start()
 
         self.create_buttonbar()
@@ -207,7 +232,9 @@ class Aria2Gui(ttk.Frame):
             bootstyle="outline-dark",
         )
         torrent_btn.pack(side=tk.LEFT, padx=(1, 0), pady=1)
-        ToolTip(torrent_btn, text="Create .torrent file & Magnet Link", bootstyle="info")
+        ToolTip(
+            torrent_btn, text="Create .torrent file & Magnet Link", bootstyle="info"
+        )
 
         start_btn = ttk.Button(
             master=opts_row,
@@ -296,12 +323,20 @@ class Aria2Gui(ttk.Frame):
         daemon_menu = tk.Menu(daemon_menu_btn, tearoff=0)
         daemon_menu.add_command(label="▶ Start Daemon", command=self.start_aria2_daemon)
         daemon_menu.add_command(label="⏹ Stop Daemon", command=self.stop_aria2_daemon)
-        daemon_menu.add_command(label="🔄 Restart Daemon", command=self.restart_aria2_daemon)
+        daemon_menu.add_command(
+            label="🔄 Restart Daemon", command=self.restart_aria2_daemon
+        )
         daemon_menu.add_separator()
-        daemon_menu.add_command(label="🔌 Reconnect RPC / WS", command=self.reconnect_aria2_daemon)
+        daemon_menu.add_command(
+            label="🔌 Reconnect RPC / WS", command=self.reconnect_aria2_daemon
+        )
         daemon_menu_btn["menu"] = daemon_menu
         daemon_menu_btn.pack(side=tk.RIGHT, padx=(0, 1), pady=1)
-        ToolTip(daemon_menu_btn, text="Aria2 Daemon lifecycle (Start / Stop / Reconnect)", bootstyle="info")
+        ToolTip(
+            daemon_menu_btn,
+            text="Aria2 Daemon lifecycle (Start / Stop / Reconnect)",
+            bootstyle="info",
+        )
 
         logs_btn = ttk.Button(
             master=opts_row,
@@ -403,9 +438,13 @@ class Aria2Gui(ttk.Frame):
         daemon_sub = tk.Menu(self.context_menu, tearoff=0)
         daemon_sub.add_command(label="Start Daemon", command=self.start_aria2_daemon)
         daemon_sub.add_command(label="Stop Daemon", command=self.stop_aria2_daemon)
-        daemon_sub.add_command(label="Restart Daemon", command=self.restart_aria2_daemon)
+        daemon_sub.add_command(
+            label="Restart Daemon", command=self.restart_aria2_daemon
+        )
         daemon_sub.add_separator()
-        daemon_sub.add_command(label="Reconnect RPC", command=self.reconnect_aria2_daemon)
+        daemon_sub.add_command(
+            label="Reconnect RPC", command=self.reconnect_aria2_daemon
+        )
         self.context_menu.add_cascade(label="Aria2 Daemon", menu=daemon_sub)
 
     def show_context_menu(self, event):
@@ -512,7 +551,11 @@ class Aria2Gui(ttk.Frame):
             bootstyle="link",
         )
         self.daemon_status_btn.pack(side=tk.LEFT, padx=12, pady=1)
-        ToolTip(self.daemon_status_btn, text="Click to test / reconnect Aria2 daemon", bootstyle="info")
+        ToolTip(
+            self.daemon_status_btn,
+            text="Click to test / reconnect Aria2 daemon",
+            bootstyle="info",
+        )
 
         # Static label structure with StringVars to prevent memory leaks
         self.stats_frame = tk.Frame(opts_row)
@@ -604,8 +647,10 @@ class Aria2Gui(ttk.Frame):
 
     def open_create_torrent(self):
         """Open the CreateTorrentWindow modal dialog."""
+
         def handle_created(t_path: Path, magnet: str):
             self.show_toast(f"Created Torrent: {t_path.name}")
+
         CreateTorrentWindow(master=self, on_created=handle_created)
 
     def open_selected_checksum(self):
@@ -922,6 +967,7 @@ class Aria2Gui(ttk.Frame):
 
     def open_batch_add(self):
         """Open smart batch URL addition dialog."""
+
         def _handle_batch(urls: list[str], options: dict[str, Any]):
             for url in urls:
                 self.download_thread(url, options)
@@ -1012,6 +1058,7 @@ class Aria2Gui(ttk.Frame):
 
     def start_aria2_daemon(self):
         """Start the Aria2 background daemon process."""
+
         def _bg():
             try:
                 pid = self.api.start_server()
@@ -1028,6 +1075,7 @@ class Aria2Gui(ttk.Frame):
 
     def stop_aria2_daemon(self):
         """Stop the Aria2 background daemon process."""
+
         def _bg():
             try:
                 self.api.stop_server()
@@ -1045,6 +1093,7 @@ class Aria2Gui(ttk.Frame):
 
     def restart_aria2_daemon(self):
         """Restart the Aria2 background daemon process."""
+
         def _bg():
             try:
                 self.show_toast("Restarting Aria2 daemon...")
@@ -1062,6 +1111,7 @@ class Aria2Gui(ttk.Frame):
 
     def reconnect_aria2_daemon(self):
         """Reconnect RPC client and WebSocket stream to the Aria2 daemon."""
+
         def _bg():
             try:
                 is_up = self.api.reconnect()
@@ -1070,7 +1120,9 @@ class Aria2Gui(ttk.Frame):
                     if hasattr(self, "daemon_status_btn"):
                         dot_img = self.svg_icons.get("dot-online")
                         if dot_img:
-                            self.daemon_status_btn.config(image=dot_img, compound=tk.LEFT)
+                            self.daemon_status_btn.config(
+                                image=dot_img, compound=tk.LEFT
+                            )
                         self.daemon_status_var.set(" Daemon: Connected")
                     self.refresh_downloads_table()
                 else:
@@ -1078,8 +1130,12 @@ class Aria2Gui(ttk.Frame):
                     if hasattr(self, "daemon_status_btn"):
                         dot_img = self.svg_icons.get("dot-offline")
                         if dot_img:
-                            self.daemon_status_btn.config(image=dot_img, compound=tk.LEFT)
-                        self.daemon_status_var.set(" Daemon: Offline (Click to Reconnect)")
+                            self.daemon_status_btn.config(
+                                image=dot_img, compound=tk.LEFT
+                            )
+                        self.daemon_status_var.set(
+                            " Daemon: Offline (Click to Reconnect)"
+                        )
             except Exception as e:
                 logger.log(f"Error reconnecting to daemon: {e}", level="error")
                 self.show_toast(f"Connection failed: {e}")

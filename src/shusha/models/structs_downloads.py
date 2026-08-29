@@ -6,7 +6,7 @@ They hold structured information about torrents, files, and downloads in aria2c.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -48,7 +48,7 @@ class BitTorrent:
     @property
     def creation_date(self) -> datetime:
         ts = self._struct.get("creationDate", 0)
-        return datetime.fromtimestamp(int(ts or 0), tz=timezone.utc)
+        return datetime.fromtimestamp(int(ts or 0), tz=UTC)
 
     @property
     def mode(self) -> str | None:

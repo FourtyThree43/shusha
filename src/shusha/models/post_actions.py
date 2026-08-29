@@ -28,18 +28,27 @@ class PostActions:
         try:
             if system == "Windows":
                 import winsound
+
                 beep_fn = getattr(winsound, "MessageBeep", None)
                 if callable(beep_fn):
                     beep_fn(getattr(winsound, "MB_ICONASTERISK", 0))
             elif system == "Darwin":
                 # macOS
-                subprocess.Popen(["afplay", "/System/Library/Sounds/Glass.aiff"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                subprocess.Popen(
+                    ["afplay", "/System/Library/Sounds/Glass.aiff"],
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                )
             else:
                 # Linux (try paplay, aplay, or terminal beep)
                 if shutil.which("paplay"):
                     sound_path = "/usr/share/sounds/freedesktop/stereo/complete.oga"
                     if Path(sound_path).exists():
-                        subprocess.Popen(["paplay", sound_path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                        subprocess.Popen(
+                            ["paplay", sound_path],
+                            stdout=subprocess.DEVNULL,
+                            stderr=subprocess.DEVNULL,
+                        )
                     else:
                         print("\a", end="", flush=True)
                 elif shutil.which("aplay"):
@@ -83,8 +92,15 @@ class PostActions:
         )
 
         try:
-            logger.log(f"Executing post-download command: {formatted_cmd}", level="info")
-            subprocess.Popen(formatted_cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            logger.log(
+                f"Executing post-download command: {formatted_cmd}", level="info"
+            )
+            subprocess.Popen(
+                formatted_cmd,
+                shell=True,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
             return True
         except Exception as e:
             logger.log(f"Error executing post-download command: {e}", level="error")
@@ -98,7 +114,9 @@ class PostActions:
             if system == "Windows":
                 subprocess.Popen(["shutdown", "/s", "/t", "60"])
             elif system == "Darwin":
-                subprocess.Popen(["osascript", "-e", 'tell application "System Events" to shut down'])
+                subprocess.Popen(
+                    ["osascript", "-e", 'tell application "System Events" to shut down']
+                )
             else:
                 subprocess.Popen(["shutdown", "-h", "+1"])
             logger.log("System shutdown sequence initiated.", level="warning")
@@ -113,7 +131,9 @@ class PostActions:
         system = platform.system()
         try:
             if system == "Windows":
-                subprocess.Popen(["rundll32.exe", "powrprof.dll,SetSuspendState", "0,1,0"])
+                subprocess.Popen(
+                    ["rundll32.exe", "powrprof.dll,SetSuspendState", "0,1,0"]
+                )
             elif system == "Darwin":
                 subprocess.Popen(["pmset", "sleepnow"])
             else:

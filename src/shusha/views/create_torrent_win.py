@@ -51,14 +51,28 @@ class CreateTorrentWindow(ttk.Toplevel):
         container.pack(fill=tk.BOTH, expand=True)
 
         # Source Selection
-        src_lf = ttk.Labelframe(container, text="Source Target (File or Directory)", padding=10)
+        src_lf = ttk.Labelframe(
+            container, text="Source Target (File or Directory)", padding=10
+        )
         src_lf.pack(fill=tk.X, pady=(0, 10))
 
         s_row = ttk.Frame(src_lf)
         s_row.pack(fill=tk.X)
-        ttk.Entry(s_row, textvariable=self.source_path_var).pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 5))
-        ttk.Button(s_row, text="Select File...", command=self._browse_file, bootstyle="info-outline").pack(side=tk.LEFT, padx=2)
-        ttk.Button(s_row, text="Select Folder...", command=self._browse_folder, bootstyle="secondary-outline").pack(side=tk.LEFT, padx=2)
+        ttk.Entry(s_row, textvariable=self.source_path_var).pack(
+            side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 5)
+        )
+        ttk.Button(
+            s_row,
+            text="Select File...",
+            command=self._browse_file,
+            bootstyle="info-outline",
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            s_row,
+            text="Select Folder...",
+            command=self._browse_folder,
+            bootstyle="secondary-outline",
+        ).pack(side=tk.LEFT, padx=2)
 
         # Parameters
         param_lf = ttk.Labelframe(container, text="Torrent Properties", padding=10)
@@ -77,7 +91,9 @@ class CreateTorrentWindow(ttk.Toplevel):
         ).grid(row=0, column=1, sticky=tk.W, pady=3, padx=5)
 
         ttk.Label(p_grid, text="Comment:").grid(row=1, column=0, sticky=tk.W, pady=3)
-        ttk.Entry(p_grid, textvariable=self.comment_var, width=35).grid(row=1, column=1, sticky=tk.EW, pady=3, padx=5)
+        ttk.Entry(p_grid, textvariable=self.comment_var, width=35).grid(
+            row=1, column=1, sticky=tk.EW, pady=3, padx=5
+        )
 
         ttk.Checkbutton(
             p_grid,
@@ -100,22 +116,41 @@ class CreateTorrentWindow(ttk.Toplevel):
         ttk.Label(mag_row, text="Magnet Link:").pack(anchor=tk.W)
         m_entry_row = ttk.Frame(mag_row)
         m_entry_row.pack(fill=tk.X, pady=(2, 0))
-        ttk.Entry(m_entry_row, textvariable=self.magnet_output_var, state="readonly").pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 5))
-        ttk.Button(m_entry_row, text="Copy Link", command=self._copy_magnet, bootstyle="secondary-outline").pack(side=tk.RIGHT)
+        ttk.Entry(
+            m_entry_row, textvariable=self.magnet_output_var, state="readonly"
+        ).pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 5))
+        ttk.Button(
+            m_entry_row,
+            text="Copy Link",
+            command=self._copy_magnet,
+            bootstyle="secondary-outline",
+        ).pack(side=tk.RIGHT)
 
         # Bottom Button Bar
         btn_bar = ttk.Frame(container)
         btn_bar.pack(fill=tk.X, side=tk.BOTTOM)
-        ttk.Button(btn_bar, text="Close", command=self.destroy, bootstyle="secondary", width=10).pack(side=tk.RIGHT, padx=(5, 0))
-        ttk.Button(btn_bar, text="Generate .torrent", command=self._create_torrent, bootstyle="success", width=16).pack(side=tk.RIGHT)
+        ttk.Button(
+            btn_bar, text="Close", command=self.destroy, bootstyle="secondary", width=10
+        ).pack(side=tk.RIGHT, padx=(5, 0))
+        ttk.Button(
+            btn_bar,
+            text="Generate .torrent",
+            command=self._create_torrent,
+            bootstyle="success",
+            width=16,
+        ).pack(side=tk.RIGHT)
 
     def _browse_file(self) -> None:
-        selected = filedialog.askopenfilename(title="Select File to Package", parent=self)
+        selected = filedialog.askopenfilename(
+            title="Select File to Package", parent=self
+        )
         if selected:
             self.source_path_var.set(selected)
 
     def _browse_folder(self) -> None:
-        selected = filedialog.askdirectory(title="Select Directory to Package", parent=self)
+        selected = filedialog.askdirectory(
+            title="Select Directory to Package", parent=self
+        )
         if selected:
             self.source_path_var.set(selected)
 
@@ -137,7 +172,11 @@ class CreateTorrentWindow(ttk.Toplevel):
                 chosen_size = size
                 break
 
-        trackers = [t.strip() for t in self.trackers_text.get("1.0", tk.END).split("\n") if t.strip()]
+        trackers = [
+            t.strip()
+            for t in self.trackers_text.get("1.0", tk.END).split("\n")
+            if t.strip()
+        ]
 
         out_file = filedialog.asksaveasfilename(
             title="Save .torrent File As",

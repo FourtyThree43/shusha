@@ -21,7 +21,16 @@ from shusha.models.category_manager import CategoryManager
 from shusha.models.utilities import download_dir
 
 DEFAULT_DIR = download_dir()
-CATEGORIES = ["Auto-Detect", "Video", "Audio", "Archive", "Document", "Software", "Image", "Other"]
+CATEGORIES = [
+    "Auto-Detect",
+    "Video",
+    "Audio",
+    "Archive",
+    "Document",
+    "Software",
+    "Image",
+    "Other",
+]
 
 
 class AddWindow(ttk.Toplevel):
@@ -66,7 +75,9 @@ class AddWindow(ttk.Toplevel):
         url_row = ttk.Frame(page)
         url_row.pack(fill=tk.BOTH, expand=True, pady=(0, 8))
 
-        ttk.Label(url_row, text="Download URLs (one per line):").pack(anchor=tk.W, pady=(0, 2))
+        ttk.Label(url_row, text="Download URLs (one per line):").pack(
+            anchor=tk.W, pady=(0, 2)
+        )
         self.urls = ttk.ScrolledText(url_row, wrap=tk.WORD, height=4)
         self.urls.pack(fill=tk.BOTH, expand=True)
         self.urls.bind("<KeyRelease>", self._on_url_text_change)
@@ -80,34 +91,67 @@ class AddWindow(ttk.Toplevel):
 
         # Category
         ttk.Label(grid, text="Category:").grid(row=0, column=0, sticky=tk.W, pady=3)
-        cat_combo = ttk.Combobox(grid, textvariable=self.category_var, values=CATEGORIES, width=14, state="readonly")
+        cat_combo = ttk.Combobox(
+            grid,
+            textvariable=self.category_var,
+            values=CATEGORIES,
+            width=14,
+            state="readonly",
+        )
         cat_combo.grid(row=0, column=1, sticky=tk.W, pady=3, padx=(5, 15))
         cat_combo.bind("<<ComboboxSelected>>", self._on_category_selected)
 
         # Splits
         ttk.Label(grid, text="Splits:").grid(row=0, column=2, sticky=tk.W, pady=3)
-        ttk.Spinbox(grid, textvariable=self.split_var, from_=1, to=64, width=5).grid(row=0, column=3, sticky=tk.W, pady=3, padx=5)
+        ttk.Spinbox(grid, textvariable=self.split_var, from_=1, to=64, width=5).grid(
+            row=0, column=3, sticky=tk.W, pady=3, padx=5
+        )
 
         # Rename
         ttk.Label(grid, text="Rename File:").grid(row=1, column=0, sticky=tk.W, pady=3)
-        ttk.Entry(grid, textvariable=self.rename_var, width=30).grid(row=1, column=1, columnspan=3, sticky=tk.EW, pady=3, padx=5)
+        ttk.Entry(grid, textvariable=self.rename_var, width=30).grid(
+            row=1, column=1, columnspan=3, sticky=tk.EW, pady=3, padx=5
+        )
 
         # Checksum
-        ttk.Label(grid, text="Checksum (sha-256=...):").grid(row=2, column=0, sticky=tk.W, pady=3)
-        ttk.Entry(grid, textvariable=self.checksum_var, width=30).grid(row=2, column=1, columnspan=3, sticky=tk.EW, pady=3, padx=5)
+        ttk.Label(grid, text="Checksum (sha-256=...):").grid(
+            row=2, column=0, sticky=tk.W, pady=3
+        )
+        ttk.Entry(grid, textvariable=self.checksum_var, width=30).grid(
+            row=2, column=1, columnspan=3, sticky=tk.EW, pady=3, padx=5
+        )
 
         # Destination folder
         path_row = ttk.Frame(opt_lf)
         path_row.pack(fill=tk.X, pady=(6, 0))
         ttk.Label(path_row, text="Save to:").pack(side=tk.LEFT, padx=(0, 5))
-        ttk.Entry(path_row, textvariable=self.path_var).pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
-        ttk.Button(path_row, text="Browse...", command=self._on_browse, bootstyle="secondary-outline").pack(side=tk.RIGHT)
+        ttk.Entry(path_row, textvariable=self.path_var).pack(
+            side=tk.LEFT, fill=tk.X, expand=True, padx=5
+        )
+        ttk.Button(
+            path_row,
+            text="Browse...",
+            command=self._on_browse,
+            bootstyle="secondary-outline",
+        ).pack(side=tk.RIGHT)
 
         # Bottom buttons
         btn_bar = ttk.Frame(page)
         btn_bar.pack(fill=tk.X, side=tk.BOTTOM)
-        ttk.Button(btn_bar, text="Cancel", command=self.destroy, bootstyle="secondary", width=10).pack(side=tk.RIGHT, padx=(5, 0))
-        ttk.Button(btn_bar, text="Download", command=self._submit_urls, bootstyle="success", width=12).pack(side=tk.RIGHT)
+        ttk.Button(
+            btn_bar,
+            text="Cancel",
+            command=self.destroy,
+            bootstyle="secondary",
+            width=10,
+        ).pack(side=tk.RIGHT, padx=(5, 0))
+        ttk.Button(
+            btn_bar,
+            text="Download",
+            command=self._submit_urls,
+            bootstyle="success",
+            width=12,
+        ).pack(side=tk.RIGHT)
 
     def _build_torrent_page(self) -> None:
         """Create Torrent / Metalink page."""
@@ -118,8 +162,15 @@ class AddWindow(ttk.Toplevel):
         t_row.pack(fill=tk.X, pady=(10, 15))
 
         ttk.Label(t_row, text="File:").pack(side=tk.LEFT, padx=(0, 5))
-        ttk.Entry(t_row, textvariable=self.torrent_file_var).pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
-        ttk.Button(t_row, text="Browse...", command=self._on_browse_torrent, bootstyle="info-outline").pack(side=tk.RIGHT)
+        ttk.Entry(t_row, textvariable=self.torrent_file_var).pack(
+            side=tk.LEFT, fill=tk.X, expand=True, padx=5
+        )
+        ttk.Button(
+            t_row,
+            text="Browse...",
+            command=self._on_browse_torrent,
+            bootstyle="info-outline",
+        ).pack(side=tk.RIGHT)
 
         opt_lf = ttk.Labelframe(page, text="Save Location", padding=10)
         opt_lf.pack(fill=tk.X, pady=(0, 15))
@@ -127,13 +178,32 @@ class AddWindow(ttk.Toplevel):
         path_row = ttk.Frame(opt_lf)
         path_row.pack(fill=tk.X)
         ttk.Label(path_row, text="Save to:").pack(side=tk.LEFT, padx=(0, 5))
-        ttk.Entry(path_row, textvariable=self.path_var).pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
-        ttk.Button(path_row, text="Browse...", command=self._on_browse, bootstyle="secondary-outline").pack(side=tk.RIGHT)
+        ttk.Entry(path_row, textvariable=self.path_var).pack(
+            side=tk.LEFT, fill=tk.X, expand=True, padx=5
+        )
+        ttk.Button(
+            path_row,
+            text="Browse...",
+            command=self._on_browse,
+            bootstyle="secondary-outline",
+        ).pack(side=tk.RIGHT)
 
         btn_bar = ttk.Frame(page)
         btn_bar.pack(fill=tk.X, side=tk.BOTTOM)
-        ttk.Button(btn_bar, text="Cancel", command=self.destroy, bootstyle="secondary", width=10).pack(side=tk.RIGHT, padx=(5, 0))
-        ttk.Button(btn_bar, text="Start Torrent", command=self._submit_torrent, bootstyle="success", width=14).pack(side=tk.RIGHT)
+        ttk.Button(
+            btn_bar,
+            text="Cancel",
+            command=self.destroy,
+            bootstyle="secondary",
+            width=10,
+        ).pack(side=tk.RIGHT, padx=(5, 0))
+        ttk.Button(
+            btn_bar,
+            text="Start Torrent",
+            command=self._submit_torrent,
+            bootstyle="success",
+            width=14,
+        ).pack(side=tk.RIGHT)
 
     def _build_advanced_page(self) -> None:
         """Create Advanced HTTP / Network options page."""
@@ -155,7 +225,9 @@ class AddWindow(ttk.Toplevel):
 
         for idx, (lbl_text, var) in enumerate(fields):
             ttk.Label(grid, text=lbl_text).grid(row=idx, column=0, sticky=tk.W, pady=4)
-            ttk.Entry(grid, textvariable=var, width=40).grid(row=idx, column=1, sticky=tk.EW, pady=4, padx=5)
+            ttk.Entry(grid, textvariable=var, width=40).grid(
+                row=idx, column=1, sticky=tk.EW, pady=4, padx=5
+            )
 
         grid.columnconfigure(1, weight=1)
 
@@ -169,18 +241,24 @@ class AddWindow(ttk.Toplevel):
         if first_url:
             detected_cat = CategoryManager.get_category(first_url)
             if detected_cat != "Other":
-                target_dir = CategoryManager.get_category_directory(DEFAULT_DIR, detected_cat, auto_subfolder=True)
+                target_dir = CategoryManager.get_category_directory(
+                    DEFAULT_DIR, detected_cat, auto_subfolder=True
+                )
                 self.path_var.set(str(target_dir))
 
     def _on_category_selected(self, event: Any = None) -> None:
         """Update destination path when category is manually selected."""
         cat = self.category_var.get()
         if cat != "Auto-Detect":
-            target_dir = CategoryManager.get_category_directory(DEFAULT_DIR, cat, auto_subfolder=True)
+            target_dir = CategoryManager.get_category_directory(
+                DEFAULT_DIR, cat, auto_subfolder=True
+            )
             self.path_var.set(str(target_dir))
 
     def _on_browse(self) -> None:
-        path = askdirectory(title="Select Download Directory", initialdir=self.path_var.get())
+        path = askdirectory(
+            title="Select Download Directory", initialdir=self.path_var.get()
+        )
         if path:
             self.path_var.set(path)
 

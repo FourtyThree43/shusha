@@ -31,7 +31,10 @@ def bencode(data: Any) -> bytes:
     if isinstance(data, list):
         return b"l" + b"".join(bencode(item) for item in data) + b"e"
     if isinstance(data, dict):
-        items = sorted(data.items(), key=lambda kv: kv[0].encode("utf-8") if isinstance(kv[0], str) else kv[0])
+        items = sorted(
+            data.items(),
+            key=lambda kv: kv[0].encode("utf-8") if isinstance(kv[0], str) else kv[0],
+        )
         return b"d" + b"".join(bencode(k) + bencode(v) for k, v in items) + b"e"
     raise TypeError(f"Cannot bencode object of type {type(data)}")
 
@@ -71,7 +74,11 @@ class TorrentCreator:
             raise FileNotFoundError(f"Target path does not exist: {source}")
 
         tracker_list = trackers or TrackerService.get_trackers()[:10]
-        announce = tracker_list[0] if tracker_list else "udp://tracker.opentrackr.org:1337/announce"
+        announce = (
+            tracker_list[0]
+            if tracker_list
+            else "udp://tracker.opentrackr.org:1337/announce"
+        )
         announce_list = [[t] for t in tracker_list]
 
         # Calculate piece hashes

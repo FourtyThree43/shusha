@@ -93,10 +93,11 @@ class Client:
         """
         import socket
         import time
-        
+
         # Check server reachability with caching (check every 5 seconds)
         # Skip if server is mocked (for testing)
         import unittest.mock
+
         if not isinstance(self.server, unittest.mock.Mock):
             current_time = time.time()
             if (
@@ -105,7 +106,7 @@ class Client:
             ):
                 self._last_reachable = self.is_server_reachable(timeout=2.0)
                 self._last_reachability_check = current_time
-            
+
             if not self._last_reachable:
                 logger.log(
                     f"RPC server at {self.server_uri} is not reachable. "
@@ -117,7 +118,7 @@ class Client:
                     f"RPC server at {self.server_uri} is not reachable. "
                     f"Please ensure aria2 is running with RPC enabled on {self.remote.host}:{self.remote.port}.",
                 )
-        
+
         request_params = self._build_request_params(params)
         try:
             if "." in method:
@@ -137,7 +138,8 @@ class Client:
                 level="error",
             )
             raise XMLRPCClientException(
-                -1, f"Connection timeout. Server at {self.server_uri} is not responding."
+                -1,
+                f"Connection timeout. Server at {self.server_uri} is not responding.",
             ) from e
         except socket.gaierror as e:
             logger.log(
@@ -155,7 +157,8 @@ class Client:
                 level="error",
             )
             raise XMLRPCClientException(
-                -1, f"Connection refused. Server at {self.server_uri} is not running or unreachable."
+                -1,
+                f"Connection refused. Server at {self.server_uri} is not running or unreachable.",
             ) from e
         except ConnectionResetError as e:
             logger.log(
@@ -195,11 +198,9 @@ class Client:
             parsed = urlparse(self.server_uri)
             host = parsed.hostname or self.remote.host
             port = parsed.port or self.remote.port
-            
-            target_host = (
-                "127.0.0.1" if host in ("localhost", "0.0.0.0") else host
-            )
-            
+
+            target_host = "127.0.0.1" if host in ("localhost", "0.0.0.0") else host
+
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 s.settimeout(timeout)
                 result = s.connect_ex((target_host, int(port))) == 0

@@ -170,13 +170,23 @@ def render_vector_icon(
             width=stroke,
         )
         draw.line([(pad + 5, pad), (pad + 5, pad + 6)], fill=color, width=stroke)
-        draw.line([(size - pad - 5, pad), (size - pad - 5, pad + 6)], fill=color, width=stroke)
-        draw.line([(mid_x, size - pad - 2), (mid_x, size - pad + 3)], fill=color, width=stroke)
+        draw.line(
+            [(size - pad - 5, pad), (size - pad - 5, pad + 6)], fill=color, width=stroke
+        )
+        draw.line(
+            [(mid_x, size - pad - 2), (mid_x, size - pad + 3)], fill=color, width=stroke
+        )
 
     elif shape == "trash":
-        draw.rectangle([pad, pad + 4, size - pad, size - pad], outline=color, width=stroke)
-        draw.line([(pad - 2, pad + 4), (size - pad + 2, pad + 4)], fill=color, width=stroke)
-        draw.line([(size // 2 - 3, pad), (size // 2 + 3, pad)], fill=color, width=stroke)
+        draw.rectangle(
+            [pad, pad + 4, size - pad, size - pad], outline=color, width=stroke
+        )
+        draw.line(
+            [(pad - 2, pad + 4), (size - pad + 2, pad + 4)], fill=color, width=stroke
+        )
+        draw.line(
+            [(size // 2 - 3, pad), (size // 2 + 3, pad)], fill=color, width=stroke
+        )
 
     elif shape == "refresh":
         draw.arc([pad, pad, size - pad, size - pad], 45, 315, fill=color, width=stroke)
@@ -188,24 +198,38 @@ def render_vector_icon(
     elif shape == "arrow-up":
         mid = size // 2
         draw.line([(mid, size - pad), (mid, pad)], fill=color, width=stroke)
-        draw.polygon([(mid, pad - 2), (mid - 5, pad + 6), (mid + 5, pad + 6)], fill=color)
+        draw.polygon(
+            [(mid, pad - 2), (mid - 5, pad + 6), (mid + 5, pad + 6)], fill=color
+        )
 
     elif shape == "arrow-down":
         mid = size // 2
         draw.line([(mid, pad), (mid, size - pad)], fill=color, width=stroke)
         draw.polygon(
-            [(mid, size - pad + 2), (mid - 5, size - pad - 6), (mid + 5, size - pad - 6)],
+            [
+                (mid, size - pad + 2),
+                (mid - 5, size - pad - 6),
+                (mid + 5, size - pad - 6),
+            ],
             fill=color,
         )
 
     elif shape == "gear":
-        draw.ellipse([pad + 3, pad + 3, size - pad - 3, size - pad - 3], outline=color, width=stroke)
+        draw.ellipse(
+            [pad + 3, pad + 3, size - pad - 3, size - pad - 3],
+            outline=color,
+            width=stroke,
+        )
         draw.ellipse([pad + 6, pad + 6, size - pad - 6, size - pad - 6], fill=color)
 
     elif shape == "magnet":
-        draw.arc([pad, pad, size - pad, size - pad + 4], 0, 180, fill=color, width=stroke)
+        draw.arc(
+            [pad, pad, size - pad, size - pad + 4], 0, 180, fill=color, width=stroke
+        )
         draw.line([(pad, pad + 6), (pad, size - pad)], fill=color, width=stroke)
-        draw.line([(size - pad, pad + 6), (size - pad, size - pad)], fill=color, width=stroke)
+        draw.line(
+            [(size - pad, pad + 6), (size - pad, size - pad)], fill=color, width=stroke
+        )
 
     elif shape == "grid":
         step = max(3, w // 3)
@@ -218,7 +242,9 @@ def render_vector_icon(
     elif shape == "list-plus":
         draw.line([(pad, pad + 3), (size - pad - 6, pad + 3)], fill=color, width=stroke)
         draw.line([(pad, pad + 9), (size - pad - 6, pad + 9)], fill=color, width=stroke)
-        draw.line([(pad, pad + 15), (size - pad - 6, pad + 15)], fill=color, width=stroke)
+        draw.line(
+            [(pad, pad + 15), (size - pad - 6, pad + 15)], fill=color, width=stroke
+        )
         mid_x = size - pad
         mid_y = size - pad
         draw.line([(mid_x, mid_y - 4), (mid_x, mid_y + 4)], fill=color, width=stroke)
@@ -228,19 +254,25 @@ def render_vector_icon(
         mid = size // 2
         r = max(4, size // 3)
         draw.ellipse([mid - r, mid - r, mid + r, mid + r], fill="#00bc8c")
-        draw.ellipse([mid - r // 2, mid - r // 2, mid + r // 2, mid + r // 2], fill="#a3e9d4")
+        draw.ellipse(
+            [mid - r // 2, mid - r // 2, mid + r // 2, mid + r // 2], fill="#a3e9d4"
+        )
 
     elif shape == "dot-offline":
         mid = size // 2
         r = max(4, size // 3)
         draw.ellipse([mid - r, mid - r, mid + r, mid + r], fill="#e74c3c")
-        draw.ellipse([mid - r // 2, mid - r // 2, mid + r // 2, mid + r // 2], fill="#f5b7b1")
+        draw.ellipse(
+            [mid - r // 2, mid - r // 2, mid + r // 2, mid + r // 2], fill="#f5b7b1"
+        )
 
     elif shape == "dot-warning":
         mid = size // 2
         r = max(4, size // 3)
         draw.ellipse([mid - r, mid - r, mid + r, mid + r], fill="#f39c12")
-        draw.ellipse([mid - r // 2, mid - r // 2, mid + r // 2, mid + r // 2], fill="#fdebd0")
+        draw.ellipse(
+            [mid - r // 2, mid - r // 2, mid + r // 2, mid + r // 2], fill="#fdebd0"
+        )
 
     elif shape == "clock":
         draw.ellipse([pad, pad, size - pad, size - pad], outline=color, width=stroke)
@@ -259,7 +291,9 @@ def render_vector_icon(
         draw.polygon(points, outline=color, width=stroke)
 
     elif shape == "folder":
-        draw.rectangle([pad, pad + 4, size - pad, size - pad], outline=color, width=stroke)
+        draw.rectangle(
+            [pad, pad + 4, size - pad, size - pad], outline=color, width=stroke
+        )
         draw.line([(pad, pad + 4), (pad + 6, pad)], fill=color, width=stroke)
         draw.line([(pad + 6, pad), (pad + 12, pad)], fill=color, width=stroke)
         draw.line([(pad + 12, pad), (pad + 14, pad + 4)], fill=color, width=stroke)
@@ -293,7 +327,9 @@ def get_svg_tk_image(
         return _TK_IMAGE_CACHE[cache_key]
 
     try:
-        pil_img = render_vector_icon(icon_name, size=size, color=color, bg_color=bg_color)
+        pil_img = render_vector_icon(
+            icon_name, size=size, color=color, bg_color=bg_color
+        )
         photo = ImageTk.PhotoImage(pil_img)
         _TK_IMAGE_CACHE[cache_key] = photo
         return photo

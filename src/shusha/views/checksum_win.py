@@ -37,7 +37,9 @@ class ChecksumWindow(ttk.Toplevel):
 
         self.file_path_var = tk.StringVar(value=str(initial_file or ""))
         self.expected_hash_var = tk.StringVar(value="")
-        self.status_msg_var = tk.StringVar(value="Select a file and click Compute Hashes")
+        self.status_msg_var = tk.StringVar(
+            value="Select a file and click Compute Hashes"
+        )
 
         self.hash_vars = {
             "MD5": tk.StringVar(value=""),
@@ -61,9 +63,18 @@ class ChecksumWindow(ttk.Toplevel):
 
         f_row = ttk.Frame(file_lf)
         f_row.pack(fill=tk.X)
-        ttk.Entry(f_row, textvariable=self.file_path_var).pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 5))
-        ttk.Button(f_row, text="Browse...", command=self._browse_file, bootstyle="secondary-outline").pack(side=tk.LEFT, padx=2)
-        ttk.Button(f_row, text="Compute", command=self._start_hashing, bootstyle="primary").pack(side=tk.LEFT, padx=2)
+        ttk.Entry(f_row, textvariable=self.file_path_var).pack(
+            side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 5)
+        )
+        ttk.Button(
+            f_row,
+            text="Browse...",
+            command=self._browse_file,
+            bootstyle="secondary-outline",
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            f_row, text="Compute", command=self._start_hashing, bootstyle="primary"
+        ).pack(side=tk.LEFT, padx=2)
 
         # Calculated Hashes
         hash_lf = ttk.Labelframe(container, text="Computed Hashes", padding=10)
@@ -73,8 +84,12 @@ class ChecksumWindow(ttk.Toplevel):
         grid.pack(fill=tk.BOTH, expand=True)
 
         for idx, (algo, var) in enumerate(self.hash_vars.items()):
-            ttk.Label(grid, text=f"{algo}:", width=10, font=("TkDefaultFont", 9, "bold")).grid(row=idx, column=0, sticky=tk.W, pady=3)
-            ttk.Entry(grid, textvariable=var, state="readonly").grid(row=idx, column=1, sticky=tk.EW, pady=3, padx=5)
+            ttk.Label(
+                grid, text=f"{algo}:", width=10, font=("TkDefaultFont", 9, "bold")
+            ).grid(row=idx, column=0, sticky=tk.W, pady=3)
+            ttk.Entry(grid, textvariable=var, state="readonly").grid(
+                row=idx, column=1, sticky=tk.EW, pady=3, padx=5
+            )
             ttk.Button(
                 grid,
                 text="Copy",
@@ -95,7 +110,9 @@ class ChecksumWindow(ttk.Toplevel):
         e_entry = ttk.Entry(v_row, textvariable=self.expected_hash_var)
         e_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
         e_entry.bind("<KeyRelease>", self._check_match)
-        ttk.Button(v_row, text="Verify", command=self._check_match, bootstyle="info-outline").pack(side=tk.RIGHT)
+        ttk.Button(
+            v_row, text="Verify", command=self._check_match, bootstyle="info-outline"
+        ).pack(side=tk.RIGHT)
 
         self.status_label = ttk.Label(
             container,
@@ -104,7 +121,13 @@ class ChecksumWindow(ttk.Toplevel):
         )
         self.status_label.pack(side=tk.LEFT, pady=5)
 
-        ttk.Button(container, text="Close", command=self.destroy, bootstyle="secondary", width=10).pack(side=tk.RIGHT, pady=5)
+        ttk.Button(
+            container,
+            text="Close",
+            command=self.destroy,
+            bootstyle="secondary",
+            width=10,
+        ).pack(side=tk.RIGHT, pady=5)
 
     def _browse_file(self) -> None:
         selected = filedialog.askopenfilename(title="Select File to Hash", parent=self)
@@ -125,7 +148,9 @@ class ChecksumWindow(ttk.Toplevel):
             return
 
         self.status_msg_var.set("Computing hashes in background...")
-        threading.Thread(target=self._compute_bg, args=(Path(path_str),), daemon=True).start()
+        threading.Thread(
+            target=self._compute_bg, args=(Path(path_str),), daemon=True
+        ).start()
 
     def compute_hashes_sync(self, target: Path) -> dict[str, str]:
         """Compute all cryptographic hashes synchronously and populate UI variables."""

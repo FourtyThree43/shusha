@@ -24,24 +24,34 @@ def build_parser() -> argparse.ArgumentParser:
         prog="shusha",
         description="Shusha Download Manager - Advanced Multi-Protocol CLI & GUI",
     )
-    parser.add_argument("--gui", action="store_true", help="Launch Graphical User Interface")
+    parser.add_argument(
+        "--gui", action="store_true", help="Launch Graphical User Interface"
+    )
     parser.add_argument("--version", action="store_true", help="Show version info")
 
     subparsers = parser.add_subparsers(dest="subcommand", help="Available subcommands")
 
     # 1. add
     add_p = subparsers.add_parser("add", help="Add new download URL or torrent file")
-    add_p.add_argument("url", help="Download URL, Magnet link, or path to .torrent file")
+    add_p.add_argument(
+        "url", help="Download URL, Magnet link, or path to .torrent file"
+    )
     add_p.add_argument("--out", "-o", help="Target filename")
     add_p.add_argument("--dir", "-d", help="Destination directory")
-    add_p.add_argument("--split", "-s", type=int, default=8, help="Number of split connections")
+    add_p.add_argument(
+        "--split", "-s", type=int, default=8, help="Number of split connections"
+    )
     add_p.add_argument("--header", help="Custom HTTP header (Key: Value)")
     add_p.add_argument("--user-agent", help="Custom User-Agent string")
     add_p.add_argument("--referer", help="Custom Referer URL")
 
     # 2. list
-    list_p = subparsers.add_parser("list", help="List active, waiting, and stopped downloads")
-    list_p.add_argument("--status", choices=["active", "waiting", "stopped", "all"], default="all")
+    list_p = subparsers.add_parser(
+        "list", help="List active, waiting, and stopped downloads"
+    )
+    list_p.add_argument(
+        "--status", choices=["active", "waiting", "stopped", "all"], default="all"
+    )
 
     # 3. pause
     pause_p = subparsers.add_parser("pause", help="Pause a download by GID (or all)")
@@ -54,27 +64,43 @@ def build_parser() -> argparse.ArgumentParser:
     # 5. remove
     rm_p = subparsers.add_parser("remove", help="Remove a download task")
     rm_p.add_argument("gid", help="Download GID")
-    rm_p.add_argument("--files", "-f", action="store_true", help="Delete downloaded files from disk")
+    rm_p.add_argument(
+        "--files", "-f", action="store_true", help="Delete downloaded files from disk"
+    )
 
     # 6. daemon
     d_p = subparsers.add_parser("daemon", help="Manage aria2 daemon process")
-    d_p.add_argument("action", choices=["start", "stop", "restart", "status"], help="Daemon action")
+    d_p.add_argument(
+        "action", choices=["start", "stop", "restart", "status"], help="Daemon action"
+    )
 
     # 7. stats
-    subparsers.add_parser("stats", help="Show global bandwidth and queue transfer statistics")
+    subparsers.add_parser(
+        "stats", help="Show global bandwidth and queue transfer statistics"
+    )
 
     # 8. torrent create
     tor_p = subparsers.add_parser("torrent", help="BitTorrent packaging utilities")
     tor_sub = tor_p.add_subparsers(dest="tor_action")
-    create_p = tor_sub.add_parser("create", help="Create .torrent file from local file or directory")
+    create_p = tor_sub.add_parser(
+        "create", help="Create .torrent file from local file or directory"
+    )
     create_p.add_argument("source", help="Source file or folder path")
     create_p.add_argument("--output", "-o", help="Output .torrent file path")
-    create_p.add_argument("--piece-size", type=int, default=512 * 1024, help="Piece length in bytes")
+    create_p.add_argument(
+        "--piece-size", type=int, default=512 * 1024, help="Piece length in bytes"
+    )
 
     # 9. hash
-    hash_p = subparsers.add_parser("hash", help="Compute cryptographic hashes of a file")
+    hash_p = subparsers.add_parser(
+        "hash", help="Compute cryptographic hashes of a file"
+    )
     hash_p.add_argument("file", help="File to hash")
-    hash_p.add_argument("--algo", choices=["md5", "sha1", "sha256", "sha512", "crc32", "all"], default="all")
+    hash_p.add_argument(
+        "--algo",
+        choices=["md5", "sha1", "sha256", "sha512", "crc32", "all"],
+        default="all",
+    )
 
     # 10. probe
     probe_p = subparsers.add_parser("probe", help="Probe and benchmark mirror URLs")
@@ -87,12 +113,14 @@ def handle_cli(args: argparse.Namespace) -> int:
     """Execute parsed CLI command."""
     if args.version:
         from shusha.__about__ import __version__
+
         print(f"Shusha Download Manager v{__version__}")
         return 0
 
     if not args.subcommand or args.gui:
         # Launch GUI
         from shusha.ShushaDM import main as gui_main
+
         gui_main()
         return 0
 
@@ -101,7 +129,9 @@ def handle_cli(args: argparse.Namespace) -> int:
     if args.subcommand == "daemon":
         if args.action == "start":
             pid = api.start_server()
-            print(f"Daemon started with PID: {pid}" if pid else "Daemon already running.")
+            print(
+                f"Daemon started with PID: {pid}" if pid else "Daemon already running."
+            )
         elif args.action == "stop":
             api.stop_server()
             print("Daemon stopped.")
@@ -142,7 +172,9 @@ def handle_cli(args: argparse.Namespace) -> int:
         if not downloads:
             print("No downloads found in queue.")
             return 0
-        print(f"{'GID':<18} {'STATUS':<12} {'SIZE':<12} {'PROGRESS':<10} {'SPEED':<12} {'NAME'}")
+        print(
+            f"{'GID':<18} {'STATUS':<12} {'SIZE':<12} {'PROGRESS':<10} {'SPEED':<12} {'NAME'}"
+        )
         print("-" * 80)
         for d in downloads:
             print(

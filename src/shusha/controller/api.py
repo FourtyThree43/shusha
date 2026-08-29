@@ -64,7 +64,9 @@ class ShushaAPI:
         self.remote = daemon or Daemon(host=cfg_host, port=cfg_port, secret=cfg_secret)
         self.client = client or Client(self.remote, secret=cfg_secret)
         self.db = db or ShushaDB(filename="shusha.db")
-        self.ws_client = ws_client or Aria2WsClient(host=cfg_host, port=cfg_port, secret=cfg_secret)
+        self.ws_client = ws_client or Aria2WsClient(
+            host=cfg_host, port=cfg_port, secret=cfg_secret
+        )
         self.scheduler = BandwidthScheduler()
 
     def connect_ws(self) -> bool:
@@ -93,7 +95,11 @@ class ShushaAPI:
         Returns:
             List of successfully added Download objects.
         """
-        urls = extract_urls(text_or_urls) if isinstance(text_or_urls, str) else text_or_urls
+        urls = (
+            extract_urls(text_or_urls)
+            if isinstance(text_or_urls, str)
+            else text_or_urls
+        )
         added: list[Download] = []
         for u in urls:
             dl = self.add_uris([u], options=options)

@@ -119,7 +119,10 @@ class DownloadInspectorWindow(ttk.Toplevel):
             ("GID", self.download.gid),
             ("Status", self.download.status),
             ("Progress", self.download.progress_string()),
-            ("Size", f"{self.download.completed_length_string()} / {self.download.total_length_string()}"),
+            (
+                "Size",
+                f"{self.download.completed_length_string()} / {self.download.total_length_string()}",
+            ),
             ("Download Speed", self.download.download_speed_string()),
             ("Upload Speed", self.download.upload_speed_string()),
             ("ETA", self.download.eta_string()),
@@ -131,8 +134,12 @@ class DownloadInspectorWindow(ttk.Toplevel):
         for _idx, (lbl, val) in enumerate(props):
             row = ttk.Frame(self.tab_overview)
             row.pack(fill=tk.X, pady=3)
-            ttk.Label(row, text=f"{lbl}:", width=16, font=("TkDefaultFont", 9, "bold")).pack(side=tk.LEFT)
-            ttk.Label(row, text=val, font=("TkDefaultFont", 9)).pack(side=tk.LEFT, fill=tk.X, expand=tk.YES)
+            ttk.Label(
+                row, text=f"{lbl}:", width=16, font=("TkDefaultFont", 9, "bold")
+            ).pack(side=tk.LEFT)
+            ttk.Label(row, text=val, font=("TkDefaultFont", 9)).pack(
+                side=tk.LEFT, fill=tk.X, expand=tk.YES
+            )
 
     def _build_files_tab(self) -> None:
         cols = ["Index", "Filename", "Size", "Completed", "Selected"]
@@ -150,19 +157,28 @@ class DownloadInspectorWindow(ttk.Toplevel):
     def _refresh_files_data(self) -> None:
         rows: list[list[str]] = []
         for f in self.download.files:
-            rows.append([
-                str(f.index),
-                f.path.name if f.path else f"File #{f.index}",
-                f.length_string(),
-                f.completed_length_string(),
-                "Yes" if f.selected else "No",
-            ])
+            rows.append(
+                [
+                    str(f.index),
+                    f.path.name if f.path else f"File #{f.index}",
+                    f.length_string(),
+                    f.completed_length_string(),
+                    "Yes" if f.selected else "No",
+                ]
+            )
         self.files_table.delete_rows()
         self.files_table.insert_rows("end", rows)
         self.files_table.load_table_data()
 
     def _build_peers_tab(self) -> None:
-        cols = ["IP:Port", "Client / Peer ID", "DL Speed", "UL Speed", "Progress", "Seeder"]
+        cols = [
+            "IP:Port",
+            "Client / Peer ID",
+            "DL Speed",
+            "UL Speed",
+            "Progress",
+            "Seeder",
+        ]
         self.peers_table = Tableview(
             master=self.tab_peers,
             coldata=cols,
@@ -210,24 +226,34 @@ class DownloadInspectorWindow(ttk.Toplevel):
         new_trackers = [t for t in best_trackers if t not in current_set]
 
         if new_trackers:
-            self.trackers_box.insert(tk.END, ("\n" if current_text else "") + "\n".join(new_trackers))
+            self.trackers_box.insert(
+                tk.END, ("\n" if current_text else "") + "\n".join(new_trackers)
+            )
             csv_val = ",".join(list(current_set) + new_trackers)
             if self.download.gid:
-                self.api.client.change_option(self.download.gid, {"bt-tracker": csv_val})
+                self.api.client.change_option(
+                    self.download.gid, {"bt-tracker": csv_val}
+                )
 
     def _build_options_tab(self) -> None:
         row1 = ttk.Frame(self.tab_options)
         row1.pack(fill=tk.X, pady=4)
         ttk.Label(row1, text="Max Download Limit:", width=20).pack(side=tk.LEFT)
         self.dl_limit_var = tk.StringVar(value="0")
-        ttk.Entry(row1, textvariable=self.dl_limit_var, width=12).pack(side=tk.LEFT, padx=4)
-        ttk.Label(row1, text="(e.g. 500K, 2M, 0 for unlimited)").pack(side=tk.LEFT, padx=4)
+        ttk.Entry(row1, textvariable=self.dl_limit_var, width=12).pack(
+            side=tk.LEFT, padx=4
+        )
+        ttk.Label(row1, text="(e.g. 500K, 2M, 0 for unlimited)").pack(
+            side=tk.LEFT, padx=4
+        )
 
         row2 = ttk.Frame(self.tab_options)
         row2.pack(fill=tk.X, pady=4)
         ttk.Label(row2, text="Max Upload Limit:", width=20).pack(side=tk.LEFT)
         self.ul_limit_var = tk.StringVar(value="0")
-        ttk.Entry(row2, textvariable=self.ul_limit_var, width=12).pack(side=tk.LEFT, padx=4)
+        ttk.Entry(row2, textvariable=self.ul_limit_var, width=12).pack(
+            side=tk.LEFT, padx=4
+        )
         ttk.Label(row2, text="(e.g. 100K, 1M, 0)").pack(side=tk.LEFT, padx=4)
 
         btn_row = ttk.Frame(self.tab_options)
@@ -270,8 +296,8 @@ class DownloadInspectorWindow(ttk.Toplevel):
                     [
                         f"{p.get('ip', '')}:{p.get('port', '')}",
                         p.get("peerId", "Unknown"),
-                        f"{int(p.get('downloadSpeed', 0))/1024:.1f} KB/s",
-                        f"{int(p.get('uploadSpeed', 0))/1024:.1f} KB/s",
+                        f"{int(p.get('downloadSpeed', 0)) / 1024:.1f} KB/s",
+                        f"{int(p.get('uploadSpeed', 0)) / 1024:.1f} KB/s",
                         f"{p.get('bitfield', '')[:10]}...",
                         "Yes" if p.get("seeder") == "true" else "No",
                     ]
@@ -286,12 +312,14 @@ class DownloadInspectorWindow(ttk.Toplevel):
                 server_rows: list[list[str]] = []
                 for s in servers_data:
                     for s_item in s.get("servers", []):
-                        server_rows.append([
-                            str(s.get("index", "1")),
-                            s_item.get("uri", ""),
-                            f"{int(s_item.get('downloadSpeed', 0))/1024:.1f} KB/s",
-                            str(s_item.get("currentConnection", 1)),
-                        ])
+                        server_rows.append(
+                            [
+                                str(s.get("index", "1")),
+                                s_item.get("uri", ""),
+                                f"{int(s_item.get('downloadSpeed', 0)) / 1024:.1f} KB/s",
+                                str(s_item.get("currentConnection", 1)),
+                            ]
+                        )
                 self.servers_table.delete_rows()
                 self.servers_table.insert_rows("end", server_rows)
                 self.servers_table.load_table_data()

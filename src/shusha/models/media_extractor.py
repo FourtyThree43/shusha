@@ -81,7 +81,11 @@ class MediaExtractor:
             codecs = attrs.get("CODECS", "")
             name = attrs.get("NAME", "")
 
-            full_url = urljoin(base_url, stream_uri.strip()) if base_url else stream_uri.strip()
+            full_url = (
+                urljoin(base_url, stream_uri.strip())
+                if base_url
+                else stream_uri.strip()
+            )
 
             variants.append(
                 StreamQuality(

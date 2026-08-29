@@ -19,14 +19,18 @@ class TestChecksumWindow(unittest.TestCase):
             sample_file = Path(tmpdir) / "sample.txt"
             sample_file.write_text("Hello World Shusha")
 
-            win = ChecksumWindow(master=root, initial_file=sample_file, compute_on_open=False)
+            win = ChecksumWindow(
+                master=root, initial_file=sample_file, compute_on_open=False
+            )
             self.assertIsInstance(win, ttk.Toplevel)
 
             # Synchronously run compute logic
             win.compute_hashes_sync(sample_file)
 
             # Check values
-            self.assertEqual(win.hash_vars["MD5"].get(), "b3c9cba8e007e137110d4d1257a60cc3")
+            self.assertEqual(
+                win.hash_vars["MD5"].get(), "b3c9cba8e007e137110d4d1257a60cc3"
+            )
             self.assertTrue(len(win.hash_vars["SHA-256"].get()) > 0)
 
             # Test compare

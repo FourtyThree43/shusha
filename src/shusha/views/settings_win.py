@@ -155,9 +155,7 @@ class SettingsWindow(ttk.Toplevel):
         self.enable_pex_var = tk.BooleanVar(
             value=bool(bt_config.get("enable_pex", True))
         )
-        self.bt_max_peers_var = tk.StringVar(
-            value=str(bt_config.get("max_peers", 55))
-        )
+        self.bt_max_peers_var = tk.StringVar(value=str(bt_config.get("max_peers", 55)))
         self.seed_ratio_var = tk.StringVar(
             value=str(bt_config.get("seed_ratio", "1.0"))
         )
@@ -638,7 +636,9 @@ class SettingsWindow(ttk.Toplevel):
                         ),
                         "max-concurrent-downloads": str(max_concurrent),
                         "enable-dht": "true" if self.enable_dht_var.get() else "false",
-                        "enable-peer-exchange": "true" if self.enable_pex_var.get() else "false",
+                        "enable-peer-exchange": "true"
+                        if self.enable_pex_var.get()
+                        else "false",
                     }
                     self.api.client.change_global_option(aria2_runtime_opts)
                 except Exception as rpc_err:

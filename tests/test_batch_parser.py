@@ -20,7 +20,9 @@ class TestBatchParser(unittest.TestCase):
         self.assertIn("http://example.org/image.iso", urls)
 
     def test_extract_magnet_links(self):
-        magnet = "magnet:?xt=urn:btih:3b245504d603a1a6b0805342c3cd3ef10f9b6e23&dn=Ubuntu"
+        magnet = (
+            "magnet:?xt=urn:btih:3b245504d603a1a6b0805342c3cd3ef10f9b6e23&dn=Ubuntu"
+        )
         text = f"Download link: {magnet}"
         urls = extract_urls(text)
         self.assertEqual(urls, [magnet])

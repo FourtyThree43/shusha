@@ -22,9 +22,29 @@ URL_REGEX = re.compile(
 )
 
 DOWNLOADABLE_EXTENSIONS = (
-    ".zip", ".rar", ".7z", ".tar.gz", ".tar.xz", ".iso", ".exe", ".msi",
-    ".dmg", ".pkg", ".deb", ".rpm", ".AppImage", ".apk", ".mp4", ".mkv",
-    ".avi", ".mp3", ".flac", ".pdf", ".epub", ".torrent", ".metalink",
+    ".zip",
+    ".rar",
+    ".7z",
+    ".tar.gz",
+    ".tar.xz",
+    ".iso",
+    ".exe",
+    ".msi",
+    ".dmg",
+    ".pkg",
+    ".deb",
+    ".rpm",
+    ".AppImage",
+    ".apk",
+    ".mp4",
+    ".mkv",
+    ".avi",
+    ".mp3",
+    ".flac",
+    ".pdf",
+    ".epub",
+    ".torrent",
+    ".metalink",
 )
 
 
@@ -84,6 +104,7 @@ class ClipboardWatcher:
 
         try:
             import tkinter as tk
+
             root = tk.Tk()
             root.withdraw()
             content = root.clipboard_get()
@@ -100,7 +121,10 @@ class ClipboardWatcher:
                     content = self._get_clipboard_text()
                     if content and content != self._last_content:
                         self._last_content = content
-                        if self.is_downloadable_url(content) and content not in self._seen_urls:
+                        if (
+                            self.is_downloadable_url(content)
+                            and content not in self._seen_urls
+                        ):
                             self._seen_urls.add(content)
                             if len(self._seen_urls) > 500:
                                 self._seen_urls.clear()

@@ -319,8 +319,7 @@ def calculate_eta(
     completed: int,
     total: int,
     speed: int,
-) -> float | None:
-    ...
+) -> float | None: ...
 ```
 
 ---
@@ -587,10 +586,7 @@ for normal application functionality.
 Prefer explicit argument arrays:
 
 ```python
-subprocess.Popen(
-    [executable, *arguments],
-    ...
-)
+subprocess.Popen([executable, *arguments], ...)
 ```
 
 Validate:

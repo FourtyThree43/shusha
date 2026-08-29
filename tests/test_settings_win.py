@@ -46,6 +46,7 @@ class TestSettingsWindowAndConfig(unittest.TestCase):
     def test_app_settings_setters(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             from unittest.mock import patch
+
             with patch("shusha.models.utilities.user_config_dir", return_value=tmpdir):
                 settings = AppSettings()
                 settings.set_download_dir("/tmp/test_dl")
@@ -54,7 +55,9 @@ class TestSettingsWindowAndConfig(unittest.TestCase):
                 settings.set_logs_dir("/tmp/test_logs")
                 self.assertEqual(settings.get_logs_dir(), "/tmp/test_logs")
 
-                settings.set_aria2_config(host="192.168.1.50", port=6801, secret="supertoken")
+                settings.set_aria2_config(
+                    host="192.168.1.50", port=6801, secret="supertoken"
+                )
                 self.assertEqual(settings.get_aria2_host(), "192.168.1.50")
                 self.assertEqual(settings.get_aria2_port(), 6801)
                 self.assertEqual(settings.get_aria2_secret(), "supertoken")

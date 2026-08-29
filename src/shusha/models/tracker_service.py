@@ -51,7 +51,9 @@ class TrackerService:
         Returns:
             List of clean tracker announce URLs.
         """
-        if force_refresh or (time.time() - cls._last_fetched > 86400 and not cls._cached_trackers):
+        if force_refresh or (
+            time.time() - cls._last_fetched > 86400 and not cls._cached_trackers
+        ):
             cls.fetch_latest_trackers_sync()
         return list(cls._cached_trackers)
 
@@ -89,7 +91,10 @@ class TrackerService:
                         if line and not line.startswith("#") and "://" in line:
                             fetched.add(line)
             except Exception as e:
-                logger.log(f"Notice: Failed to fetch trackers from {source_url}: {e}", level="debug")
+                logger.log(
+                    f"Notice: Failed to fetch trackers from {source_url}: {e}",
+                    level="debug",
+                )
 
         with cls._lock:
             if fetched:
@@ -98,10 +103,9 @@ class TrackerService:
             return list(cls._cached_trackers)
 
     @classmethod
-    def fetch_latest_trackers_async(
-        cls, on_complete: Any = None
-    ) -> threading.Thread:
+    def fetch_latest_trackers_async(cls, on_complete: Any = None) -> threading.Thread:
         """Fetch trackers in a background thread."""
+
         def _bg():
             trackers = cls.fetch_latest_trackers_sync()
             if callable(on_complete):

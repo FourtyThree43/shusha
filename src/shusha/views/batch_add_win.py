@@ -101,9 +101,9 @@ class BatchAddWindow(ttk.Toplevel):
         conn_row.pack(fill=tk.X, pady=2)
         ttk.Label(conn_row, text="Split Chunks:", width=14).pack(side=tk.LEFT)
         self.split_var = tk.StringVar(value="8")
-        ttk.Spinbox(conn_row, from_=1, to=16, textvariable=self.split_var, width=5).pack(
-            side=tk.LEFT, padx=4
-        )
+        ttk.Spinbox(
+            conn_row, from_=1, to=16, textvariable=self.split_var, width=5
+        ).pack(side=tk.LEFT, padx=4)
 
         # Buttons
         btn_box = ttk.Frame(main_frame)
@@ -129,7 +129,11 @@ class BatchAddWindow(ttk.Toplevel):
         try:
             clip = self.clipboard_get()
             if clip:
-                self.text_box.insert(tk.END, ("\n" if self.text_box.get("1.0", tk.END).strip() else "") + clip.strip())
+                self.text_box.insert(
+                    tk.END,
+                    ("\n" if self.text_box.get("1.0", tk.END).strip() else "")
+                    + clip.strip(),
+                )
                 self._parse_preview()
         except Exception:
             pass

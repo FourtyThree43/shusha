@@ -49,7 +49,7 @@ class Options(Mapping[str, Any]):
         if class_ is not None:
             try:
                 return class_(value)
-            except (ValueError, TypeError):
+            except ValueError, TypeError:
                 return value
         if isinstance(value, str) and value.isdigit():
             return int(value)

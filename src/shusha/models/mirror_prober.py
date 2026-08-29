@@ -66,7 +66,9 @@ class MirrorProber:
                 supports_ranges = accept_ranges or content_range or status == 206
 
                 clen_header = resp.headers.get("Content-Length")
-                content_length = int(clen_header) if clen_header and clen_header.isdigit() else None
+                content_length = (
+                    int(clen_header) if clen_header and clen_header.isdigit() else None
+                )
 
                 return MirrorProbeResult(
                     url=url,
@@ -109,7 +111,9 @@ class MirrorProber:
         if not urls:
             return results
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=min(len(urls), max_workers)) as executor:
+        with concurrent.futures.ThreadPoolExecutor(
+            max_workers=min(len(urls), max_workers)
+        ) as executor:
             future_to_url = {
                 executor.submit(cls.probe_single_mirror, u, timeout): u for u in urls
             }

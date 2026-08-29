@@ -74,7 +74,7 @@ class PieceMapWidget(ttk.Frame):
             total_pieces = int(getattr(download, "num_pieces", 0) or 0)
             completed_pieces = int(getattr(download, "num_completed_pieces", 0) or 0)
             piece_len = int(getattr(download, "piece_length", 0) or 0)
-        except (TypeError, ValueError):
+        except TypeError, ValueError:
             total_pieces, completed_pieces, piece_len = 0, 0, 0
 
         pct = (completed_pieces / total_pieces * 100) if total_pieces > 0 else 0.0
