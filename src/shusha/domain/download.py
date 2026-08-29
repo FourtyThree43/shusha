@@ -2,7 +2,7 @@
 Download aggregate entity in the Shusha 2 domain.
 """
 
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 
 from shusha.domain.download_file import DownloadFile
 from shusha.domain.download_source import DownloadSource
@@ -11,7 +11,7 @@ from shusha.domain.states import DownloadState, validate_transition
 from shusha.domain.values import Bitfield, BitRate, ByteSize, Duration, Percentage
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True, slots=True, kw_only=True)
 class Download:
     """Core Download domain entity."""
 
@@ -19,13 +19,13 @@ class Download:
     download_id: DownloadId
     name: str
     state: DownloadState
-    total_length: ByteSize | None
-    completed_length: ByteSize
-    download_speed: BitRate
-    upload_speed: BitRate
-    eta: Duration | None
-    files: list[DownloadFile]
-    sources: list[DownloadSource]
+    total_length: ByteSize | None = None
+    completed_length: ByteSize = field(default_factory=lambda: ByteSize(0))
+    download_speed: BitRate = field(default_factory=lambda: BitRate(0))
+    upload_speed: BitRate = field(default_factory=lambda: BitRate(0))
+    eta: Duration | None = None
+    files: list[DownloadFile] = field(default_factory=list)
+    sources: list[DownloadSource] = field(default_factory=list)
     category_id: CategoryId | None = None
     bitfield: Bitfield | None = None
     error_code: int | None = None
@@ -60,6 +60,10 @@ class Download:
         """Enforce domain invariants and state transition rules."""
         validate_transition(self.state, new_state)
         return replace(self, state=new_state)
+
+    def assign_category(self, category_id: CategoryId | None) -> Download:
+        """Assign or change the category associated with this download."""
+        return replace(self, category_id=category_id)
 
     def update_progress(
         self,
