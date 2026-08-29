@@ -189,11 +189,27 @@ class RemoveDownloadUseCase:
             self.client.remove_download_result(dl.gid)
 
         if delete_files:
-            for f in dl.files:
+            files_to_delete = list(dl.files)
+            if not files_to_delete:
+                with contextlib.suppress(Exception):
+                    fresh = self.client.tell_status(dl.gid)
+                    files_to_delete = fresh.files
+
+            for f in files_to_delete:
                 p = Path(f.path)
                 if p.exists() and p.is_file():
                     with contextlib.suppress(Exception):
                         p.unlink()
+                ctl = Path(f"{f.path}.aria2")
+                if ctl.exists() and ctl.is_file():
+                    with contextlib.suppress(Exception):
+                        ctl.unlink()
+
+            if dl.dir_path and dl.name:
+                fallback_p = Path(dl.dir_path) / dl.name
+                if fallback_p.exists() and fallback_p.is_file():
+                    with contextlib.suppress(Exception):
+                        fallback_p.unlink()
 
         self.download_repo.delete(download_id)
 
