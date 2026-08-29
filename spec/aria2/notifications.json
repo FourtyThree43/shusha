@@ -1,0 +1,80 @@
+[
+  {
+    "name": "aria2.onDownloadStart",
+    "description": "Emitted when a download starts or resumes.",
+    "parameters": [
+      {
+        "name": "event",
+        "type": "dict",
+        "structure": {
+          "gid": "str"
+        }
+      }
+    ]
+  },
+  {
+    "name": "aria2.onDownloadPause",
+    "description": "Emitted when a download is paused.",
+    "parameters": [
+      {
+        "name": "event",
+        "type": "dict",
+        "structure": {
+          "gid": "str"
+        }
+      }
+    ]
+  },
+  {
+    "name": "aria2.onDownloadStop",
+    "description": "Emitted when a download is stopped by user intervention.",
+    "parameters": [
+      {
+        "name": "event",
+        "type": "dict",
+        "structure": {
+          "gid": "str"
+        }
+      }
+    ]
+  },
+  {
+    "name": "aria2.onDownloadComplete",
+    "description": "Emitted when a download completes successfully.",
+    "parameters": [
+      {
+        "name": "event",
+        "type": "dict",
+        "structure": {
+          "gid": "str"
+        }
+      }
+    ]
+  },
+  {
+    "name": "aria2.onDownloadError",
+    "description": "Emitted when a download stops due to an error.",
+    "parameters": [
+      {
+        "name": "event",
+        "type": "dict",
+        "structure": {
+          "gid": "str"
+        }
+      }
+    ]
+  },
+  {
+    "name": "aria2.onBtDownloadComplete",
+    "description": "Emitted when a BitTorrent download completes seeding or finishes downloading files.",
+    "parameters": [
+      {
+        "name": "event",
+        "type": "dict",
+        "structure": {
+          "gid": "str"
+        }
+      }
+    ]
+  }
+]

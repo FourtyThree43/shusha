@@ -1,0 +1,4308 @@
+[
+  {
+    "name": "version",
+    "short_name": "v",
+    "category": "basic",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": false,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Print the version number and exit.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-version"
+  },
+  {
+    "name": "help",
+    "short_name": "h",
+    "category": "basic",
+    "type": "enum",
+    "default": "#basic",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "basic",
+      "advanced",
+      "http",
+      "https",
+      "ftp",
+      "metalink",
+      "bittorrent",
+      "cookie",
+      "hook",
+      "file",
+      "rpc",
+      "checksum",
+      "experimental",
+      "deprecated",
+      "help",
+      "all"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": false,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Print usage and exit. The help messages are classified with tags. A tag starts with \"#\". For example, type \"--help=#http\" to get the usage for the options tagged with \"#http\". If non-tag word is given, print the usage for the options whose name includes that word.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-help"
+  },
+  {
+    "name": "timeout",
+    "short_name": "t",
+    "category": "http",
+    "type": "duration",
+    "default": "60",
+    "minimum": 1,
+    "maximum": 600,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set timeout in seconds.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-timeout"
+  },
+  {
+    "name": "connect-timeout",
+    "short_name": null,
+    "category": "http",
+    "type": "duration",
+    "default": "60",
+    "minimum": 1,
+    "maximum": 600,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set the connect timeout in seconds to establish connection to HTTP/FTP/proxy server. After the connection is established, this option makes no effect and --timeout option is used instead.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-connect-timeout"
+  },
+  {
+    "name": "max-tries",
+    "short_name": "m",
+    "category": "http",
+    "type": "integer",
+    "default": "5",
+    "minimum": 0,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set number of tries. 0 means unlimited.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-max-tries"
+  },
+  {
+    "name": "auto-save-interval",
+    "short_name": null,
+    "category": "advanced",
+    "type": "duration",
+    "default": "60",
+    "minimum": 0,
+    "maximum": 600,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Save a control file(*.aria2) every SEC seconds. If 0 is given, a control file is not saved during download. aria2 saves a control file when it stops regardless of the value.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-auto-save-interval"
+  },
+  {
+    "name": "log",
+    "short_name": "l",
+    "category": "basic",
+    "type": "enum",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "/path/to/file",
+      "-"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "The file name of the log file. If '-' is specified, log is written to stdout.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-log"
+  },
+  {
+    "name": "dir",
+    "short_name": "d",
+    "category": "basic",
+    "type": "path",
+    "default": "/home/BillGates/code/shusha",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "The directory to store the downloaded file.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-dir"
+  },
+  {
+    "name": "out",
+    "short_name": "o",
+    "category": "basic",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "The file name of the downloaded file. It is always relative to the directory given in -d option. When the -Z option is used, this option will be ignored.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-out"
+  },
+  {
+    "name": "split",
+    "short_name": "s",
+    "category": "basic",
+    "type": "integer",
+    "default": "5",
+    "minimum": 1,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Download a file using N connections. If more than N URIs are given, first N URIs are used and remaining URLs are used for backup. If less than N URIs are given, those URLs are used more than once so that N connections total are made simultaneously. The number of connections to the same host is restricted by the --max-connection-per-server option. See also the --min-split-size option.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-split"
+  },
+  {
+    "name": "daemon",
+    "short_name": "D",
+    "category": "advanced",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL",
+      "DAEMON"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Run as daemon. The current working directory will be changed to \"/\" and standard input, standard output and standard error will be redirected to \"/dev/null\".",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-daemon"
+  },
+  {
+    "name": "referer",
+    "short_name": null,
+    "category": "http",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set an http referrrer (Referer). This affects all http/https downloads. If \"*\" is given, the download URI is also used as the referrer. This may be useful when used together with the -P option.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-referer"
+  },
+  {
+    "name": "lowest-speed-limit",
+    "short_name": null,
+    "category": "http",
+    "type": "integer",
+    "default": "0",
+    "minimum": 0,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Close connection if download speed is lower than or equal to this value(bytes per sec). 0 means aria2 does not have a lowest speed limit. You can append K or M(1K = 1024, 1M = 1024K). This option does not affect BitTorrent downloads.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-lowest-speed-limit"
+  },
+  {
+    "name": "piece-length",
+    "short_name": null,
+    "category": "advanced",
+    "type": "size",
+    "default": "1M",
+    "minimum": 1048576,
+    "maximum": 1073741824,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set a piece length for HTTP/FTP downloads. This is the boundary when aria2 splits a file. All splits occur at multiple of this length. This option will be ignored in BitTorrent downloads. It will be also ignored if Metalink file contains piece hashes.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-piece-length"
+  },
+  {
+    "name": "max-overall-download-limit",
+    "short_name": null,
+    "category": "http",
+    "type": "integer",
+    "default": "0",
+    "minimum": 0,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "0 means unrestricted. You can append K or M(1K = 1024, 1M = 1024K). To limit the download speed per download, use --max-download-limit option.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-max-overall-download-limit"
+  },
+  {
+    "name": "max-download-limit",
+    "short_name": null,
+    "category": "http",
+    "type": "integer",
+    "default": "0",
+    "minimum": 0,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set max download speed per each download in bytes/sec. 0 means unrestricted. You can append K or M(1K = 1024, 1M = 1024K). To limit the overall download speed, use --max-overall-download-limit option.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-max-download-limit"
+  },
+  {
+    "name": "file-allocation",
+    "short_name": null,
+    "category": "basic",
+    "type": "path",
+    "default": "prealloc",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Specify file allocation method. 'none' doesn't pre-allocate file space. 'prealloc' pre-allocates file space before download begins. This may take some time depending on the size of the file. If you are using newer file systems such as ext4 (with extents support), btrfs, xfs or NTFS (MinGW build only), 'falloc' is your best choice. It allocates large(few GiB) files almost instantly. Don't use 'falloc' with legacy file systems such as ext3 and FAT32 because it takes almost the same time as 'prealloc' and it blocks aria2 entirely until allocation finishes. 'falloc' may not be available if your system doesn't have posix_fallocate() function. 'trunc' uses ftruncate() system call or platform-specific counterpart to truncate a file to a specified length.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-file-allocation"
+  },
+  {
+    "name": "no-file-allocation-limit",
+    "short_name": null,
+    "category": "advanced",
+    "type": "integer",
+    "default": "5M",
+    "minimum": 0,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "size is smaller than SIZE. You can append K or M(1K = 1024, 1M = 1024K).",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-no-file-allocation-limit"
+  },
+  {
+    "name": "allow-overwrite",
+    "short_name": null,
+    "category": "advanced",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "corresponding control file doesn't exist.  See also --auto-file-renaming option.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-allow-overwrite"
+  },
+  {
+    "name": "realtime-chunk-checksum",
+    "short_name": null,
+    "category": "metalink",
+    "type": "enum",
+    "default": "true",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Validate chunk of data by calculating checksum while downloading a file if chunk checksums are provided.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-realtime-chunk-checksum"
+  },
+  {
+    "name": "check-integrity",
+    "short_name": "V",
+    "category": "basic",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "hashes or a hash of entire file. This option has effect only in BitTorrent, Metalink downloads with checksums or HTTP(S)/FTP downloads with --checksum option. If piece hashes are provided, this option can detect damaged portions of a file and re-download them. If a hash of entire file is provided, hash check is only done when file has been already download. This is determined by file length. If hash check fails, file is re-downloaded from scratch. If both piece hashes and a hash of entire file are provided, only piece hashes are used.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-check-integrity"
+  },
+  {
+    "name": "netrc-path",
+    "short_name": null,
+    "category": "basic",
+    "type": "path",
+    "default": "/home/BillGates/.netrc",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Specify the path to the netrc file.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-netrc-path"
+  },
+  {
+    "name": "continue",
+    "short_name": "c",
+    "category": "basic",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Continue downloading a partially downloaded file. Use this option to resume a download started by a web browser or another program which downloads files sequentially from the beginning. Currently this option is only applicable to http(s)/ftp downloads.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-continue"
+  },
+  {
+    "name": "no-netrc",
+    "short_name": "n",
+    "category": "http",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Disables netrc support.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-no-netrc"
+  },
+  {
+    "name": "input-file",
+    "short_name": "i",
+    "category": "basic",
+    "type": "path",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Downloads URIs found in FILE. You can specify multiple URIs for a single entity: separate URIs on a single line using the TAB character. Reads input from stdin when '-' is specified. Additionally, options can be specified after each line of URI. This optional line must start with one or more white spaces and have one option per single line. See INPUT FILE section of man page for details. See also --deferred-input option.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-input-file"
+  },
+  {
+    "name": "deferred-input",
+    "short_name": null,
+    "category": "advanced",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "and options from file specified by -i option at startup, but it reads one by one when it needs later. This may reduce memory usage if input file contains a lot of URIs to download. If false is given, aria2 reads all URIs and options at startup.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-deferred-input"
+  },
+  {
+    "name": "max-concurrent-downloads",
+    "short_name": "j",
+    "category": "basic",
+    "type": "integer",
+    "default": "5",
+    "minimum": 1,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "every static (HTTP/FTP) URL, torrent and metalink. See also --split and --optimize-concurrent-downloads options.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-max-concurrent-downloads"
+  },
+  {
+    "name": "optimize-concurrent-downloads",
+    "short_name": null,
+    "category": "advanced",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false",
+      "A:B"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "concurrent downloads according to the bandwidth available. aria2 uses the download speed observed in the previous downloads to adapt the number of downloads launched in parallel according to the rule N = A + B Log10(speed in Mbps). The coefficients A and B can be customized in the option arguments with A and B separated by a colon. The default values (A=5,B=25) lead to using typically 5 parallel downloads on 1Mbps networks and above 50 on 100Mbps networks. The number of parallel downloads remains constrained under the maximum defined by the max-concurrent-downloads parameter.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-optimize-concurrent-downloads"
+  },
+  {
+    "name": "force-sequential",
+    "short_name": "Z",
+    "category": "basic",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "and download each URI in a separate session, like the usual command-line download utilities.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-force-sequential"
+  },
+  {
+    "name": "auto-file-renaming",
+    "short_name": null,
+    "category": "advanced",
+    "type": "path",
+    "default": "true",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "exists. This option works only in http(s)/ftp download. The new file name has a dot and a number(1..9999) appended after the name, but before the file extension, if any.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-auto-file-renaming"
+  },
+  {
+    "name": "parameterized-uri",
+    "short_name": "P",
+    "category": "advanced",
+    "type": "uri",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "You can specify set of parts: http://{sv1,sv2,sv3}/foo.iso Also you can specify numeric sequences with step counter: http://host/image[000-100:2].img A step counter can be omitted. If all URIs do not point to the same file, such as the second example above, -Z option is required.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-parameterized-uri"
+  },
+  {
+    "name": "allow-piece-length-change",
+    "short_name": null,
+    "category": "advanced",
+    "type": "size",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "download when a piece length is different from one in a control file. If true is given, you can proceed but some download progress will be lost.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-allow-piece-length-change"
+  },
+  {
+    "name": "no-conf",
+    "short_name": null,
+    "category": "advanced",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Disable loading aria2.conf file.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-no-conf"
+  },
+  {
+    "name": "conf-path",
+    "short_name": null,
+    "category": "advanced",
+    "type": "path",
+    "default": "/home/BillGates/.config/aria2/aria2.conf",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Change the configuration file path to PATH.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-conf-path"
+  },
+  {
+    "name": "stop",
+    "short_name": null,
+    "category": "advanced",
+    "type": "integer",
+    "default": "0",
+    "minimum": 0,
+    "maximum": 2147483647,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Stop application after SEC seconds has passed. If 0 is given, this feature is disabled.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-stop"
+  },
+  {
+    "name": "quiet",
+    "short_name": "q",
+    "category": "advanced",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Make aria2 quiet(no console output).",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-quiet"
+  },
+  {
+    "name": "async-dns",
+    "short_name": null,
+    "category": "advanced",
+    "type": "enum",
+    "default": "true",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Enable asynchronous DNS.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-async-dns"
+  },
+  {
+    "name": "summary-interval",
+    "short_name": null,
+    "category": "advanced",
+    "type": "duration",
+    "default": "60",
+    "minimum": 0,
+    "maximum": 2147483647,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set interval to output download progress summary. Setting 0 suppresses the output.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-summary-interval"
+  },
+  {
+    "name": "log-level",
+    "short_name": null,
+    "category": "advanced",
+    "type": "enum",
+    "default": "debug",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "debug",
+      "info",
+      "notice",
+      "warn",
+      "error"
+    ],
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set log level to output to file specified using --log option.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-log-level"
+  },
+  {
+    "name": "console-log-level",
+    "short_name": null,
+    "category": "advanced",
+    "type": "enum",
+    "default": "notice",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "debug",
+      "info",
+      "notice",
+      "warn",
+      "error"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set log level to output to console.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-console-log-level"
+  },
+  {
+    "name": "uri-selector",
+    "short_name": null,
+    "category": "http",
+    "type": "uri",
+    "default": "feedback",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Specify URI selection algorithm. If 'inorder' is given, URI is tried in the order appeared in the URI list. If 'feedback' is given, aria2 uses download speed observed in the previous downloads and choose fastest server in the URI list. This also effectively skips dead mirrors. The observed download speed is a part of performance profile of servers mentioned in --server-stat-of and --server-stat-if options. If 'adaptive' is given, selects one of the best mirrors for the first and reserved connections. For supplementary ones, it returns mirrors which has not been tested yet, and if each of them has already been tested, returns mirrors which has to be tested again. Otherwise, it doesn't select anymore mirrors. Like 'feedback', it uses a performance profile of servers.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-uri-selector"
+  },
+  {
+    "name": "server-stat-timeout",
+    "short_name": null,
+    "category": "http",
+    "type": "duration",
+    "default": "86400",
+    "minimum": 0,
+    "maximum": 2147483647,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Specifies timeout in seconds to invalidate performance profile of the servers since the last contact to them.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-server-stat-timeout"
+  },
+  {
+    "name": "server-stat-if",
+    "short_name": null,
+    "category": "http",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Specify the filename to load performance profile of the servers. The loaded data will be used in some URI selector such as 'feedback'. See also --uri-selector option",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-server-stat-if"
+  },
+  {
+    "name": "server-stat-of",
+    "short_name": null,
+    "category": "http",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Specify the filename to which performance profile of the servers is saved. You can load saved data using --server-stat-if option.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-server-stat-of"
+  },
+  {
+    "name": "remote-time",
+    "short_name": "R",
+    "category": "http",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "remote HTTP/FTP server and if it is available, apply it to the local file.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-remote-time"
+  },
+  {
+    "name": "max-file-not-found",
+    "short_name": null,
+    "category": "http",
+    "type": "integer",
+    "default": "0",
+    "minimum": 0,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "If aria2 receives `file not found' status from the remote HTTP/FTP servers NUM times without getting a single byte, then force the download to fail. Specify 0 to disable this option. This options is effective only when using HTTP/FTP servers. The number of retry attempt is counted toward --max-tries, so it should be configured too.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-max-file-not-found"
+  },
+  {
+    "name": "event-poll",
+    "short_name": null,
+    "category": "advanced",
+    "type": "enum",
+    "default": "epoll",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "epoll",
+      "poll",
+      "select"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Specify the method for polling events.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-event-poll"
+  },
+  {
+    "name": "enable-rpc",
+    "short_name": null,
+    "category": "rpc",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL",
+      "RPC",
+      "DAEMON"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Enable JSON-RPC/XML-RPC server. It is strongly recommended to set secret authorization token using --rpc-secret option. See also --rpc-listen-port option.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-enable-rpc"
+  },
+  {
+    "name": "rpc-listen-port",
+    "short_name": null,
+    "category": "rpc",
+    "type": "integer",
+    "default": "6800",
+    "minimum": 1024,
+    "maximum": 65535,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "RPC",
+      "DAEMON"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Specify a port number for JSON-RPC/XML-RPC server to listen to.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-rpc-listen-port"
+  },
+  {
+    "name": "rpc-user",
+    "short_name": null,
+    "category": "rpc",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "RPC",
+      "DAEMON"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": true,
+    "experimental": false,
+    "description": "Set JSON-RPC/XML-RPC user. This option will be deprecated in the future release. Migrate to --rpc-secret option as soon as possible.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-rpc-user"
+  },
+  {
+    "name": "rpc-passwd",
+    "short_name": null,
+    "category": "rpc",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "RPC",
+      "DAEMON"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": true,
+    "deprecated": true,
+    "experimental": false,
+    "description": "Set JSON-RPC/XML-RPC password. This option will be deprecated in the future release. Migrate to --rpc-secret option as soon as possible.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-rpc-passwd"
+  },
+  {
+    "name": "rpc-max-request-size",
+    "short_name": null,
+    "category": "rpc",
+    "type": "integer",
+    "default": "2M",
+    "minimum": 0,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "RPC",
+      "DAEMON"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set max size of JSON-RPC/XML-RPC request. If aria2 detects the request is more than SIZE bytes, it drops connection.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-rpc-max-request-size"
+  },
+  {
+    "name": "rpc-listen-all",
+    "short_name": null,
+    "category": "rpc",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL",
+      "RPC",
+      "DAEMON"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "network interfaces. If false is given, listen only on local loopback interface.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-rpc-listen-all"
+  },
+  {
+    "name": "rpc-allow-origin-all",
+    "short_name": null,
+    "category": "rpc",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL",
+      "RPC",
+      "DAEMON"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "field with value '*' to the RPC response.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-rpc-allow-origin-all"
+  },
+  {
+    "name": "rpc-certificate",
+    "short_name": null,
+    "category": "rpc",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "RPC",
+      "DAEMON"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": true,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Use the certificate in FILE for RPC server. The certificate must be in PEM format. Use --rpc-private-key option to specify the private key. Use --rpc-secure option to enable encryption.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-rpc-certificate"
+  },
+  {
+    "name": "rpc-private-key",
+    "short_name": null,
+    "category": "rpc",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "RPC",
+      "DAEMON"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": true,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Use the private key in FILE for RPC server. The private key must be decrypted and in PEM format. Use --rpc-secure option to enable encryption. See also --rpc-certificate option.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-rpc-private-key"
+  },
+  {
+    "name": "rpc-secure",
+    "short_name": null,
+    "category": "rpc",
+    "type": "duration",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "RPC",
+      "DAEMON"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "RPC transport will be encrypted by SSL/TLS. The RPC clients must use https scheme to access the server. For WebSocket client, use wss scheme. Use --rpc-certificate and --rpc-private-key options to specify the server certificate and private key.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-rpc-secure"
+  },
+  {
+    "name": "rpc-save-upload-metadata",
+    "short_name": null,
+    "category": "rpc",
+    "type": "enum",
+    "default": "true",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL",
+      "RPC",
+      "DAEMON"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "metalink metadata in the directory specified by --dir option. The filename consists of SHA-1 hash hex string of metadata plus extension. For torrent, the extension is '.torrent'. For metalink, it is '.meta4'. If false is given to this option, the downloads added by aria2.addTorrent or aria2.addMetalink will not be saved by --save-session option.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-rpc-save-upload-metadata"
+  },
+  {
+    "name": "dry-run",
+    "short_name": null,
+    "category": "http",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "If true is given, aria2 just checks whether the remote file is available and doesn't download data. This option has effect on HTTP/FTP download. BitTorrent downloads are canceled if true is specified.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-dry-run"
+  },
+  {
+    "name": "reuse-uri",
+    "short_name": null,
+    "category": "http",
+    "type": "uri",
+    "default": "true",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Reuse already used URIs if no unused URIs are left.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-reuse-uri"
+  },
+  {
+    "name": "on-download-start",
+    "short_name": null,
+    "category": "advanced",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set the command to be executed after download got started. aria2 passes 3 arguments to COMMAND: GID, the number of files and file path. See Event Hook in man page for more details.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-on-download-start"
+  },
+  {
+    "name": "on-download-pause",
+    "short_name": null,
+    "category": "advanced",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set the command to be executed after download was paused. See --on-download-start option for the requirement of COMMAND.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-on-download-pause"
+  },
+  {
+    "name": "on-download-stop",
+    "short_name": null,
+    "category": "advanced",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set the command to be executed after download stopped. You can override the command to be executed for particular download result using --on-download-complete and --on-download-error. If they are specified, command specified in this option is not executed. See --on-download-start option for the requirement of COMMAND.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-on-download-stop"
+  },
+  {
+    "name": "on-download-complete",
+    "short_name": null,
+    "category": "advanced",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "completed. See --on-download-start option for the requirement of COMMAND. See also --on-download-stop option.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-on-download-complete"
+  },
+  {
+    "name": "on-download-error",
+    "short_name": null,
+    "category": "advanced",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set the command to be executed after download aborted due to error. See --on-download-start option for the requirement of COMMAND. See also --on-download-stop option.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-on-download-error"
+  },
+  {
+    "name": "interface",
+    "short_name": null,
+    "category": "advanced",
+    "type": "enum",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "interface",
+      "IP address",
+      "hostname"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Bind sockets to given interface. You can specify interface name, IP address and hostname.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-interface"
+  },
+  {
+    "name": "multiple-interface",
+    "short_name": null,
+    "category": "advanced",
+    "type": "enum",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "interface",
+      "IP address",
+      "hostname"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "sockets to. Requests will be split among the interfaces to achieve link aggregation. You can specify interface name, IP address and hostname. If --interface is used, this option will be ignored.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-multiple-interface"
+  },
+  {
+    "name": "disable-ipv6",
+    "short_name": null,
+    "category": "advanced",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Disable IPv6.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-disable-ipv6"
+  },
+  {
+    "name": "human-readable",
+    "short_name": null,
+    "category": "advanced",
+    "type": "enum",
+    "default": "true",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "(e.g., 1.2Ki, 3.4Mi) in the console readout.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-human-readable"
+  },
+  {
+    "name": "remove-control-file",
+    "short_name": null,
+    "category": "advanced",
+    "type": "path",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "with --allow-overwrite=true, download always starts from scratch. This will be useful for users behind proxy server which disables resume.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-remove-control-file"
+  },
+  {
+    "name": "always-resume",
+    "short_name": null,
+    "category": "advanced",
+    "type": "enum",
+    "default": "true",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "always tries to resume download and if resume is not possible, aborts download. If false is given, when all given URIs do not support resume or aria2 encounters N URIs which does not support resume (N is the value specified using --max-resume-failure-tries option), aria2 downloads file from scratch. See --max-resume-failure-tries option.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-always-resume"
+  },
+  {
+    "name": "max-resume-failure-tries",
+    "short_name": null,
+    "category": "advanced",
+    "type": "integer",
+    "default": "0",
+    "minimum": 0,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "downloads file from scratch when aria2 detects N number of URIs that does not support resume. If N is 0, aria2 downloads file from scratch when all given URIs do not support resume. See --always-resume option.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-max-resume-failure-tries"
+  },
+  {
+    "name": "save-session",
+    "short_name": null,
+    "category": "advanced",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Save error/unfinished downloads to FILE on exit. You can pass this output file to aria2c with -i option on restart. Please note that downloads added by aria2.addTorrent and aria2.addMetalink RPC method and whose metadata could not be saved as a file will not be saved. Downloads removed using aria2.remove and aria2.forceRemove will not be saved.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-save-session"
+  },
+  {
+    "name": "max-connection-per-server",
+    "short_name": "x",
+    "category": "basic",
+    "type": "integer",
+    "default": "1",
+    "minimum": 1,
+    "maximum": 16,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "server for each download.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-max-connection-per-server"
+  },
+  {
+    "name": "min-split-size",
+    "short_name": "k",
+    "category": "basic",
+    "type": "size",
+    "default": "20M",
+    "minimum": 1048576,
+    "maximum": 1073741824,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "aria2 does not split less than 2*SIZE byte range. For example, let's consider downloading 20MiB file. If SIZE is 10M, aria2 can split file into 2 range [0-10MiB) and [10MiB-20MiB) and download it using 2 sources(if --split >= 2, of course). If SIZE is 15M, since 2*15M > 20MiB, aria2 does not split file and download it using 1 source. You can append K or M(1K = 1024, 1M = 1024K).",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-min-split-size"
+  },
+  {
+    "name": "conditional-get",
+    "short_name": null,
+    "category": "advanced",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "than remote file. Currently, this function has many limitations. See man page for details.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-conditional-get"
+  },
+  {
+    "name": "enable-async-dns6",
+    "short_name": null,
+    "category": "advanced",
+    "type": "enum",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": true,
+    "experimental": false,
+    "description": "DNS resolver. This option will be ignored when --async-dns=false.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-enable-async-dns6"
+  },
+  {
+    "name": "max-download-result",
+    "short_name": null,
+    "category": "advanced",
+    "type": "integer",
+    "default": "1000",
+    "minimum": 0,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set maximum number of download result kept in memory. The download results are completed/error/ removed downloads. The download results are stored in FIFO queue and it can store at most NUM download results. When queue is full and new download result is created, oldest download result is removed from the front of the queue and new one is pushed to the back. Setting big number in this option may result high memory consumption after thousands of downloads. Specifying 0 means no download result is kept. Note that unfinished downloads are kept in memory regardless of this option value. See --keep-unfinished-download-result option.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-max-download-result"
+  },
+  {
+    "name": "retry-wait",
+    "short_name": null,
+    "category": "http",
+    "type": "duration",
+    "default": "0",
+    "minimum": 0,
+    "maximum": 600,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set the seconds to wait between retries. With SEC > 0, aria2 will retry download when the HTTP server returns 503 response.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-retry-wait"
+  },
+  {
+    "name": "async-dns-server",
+    "short_name": null,
+    "category": "advanced",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "used in asynchronous DNS resolver. Usually asynchronous DNS resolver reads DNS server addresses from /etc/resolv.conf. When this option is used, it uses DNS servers specified in this option instead of ones in /etc/resolv.conf. You can specify both IPv4 and IPv6 address. This option is useful when the system does not have /etc/resolv.conf and user does not have the permission to create it.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-async-dns-server"
+  },
+  {
+    "name": "show-console-readout",
+    "short_name": null,
+    "category": "advanced",
+    "type": "enum",
+    "default": "true",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-show-console-readout"
+  },
+  {
+    "name": "stream-piece-selector",
+    "short_name": null,
+    "category": "http",
+    "type": "enum",
+    "default": "default",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "default",
+      "inorder",
+      "random",
+      "geom"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "used in HTTP/FTP download. Piece means fixed length segment which is downloaded in parallel in segmented download. If 'default' is given, aria2 selects piece so that it reduces the number of establishing connection. This is reasonable default behaviour because establishing connection is an expensive operation. If 'inorder' is given, aria2 selects piece which has minimum index. Index=0 means first of the file. This will be useful to view movie while downloading it. --enable-http-pipelining option may be useful to reduce reconnection overhead. Please note that aria2 honors --min-split-size option, so it will be necessary to specify a reasonable value to --min-split-size option. If 'random' is given, aria2 selects piece randomly. Like 'inorder', --min-split-size option is honored. If 'geom' is given, at the beginning aria2 selects piece which has minimum index like 'inorder', but it exponentially increasingly keeps space from previously selected piece. This will reduce the number of establishing connection and at the same time it will download the beginning part of the file first. This will be useful to view movie while downloading it.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-stream-piece-selector"
+  },
+  {
+    "name": "truncate-console-readout",
+    "short_name": null,
+    "category": "advanced",
+    "type": "enum",
+    "default": "true",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "a single line.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-truncate-console-readout"
+  },
+  {
+    "name": "pause",
+    "short_name": null,
+    "category": "advanced",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Pause download after added. This option is effective only when --enable-rpc=true is given.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-pause"
+  },
+  {
+    "name": "download-result",
+    "short_name": null,
+    "category": "advanced",
+    "type": "enum",
+    "default": "default",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "default",
+      "full",
+      "hide"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "This option changes the way \"Download Results\" is formatted. If OPT is 'default', print GID, status, average download speed and path/URI. If multiple files are involved, path/URI of first requested file is printed and remaining ones are omitted. If OPT is 'full', print GID, status, average download speed, percentage of progress and path/URI. The percentage of progress and path/URI are printed for each requested file in each row. If OPT is 'hide', \"Download Results\" is hidden.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-download-result"
+  },
+  {
+    "name": "hash-check-only",
+    "short_name": null,
+    "category": "advanced",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "--check-integrity option, abort download whether or not download is complete.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-hash-check-only"
+  },
+  {
+    "name": "checksum",
+    "short_name": null,
+    "category": "http",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set checksum. TYPE is hash type. The supported hash type is listed in \"Hash Algorithms\" in \"aria2c -v\". DIGEST is hex digest. For example, setting sha-1 digest looks like this: sha-1=0192ba11326fe2298c8cb4de616f4d4140213838 This option applies only to HTTP(S)/FTP downloads.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-checksum"
+  },
+  {
+    "name": "stop-with-process",
+    "short_name": null,
+    "category": "advanced",
+    "type": "integer",
+    "default": null,
+    "minimum": 0,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Stop application when process PID is not running. This is useful if aria2 process is forked from a parent process. The parent process can fork aria2 with its own pid and when parent process exits for some reason, aria2 can detect it and shutdown itself.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-stop-with-process"
+  },
+  {
+    "name": "enable-mmap",
+    "short_name": null,
+    "category": "advanced",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": true,
+    "description": "Map files into memory.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-enable-mmap"
+  },
+  {
+    "name": "force-save",
+    "short_name": null,
+    "category": "advanced",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Save download with --save-session option even if the download is completed or removed. This option also saves control file in that situations. This may be useful to save BitTorrent seeding which is recognized as completed state.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-force-save"
+  },
+  {
+    "name": "save-not-found",
+    "short_name": null,
+    "category": "advanced",
+    "type": "enum",
+    "default": "true",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "if the file was not found on the server. This option also saves control file in that situations.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-save-not-found"
+  },
+  {
+    "name": "disk-cache",
+    "short_name": null,
+    "category": "advanced",
+    "type": "integer",
+    "default": "16M",
+    "minimum": 0,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Enable disk cache. If SIZE is 0, the disk cache is disabled. This feature caches the downloaded data in memory, which grows to at most SIZE bytes. The cache storage is created for aria2 instance and shared by all downloads. The one advantage of the disk cache is reduce the disk I/O because the data are written in larger unit and it is reordered by the offset of the file. If hash checking is involved and the data are cached in memory, we don't need to read them from the disk. SIZE can include K or M(1K = 1024, 1M = 1024K).",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-disk-cache"
+  },
+  {
+    "name": "gid",
+    "short_name": null,
+    "category": "advanced",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set GID manually. aria2 identifies each download by the ID called GID. The GID must be hex string of 16 characters, thus [0-9a-fA-F] are allowed and leading zeros must not be stripped. The GID all 0 is reserved and must not be used. The GID must be unique, otherwise error is reported and the download is not added. This option is useful when restoring the sessions saved using --save-session option. If this option is not used, new GID is generated by aria2.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-gid"
+  },
+  {
+    "name": "save-session-interval",
+    "short_name": null,
+    "category": "advanced",
+    "type": "duration",
+    "default": "0",
+    "minimum": 0,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Save error/unfinished downloads to a file specified by --save-session option every SEC seconds. If 0 is given, file will be saved only when aria2 exits.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-save-session-interval"
+  },
+  {
+    "name": "enable-color",
+    "short_name": null,
+    "category": "advanced",
+    "type": "enum",
+    "default": "true",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Enable color output for a terminal.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-enable-color"
+  },
+  {
+    "name": "rpc-secret",
+    "short_name": null,
+    "category": "rpc",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "RPC",
+      "DAEMON"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": true,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set RPC secret authorization token.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-rpc-secret"
+  },
+  {
+    "name": "dscp",
+    "short_name": null,
+    "category": "advanced",
+    "type": "integer",
+    "default": "0",
+    "minimum": 0,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set DSCP value in outgoing IP packets of BitTorrent traffic for QoS. This parameter sets only DSCP bits in TOS field of IP packets, not the whole field. If you take values from /usr/include/netinet/ip.h divide them by 4 (otherwise values would be incorrect, e.g. your CS1 class would turn into CS4). If you take commonly used values from RFC, network vendors' documentation, Wikipedia or any other source, use them as they are.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-dscp"
+  },
+  {
+    "name": "pause-metadata",
+    "short_name": null,
+    "category": "advanced",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Pause downloads created as a result of metadata download. There are 3 types of metadata downloads in aria2: (1) downloading .torrent file. (2) downloading torrent metadata using magnet link. (3) downloading metalink file. These metadata downloads will generate downloads using their metadata. This option pauses these subsequent downloads. This option is effective only when --enable-rpc=true is given.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-pause-metadata"
+  },
+  {
+    "name": "rlimit-nofile",
+    "short_name": null,
+    "category": "advanced",
+    "type": "integer",
+    "default": "1024",
+    "minimum": 1,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set the soft limit of open file descriptors. This open will only have effect when: a) The system supports it (posix) b) The limit does not exceed the hard limit. c) The specified limit is larger than the current soft limit. This is equivalent to setting nofile via ulimit, except that it will never decrease the limit.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-rlimit-nofile"
+  },
+  {
+    "name": "min-tls-version",
+    "short_name": null,
+    "category": "advanced",
+    "type": "enum",
+    "default": "TLSv1.2",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "TLSv1.1",
+      "TLSv1.2",
+      "TLSv1.3"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": false,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Specify minimum SSL/TLS version to enable.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-min-tls-version"
+  },
+  {
+    "name": "socket-recv-buffer-size",
+    "short_name": null,
+    "category": "advanced",
+    "type": "size",
+    "default": "0",
+    "minimum": 0,
+    "maximum": 16777216,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set the maximum socket receive buffer in bytes. Specifying 0 will disable this option. This value will be set to socket file descriptor using SO_RCVBUF socket option with setsockopt() call.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-socket-recv-buffer-size"
+  },
+  {
+    "name": "max-mmap-limit",
+    "short_name": null,
+    "category": "advanced",
+    "type": "integer",
+    "default": "9223372036854775807",
+    "minimum": 0,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set the maximum file size to enable mmap (see --enable-mmap option). The file size is determined by the sum of all files contained in one download. For example, if a download contains 5 files, then file size is the total size of those files. If file size is strictly greater than the size specified in this option, mmap will be disabled.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-max-mmap-limit"
+  },
+  {
+    "name": "stderr",
+    "short_name": null,
+    "category": "advanced",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Redirect all console output that would be otherwise printed in stdout to stderr.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-stderr"
+  },
+  {
+    "name": "keep-unfinished-download-result",
+    "short_name": null,
+    "category": "advanced",
+    "type": "enum",
+    "default": "true",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Keep unfinished download results even if doing so exceeds --max-download-result. This is useful if all unfinished downloads must be saved in session file (see --save-session option). Please keep in mind that there is no upper bound to the number of unfinished download result to keep. If that is undesirable, turn this option off.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-keep-unfinished-download-result"
+  },
+  {
+    "name": "ftp-user",
+    "short_name": null,
+    "category": "basic",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": true,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set FTP user. This affects all URLs.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-ftp-user"
+  },
+  {
+    "name": "ftp-passwd",
+    "short_name": null,
+    "category": "basic",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": true,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set FTP password. This affects all URLs.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-ftp-passwd"
+  },
+  {
+    "name": "ftp-type",
+    "short_name": null,
+    "category": "ftp",
+    "type": "enum",
+    "default": "binary",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "binary",
+      "ascii"
+    ],
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set FTP transfer type.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-ftp-type"
+  },
+  {
+    "name": "ftp-pasv",
+    "short_name": "p",
+    "category": "ftp",
+    "type": "enum",
+    "default": "true",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Use the passive mode in FTP. If false is given, the active mode will be used.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-ftp-pasv"
+  },
+  {
+    "name": "ftp-reuse-connection",
+    "short_name": null,
+    "category": "ftp",
+    "type": "enum",
+    "default": "true",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-ftp-reuse-connection"
+  },
+  {
+    "name": "ssh-host-key-md",
+    "short_name": null,
+    "category": "ftp",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set checksum for SSH host public key. TYPE is hash type. The supported hash type is sha-1 or md5. DIGEST is hex digest. For example: sha-1=b030503d4de4539dc7885e6f0f5e256704edf4c3 This option can be used to validate server's public key when SFTP is used. If this option is not set, which is default, no validation takes place.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-ssh-host-key-md"
+  },
+  {
+    "name": "http-user",
+    "short_name": null,
+    "category": "basic",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": true,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set HTTP user. This affects all URLs.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-http-user"
+  },
+  {
+    "name": "http-passwd",
+    "short_name": null,
+    "category": "basic",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": true,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set HTTP password. This affects all URLs.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-http-passwd"
+  },
+  {
+    "name": "user-agent",
+    "short_name": "U",
+    "category": "http",
+    "type": "string",
+    "default": "aria2/1.37.0",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set user agent for http(s) downloads.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-user-agent"
+  },
+  {
+    "name": "load-cookies",
+    "short_name": null,
+    "category": "basic",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Load Cookies from FILE using the Firefox3 format and Mozilla/Firefox(1.x/2.x)/Netscape format.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-load-cookies"
+  },
+  {
+    "name": "save-cookies",
+    "short_name": null,
+    "category": "http",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Save Cookies to FILE in Mozilla/Firefox(1.x/2.x)/ Netscape format. If FILE already exists, it is overwritten. Session Cookies are also saved and their expiry values are treated as 0.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-save-cookies"
+  },
+  {
+    "name": "enable-http-keep-alive",
+    "short_name": null,
+    "category": "http",
+    "type": "enum",
+    "default": "true",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-enable-http-keep-alive"
+  },
+  {
+    "name": "enable-http-pipelining",
+    "short_name": null,
+    "category": "http",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-enable-http-pipelining"
+  },
+  {
+    "name": "header",
+    "short_name": null,
+    "category": "http",
+    "type": "header",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": true,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Append HEADER to HTTP request header. You can use this option repeatedly to specify more than one header: aria2c --header=\"X-A: b78\" --header=\"X-B: 9J1\" http://host/file",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-header"
+  },
+  {
+    "name": "certificate",
+    "short_name": null,
+    "category": "http",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": true,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Use the client certificate in FILE. The certificate must be in PEM format. You may use --private-key option to specify the private key.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-certificate"
+  },
+  {
+    "name": "private-key",
+    "short_name": null,
+    "category": "http",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": true,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Use the private key in FILE. The private key must be decrypted and in PEM format. See also --certificate option.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-private-key"
+  },
+  {
+    "name": "ca-certificate",
+    "short_name": null,
+    "category": "http",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": true,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Use the certificate authorities in FILE to verify the peers. The certificate file must be in PEM format and can contain multiple CA certificates. Use --check-certificate option to enable verification.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-ca-certificate"
+  },
+  {
+    "name": "check-certificate",
+    "short_name": null,
+    "category": "http",
+    "type": "enum",
+    "default": "true",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "in --ca-certificate option.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-check-certificate"
+  },
+  {
+    "name": "use-head",
+    "short_name": null,
+    "category": "http",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Use HEAD method for the first request to the HTTP server.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-use-head"
+  },
+  {
+    "name": "http-auth-challenge",
+    "short_name": null,
+    "category": "http",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "is requested by the server. If false is set, then authorization header is always sent to the server. There is an exception: if username and password are embedded in URI, authorization header is always sent to the server regardless of this option.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-http-auth-challenge"
+  },
+  {
+    "name": "http-no-cache",
+    "short_name": null,
+    "category": "http",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "header to avoid cached content.  If false is given, these headers are not sent and you can add Cache-Control header with a directive you like using --header option.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-http-no-cache"
+  },
+  {
+    "name": "http-accept-gzip",
+    "short_name": null,
+    "category": "http",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "header and inflate response if remote server responds with 'Content-Encoding: gzip' or 'Content-Encoding: deflate'.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-http-accept-gzip"
+  },
+  {
+    "name": "content-disposition-default-utf8",
+    "short_name": null,
+    "category": "advanced",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Content-Disposition header as UTF-8 instead of ISO-8859-1, for example, the filename parameter, but not the extended version filename*.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-content-disposition-default-utf8"
+  },
+  {
+    "name": "no-want-digest-header",
+    "short_name": null,
+    "category": "http",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "when doing requests.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-no-want-digest-header"
+  },
+  {
+    "name": "http-proxy",
+    "short_name": null,
+    "category": "http",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Use a proxy server for HTTP. To override a previously defined proxy, use \"\". See also the --all-proxy option. This affects all http downloads.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-http-proxy"
+  },
+  {
+    "name": "https-proxy",
+    "short_name": null,
+    "category": "http",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Use a proxy server for HTTPS. To override a previously defined proxy, use \"\". See also the --all-proxy option. This affects all https downloads.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-https-proxy"
+  },
+  {
+    "name": "ftp-proxy",
+    "short_name": null,
+    "category": "ftp",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Use a proxy server for FTP. To override a previously defined proxy, use \"\". See also the --all-proxy option. This affects all ftp downloads.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-ftp-proxy"
+  },
+  {
+    "name": "all-proxy",
+    "short_name": null,
+    "category": "http",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Use a proxy server for all protocols. To override a previously defined proxy, use \"\". You also can override this setting and specify a proxy server for a particular protocol using the --http-proxy, --https-proxy and --ftp-proxy options. This affects all downloads.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-all-proxy"
+  },
+  {
+    "name": "no-proxy",
+    "short_name": null,
+    "category": "http",
+    "type": "enum",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "HOSTNAME",
+      "DOMAIN",
+      "NETWORK/CIDR"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Specify comma separated hostnames, domains or network address with or without CIDR block where proxy should not be used.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-no-proxy"
+  },
+  {
+    "name": "proxy-method",
+    "short_name": null,
+    "category": "http",
+    "type": "enum",
+    "default": "get",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "get",
+      "tunnel"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set the method to use in proxy request.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-proxy-method"
+  },
+  {
+    "name": "http-proxy-user",
+    "short_name": null,
+    "category": "http",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": true,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set user for --http-proxy.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-http-proxy-user"
+  },
+  {
+    "name": "http-proxy-passwd",
+    "short_name": null,
+    "category": "http",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": true,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set password for --http-proxy.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-http-proxy-passwd"
+  },
+  {
+    "name": "https-proxy-user",
+    "short_name": null,
+    "category": "http",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set user for --https-proxy.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-https-proxy-user"
+  },
+  {
+    "name": "https-proxy-passwd",
+    "short_name": null,
+    "category": "http",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": true,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set password for --https-proxy.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-https-proxy-passwd"
+  },
+  {
+    "name": "ftp-proxy-user",
+    "short_name": null,
+    "category": "ftp",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": true,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set user for --ftp-proxy.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-ftp-proxy-user"
+  },
+  {
+    "name": "ftp-proxy-passwd",
+    "short_name": null,
+    "category": "ftp",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": true,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set password for --ftp-proxy.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-ftp-proxy-passwd"
+  },
+  {
+    "name": "all-proxy-user",
+    "short_name": null,
+    "category": "http",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set user for --all-proxy.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-all-proxy-user"
+  },
+  {
+    "name": "all-proxy-passwd",
+    "short_name": null,
+    "category": "http",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": true,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set password for --all-proxy.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-all-proxy-passwd"
+  },
+  {
+    "name": "show-files",
+    "short_name": "S",
+    "category": "basic",
+    "type": "path",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": ".metalink file and exit. More detailed information will be listed in case of torrent file.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-show-files"
+  },
+  {
+    "name": "max-overall-upload-limit",
+    "short_name": null,
+    "category": "basic",
+    "type": "integer",
+    "default": "0",
+    "minimum": 0,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "0 means unrestricted. You can append K or M(1K = 1024, 1M = 1024K). To limit the upload speed per torrent, use --max-upload-limit option.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-max-overall-upload-limit"
+  },
+  {
+    "name": "max-upload-limit",
+    "short_name": "u",
+    "category": "basic",
+    "type": "integer",
+    "default": "0",
+    "minimum": 0,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "bytes/sec. 0 means unrestricted. You can append K or M(1K = 1024, 1M = 1024K). To limit the overall upload speed, use --max-overall-upload-limit option.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-max-upload-limit"
+  },
+  {
+    "name": "torrent-file",
+    "short_name": "T",
+    "category": "basic",
+    "type": "path",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "The path to the .torrent file.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-torrent-file"
+  },
+  {
+    "name": "listen-port",
+    "short_name": null,
+    "category": "basic",
+    "type": "string",
+    "default": "6881-6999",
+    "minimum": 1024,
+    "maximum": 65535,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set TCP port number for BitTorrent downloads. Multiple ports can be specified by using ',', for example: \"6881,6885\". You can also use '-' to specify a range: \"6881-6999\". ',' and '-' can be used together.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-listen-port"
+  },
+  {
+    "name": "follow-torrent",
+    "short_name": null,
+    "category": "bittorrent",
+    "type": "enum",
+    "default": "true",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "mem",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "whose suffix is .torrent or content type is application/x-bittorrent is downloaded, aria2 parses it as a torrent file and downloads files mentioned in it. If mem is specified, a torrent file is not written to the disk, but is just kept in memory. If false is specified, the .torrent file is downloaded to the disk, but is not parsed as a torrent and its contents are not downloaded.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-follow-torrent"
+  },
+  {
+    "name": "select-file",
+    "short_name": null,
+    "category": "metalink",
+    "type": "path",
+    "default": null,
+    "minimum": 1,
+    "maximum": 1048576,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set file to download by specifying its index. You can find the file index using the --show-files option. Multiple indexes can be specified by using ',', for example: \"3,6\". You can also use '-' to specify a range: \"1-5\". ',' and '-' can be used together. When used with the -M option, index may vary depending on the query(see --metalink-* options).",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-select-file"
+  },
+  {
+    "name": "seed-time",
+    "short_name": null,
+    "category": "bittorrent",
+    "type": "integer",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Specify seeding time in (fractional) minutes. Also see the --seed-ratio option.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-seed-time"
+  },
+  {
+    "name": "seed-ratio",
+    "short_name": null,
+    "category": "bittorrent",
+    "type": "integer",
+    "default": "1.0",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Specify share ratio. Seed completed torrents until share ratio reaches RATIO. You are strongly encouraged to specify equals or more than 1.0 here. Specify 0.0 if you intend to do seeding regardless of share ratio. If --seed-time option is specified along with this option, seeding ends when at least one of the conditions is satisfied.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-seed-ratio"
+  },
+  {
+    "name": "peer-id-prefix",
+    "short_name": null,
+    "category": "bittorrent",
+    "type": "string",
+    "default": "A2-1-37-0-",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "BitTorrent is 20 byte length. If more than 20 bytes are specified, only first 20 bytes are used. If less than 20 bytes are specified, random byte data are added to make its length 20 bytes.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-peer-id-prefix"
+  },
+  {
+    "name": "peer-agent",
+    "short_name": null,
+    "category": "bittorrent",
+    "type": "string",
+    "default": "aria2/1.37.0",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set client reported during Extended torrent handshakes",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-peer-agent"
+  },
+  {
+    "name": "enable-peer-exchange",
+    "short_name": null,
+    "category": "bittorrent",
+    "type": "enum",
+    "default": "true",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-enable-peer-exchange"
+  },
+  {
+    "name": "enable-dht",
+    "short_name": null,
+    "category": "basic",
+    "type": "enum",
+    "default": "true",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Enable IPv4 DHT functionality. It also enables UDP tracker support. If a private flag is set in a torrent, aria2 doesn't use DHT for that download even if ``true`` is given.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-enable-dht"
+  },
+  {
+    "name": "dht-listen-port",
+    "short_name": null,
+    "category": "basic",
+    "type": "string",
+    "default": "6881-6999",
+    "minimum": 1024,
+    "maximum": 65535,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set UDP listening port used by DHT(IPv4, IPv6) and UDP tracker. Multiple ports can be specified by using ',', for example: \"6881,6885\". You can also use '-' to specify a range: \"6881-6999\". ',' and '-' can be used together.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-dht-listen-port"
+  },
+  {
+    "name": "dht-entry-point",
+    "short_name": null,
+    "category": "bittorrent",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set host and port as an entry point to IPv4 DHT network.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-dht-entry-point"
+  },
+  {
+    "name": "dht-file-path",
+    "short_name": null,
+    "category": "bittorrent",
+    "type": "path",
+    "default": "/home/BillGates/.cache/aria2/dht.dat",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Change the IPv4 DHT routing table file to PATH.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-dht-file-path"
+  },
+  {
+    "name": "enable-dht6",
+    "short_name": null,
+    "category": "basic",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Enable IPv6 DHT functionality. Use --dht-listen-port option to specify port number to listen on. See also --dht-listen-addr6 option.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-enable-dht6"
+  },
+  {
+    "name": "dht-listen-addr6",
+    "short_name": null,
+    "category": "basic",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Specify address to bind socket for IPv6 DHT. It should be a global unicast IPv6 address of the host.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-dht-listen-addr6"
+  },
+  {
+    "name": "dht-entry-point6",
+    "short_name": null,
+    "category": "bittorrent",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "network.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-dht-entry-point6"
+  },
+  {
+    "name": "dht-file-path6",
+    "short_name": null,
+    "category": "bittorrent",
+    "type": "path",
+    "default": "/home/BillGates/.cache/aria2/dht6.dat",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Change the IPv6 DHT routing table file to PATH.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-dht-file-path6"
+  },
+  {
+    "name": "bt-min-crypto-level",
+    "short_name": null,
+    "category": "bittorrent",
+    "type": "enum",
+    "default": "plain",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "plain",
+      "arc4"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "If several encryption methods are provided by a peer, aria2 chooses the lowest one which satisfies the given level.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-bt-min-crypto-level"
+  },
+  {
+    "name": "bt-require-crypto",
+    "short_name": null,
+    "category": "bittorrent",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "establish connection with legacy BitTorrent handshake. Thus aria2 always uses Obfuscation handshake.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-bt-require-crypto"
+  },
+  {
+    "name": "bt-request-peer-speed-limit",
+    "short_name": null,
+    "category": "bittorrent",
+    "type": "integer",
+    "default": "50K",
+    "minimum": 0,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "torrent is lower than SPEED, aria2 temporarily increases the number of peers to try for more download speed. Configuring this option with your preferred download speed can increase your download speed in some cases. You can append K or M(1K = 1024, 1M = 1024K).",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-bt-request-peer-speed-limit"
+  },
+  {
+    "name": "bt-max-open-files",
+    "short_name": null,
+    "category": "bittorrent",
+    "type": "integer",
+    "default": "100",
+    "minimum": 1,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Specify maximum number of files to open in multi-file BitTorrent/Metalink downloads globally.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-bt-max-open-files"
+  },
+  {
+    "name": "bt-seed-unverified",
+    "short_name": null,
+    "category": "bittorrent",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "verifying piece hashes.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-bt-seed-unverified"
+  },
+  {
+    "name": "bt-hash-check-seed",
+    "short_name": null,
+    "category": "bittorrent",
+    "type": "enum",
+    "default": "true",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "--check-integrity option and file is complete, continue to seed file. If you want to check file and download it only when it is damaged or incomplete, set this option to false. This option has effect only on BitTorrent download.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-bt-hash-check-seed"
+  },
+  {
+    "name": "bt-max-peers",
+    "short_name": null,
+    "category": "bittorrent",
+    "type": "integer",
+    "default": "55",
+    "minimum": 0,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Specify the maximum number of peers per torrent. 0 means unlimited. See also --bt-request-peer-speed-limit option.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-bt-max-peers"
+  },
+  {
+    "name": "bt-external-ip",
+    "short_name": null,
+    "category": "bittorrent",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Specify the external IP address to use in BitTorrent download and DHT. It may be sent to BitTorrent tracker. For DHT, this option should be set to report that local node is downloading a particular torrent. This is critical to use DHT in a private network. Although this function is named 'external', it can accept any kind of IP addresses.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-bt-external-ip"
+  },
+  {
+    "name": "index-out",
+    "short_name": "O",
+    "category": "bittorrent",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set file path for file with index=INDEX. You can find the file index using the --show-files option. PATH is a relative path to the path specified in --dir option. You can use this option multiple times.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-index-out"
+  },
+  {
+    "name": "bt-tracker-interval",
+    "short_name": null,
+    "category": "bittorrent",
+    "type": "duration",
+    "default": "0",
+    "minimum": 0,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set the interval in seconds between tracker requests. This completely overrides interval value and aria2 just uses this value and ignores the min interval and interval value in the response of tracker. If 0 is set, aria2 determines interval based on the response of tracker and the download progress.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-bt-tracker-interval"
+  },
+  {
+    "name": "bt-stop-timeout",
+    "short_name": null,
+    "category": "bittorrent",
+    "type": "duration",
+    "default": "0",
+    "minimum": 0,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Stop BitTorrent download if download speed is 0 in consecutive SEC seconds. If 0 is given, this feature is disabled.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-bt-stop-timeout"
+  },
+  {
+    "name": "bt-prioritize-piece",
+    "short_name": null,
+    "category": "bittorrent",
+    "type": "enum",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "head[=SIZE]",
+      "tail[=SIZE]"
+    ],
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "pieces of each file first. This is useful for previewing files. The argument can contain 2 keywords:head and tail. To include both keywords, they must be separated by comma. These keywords can take one parameter, SIZE. For example, if head=SIZE is specified, pieces in the range of first SIZE bytes of each file get higher priority. tail=SIZE means the range of last SIZE bytes of each file. SIZE can include K or M(1K = 1024, 1M = 1024K). If SIZE is omitted, SIZE=1M is used.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-bt-prioritize-piece"
+  },
+  {
+    "name": "bt-save-metadata",
+    "short_name": null,
+    "category": "bittorrent",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "effect only when BitTorrent Magnet URI is used. The filename is hex encoded info hash with suffix .torrent. The directory to be saved is the same directory where download file is saved. If the same file already exists, metadata is not saved. See also --bt-metadata-only option.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-bt-save-metadata"
+  },
+  {
+    "name": "bt-metadata-only",
+    "short_name": null,
+    "category": "bittorrent",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "in metadata will not be downloaded. This option has effect only when BitTorrent Magnet URI is used. See also --bt-save-metadata option.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-bt-metadata-only"
+  },
+  {
+    "name": "bt-enable-lpd",
+    "short_name": null,
+    "category": "bittorrent",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-bt-enable-lpd"
+  },
+  {
+    "name": "bt-lpd-interface",
+    "short_name": null,
+    "category": "bittorrent",
+    "type": "enum",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "interface",
+      "IP address"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "this option is not specified, the default interface is chosen. You can specify interface name and IP address.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-bt-lpd-interface"
+  },
+  {
+    "name": "bt-tracker-timeout",
+    "short_name": null,
+    "category": "bittorrent",
+    "type": "duration",
+    "default": "60",
+    "minimum": 1,
+    "maximum": 600,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set timeout in seconds.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-bt-tracker-timeout"
+  },
+  {
+    "name": "bt-tracker-connect-timeout",
+    "short_name": null,
+    "category": "bittorrent",
+    "type": "duration",
+    "default": "60",
+    "minimum": 1,
+    "maximum": 600,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "establish connection to tracker. After the connection is established, this option makes no effect and --bt-tracker-timeout option is used instead.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-bt-tracker-connect-timeout"
+  },
+  {
+    "name": "dht-message-timeout",
+    "short_name": null,
+    "category": "bittorrent",
+    "type": "duration",
+    "default": "10",
+    "minimum": 1,
+    "maximum": 60,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Set timeout in seconds.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-dht-message-timeout"
+  },
+  {
+    "name": "on-bt-download-complete",
+    "short_name": null,
+    "category": "advanced",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "--on-download-complete is called after download completed and seeding is over. On the other hand, this option sets the command to be executed after download completed but before seeding. See --on-download-start option for the requirement of COMMAND.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-on-bt-download-complete"
+  },
+  {
+    "name": "bt-tracker",
+    "short_name": null,
+    "category": "bittorrent",
+    "type": "enum",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "URI",
+      "..."
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Comma separated list of additional BitTorrent tracker's announce URI. These URIs are not affected by --bt-exclude-tracker option because they are added after URIs in --bt-exclude-tracker option are removed.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-bt-tracker"
+  },
+  {
+    "name": "bt-exclude-tracker",
+    "short_name": null,
+    "category": "bittorrent",
+    "type": "enum",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "URI",
+      "... or *"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "announce URI to remove. You can use special value '*' which matches all URIs, thus removes all announce URIs. When specifying '*' in shell command-line, don't forget to escape or quote it. See also --bt-tracker option.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-bt-exclude-tracker"
+  },
+  {
+    "name": "bt-remove-unselected-file",
+    "short_name": null,
+    "category": "bittorrent",
+    "type": "path",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL",
+      "DOWNLOAD"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "download is completed in BitTorrent. To select files, use --select-file option. If it is not used, all files are assumed to be selected. Please use this option with care because it will actually remove files from your disk.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-bt-remove-unselected-file"
+  },
+  {
+    "name": "bt-detach-seed-only",
+    "short_name": null,
+    "category": "bittorrent",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Exclude seed only downloads when counting concurrent active downloads (See -j option). This means that if -j3 is given and this option is turned on and 3 downloads are active and one of those enters seed mode, then it is excluded from active download count (thus it becomes 2), and the next download waiting in queue gets started. But be aware that seeding item is still recognized as active download in RPC method.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-bt-detach-seed-only"
+  },
+  {
+    "name": "bt-force-encryption",
+    "short_name": null,
+    "category": "bittorrent",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Requires BitTorrent message payload encryption with arc4. This is a shorthand of --bt-require-crypto --bt-min-crypto-level=arc4. If true is given, deny legacy BitTorrent handshake and only use Obfuscation handshake and always encrypt message payload.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-bt-force-encryption"
+  },
+  {
+    "name": "bt-enable-hook-after-hash-check",
+    "short_name": null,
+    "category": "bittorrent",
+    "type": "enum",
+    "default": "true",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "after hash check (see -V option) in BitTorrent download. By default, when hash check succeeds, the command given by --on-bt-download-complete is executed. To disable this action, give false to this option.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-bt-enable-hook-after-hash-check"
+  },
+  {
+    "name": "bt-load-saved-metadata",
+    "short_name": null,
+    "category": "bittorrent",
+    "type": "enum",
+    "default": "false",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Before getting torrent metadata from DHT when downloading with magnet link, first try to read file saved by --bt-save-metadata option. If it is successful, then skip downloading metadata from DHT.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-bt-load-saved-metadata"
+  },
+  {
+    "name": "metalink-file",
+    "short_name": "M",
+    "category": "basic",
+    "type": "path",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "file. Reads input from stdin when '-' is specified.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-metalink-file"
+  },
+  {
+    "name": "metalink-version",
+    "short_name": null,
+    "category": "metalink",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": false,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "The version of the file to download.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-metalink-version"
+  },
+  {
+    "name": "metalink-language",
+    "short_name": null,
+    "category": "metalink",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-metalink-language"
+  },
+  {
+    "name": "metalink-os",
+    "short_name": null,
+    "category": "metalink",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "The operating system of the file to download.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-metalink-os"
+  },
+  {
+    "name": "metalink-location",
+    "short_name": null,
+    "category": "metalink",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "A comma-delimited list of locations is acceptable.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-metalink-location"
+  },
+  {
+    "name": "follow-metalink",
+    "short_name": null,
+    "category": "metalink",
+    "type": "enum",
+    "default": "true",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "mem",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "whose suffix is .meta4 or .metalink, or content type of application/metalink4+xml or application/metalink+xml is downloaded, aria2 parses it as a metalink file and downloads files mentioned in it. If mem is specified, a metalink file is not written to the disk, but is just kept in memory. If false is specified, the .metalink file is downloaded to the disk, but is not parsed as a metalink file and its contents are not downloaded.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-follow-metalink"
+  },
+  {
+    "name": "metalink-preferred-protocol",
+    "short_name": null,
+    "category": "metalink",
+    "type": "enum",
+    "default": "none",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "http",
+      "https",
+      "ftp",
+      "none"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "if you don't have any preferred protocol.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-metalink-preferred-protocol"
+  },
+  {
+    "name": "metalink-enable-unique-protocol",
+    "short_name": null,
+    "category": "metalink",
+    "type": "enum",
+    "default": "true",
+    "minimum": null,
+    "maximum": null,
+    "enum_values": [
+      "true",
+      "false"
+    ],
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "protocols are available for a mirror in a metalink file, aria2 uses one of them. Use --metalink-preferred-protocol option to specify the preference of protocol.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-metalink-enable-unique-protocol"
+  },
+  {
+    "name": "metalink-base-uri",
+    "short_name": null,
+    "category": "metalink",
+    "type": "string",
+    "default": null,
+    "minimum": null,
+    "maximum": null,
+    "enum_values": null,
+    "scope": [
+      "GLOBAL"
+    ],
+    "rpc_supported": true,
+    "cli_supported": true,
+    "sensitive": false,
+    "deprecated": false,
+    "experimental": false,
+    "description": "Specify base URI to resolve relative URI in metalink:url and metalink:metaurl element in a metalink file stored in local disk. If URI points to a directory, URI must end with '/'. Refer to man page for more information.",
+    "documentation_reference": "https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-metalink-base-uri"
+  }
+]

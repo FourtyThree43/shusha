@@ -1,0 +1,779 @@
+[
+  {
+    "name": "aria2.addUri",
+    "category": "downloads",
+    "description": "Adds a new download. uris is an array of HTTP/FTP/SFTP/BitTorrent Magnet URIs pointing to the same resource.",
+    "parameters": [
+      {
+        "name": "uris",
+        "type": "list[str]",
+        "required": true,
+        "description": "Array of URIs for the file."
+      },
+      {
+        "name": "options",
+        "type": "dict[str, str]",
+        "required": false,
+        "description": "Download-scoped aria2 options."
+      },
+      {
+        "name": "position",
+        "type": "int",
+        "required": false,
+        "description": "Queue position (0-based)."
+      }
+    ],
+    "returns": {
+      "type": "str",
+      "description": "GID of the newly registered download."
+    },
+    "errors": [
+      1,
+      28
+    ],
+    "authentication_required": true
+  },
+  {
+    "name": "aria2.addTorrent",
+    "category": "bittorrent",
+    "description": "Adds a BitTorrent download by uploading a base64-encoded .torrent file.",
+    "parameters": [
+      {
+        "name": "torrent",
+        "type": "str",
+        "required": true,
+        "description": "Base64-encoded torrent file content."
+      },
+      {
+        "name": "uris",
+        "type": "list[str]",
+        "required": false,
+        "description": "Array of web seed URIs."
+      },
+      {
+        "name": "options",
+        "type": "dict[str, str]",
+        "required": false,
+        "description": "Download-scoped aria2 options."
+      },
+      {
+        "name": "position",
+        "type": "int",
+        "required": false,
+        "description": "Queue position (0-based)."
+      }
+    ],
+    "returns": {
+      "type": "str",
+      "description": "GID of the newly registered torrent download."
+    },
+    "errors": [
+      1,
+      25,
+      26,
+      28
+    ],
+    "authentication_required": true
+  },
+  {
+    "name": "aria2.addMetalink",
+    "category": "metalink",
+    "description": "Adds a Metalink download by uploading a base64-encoded Metalink file.",
+    "parameters": [
+      {
+        "name": "metalink",
+        "type": "str",
+        "required": true,
+        "description": "Base64-encoded Metalink file content."
+      },
+      {
+        "name": "options",
+        "type": "dict[str, str]",
+        "required": false,
+        "description": "Download-scoped aria2 options."
+      },
+      {
+        "name": "position",
+        "type": "int",
+        "required": false,
+        "description": "Queue position."
+      }
+    ],
+    "returns": {
+      "type": "list[str]",
+      "description": "Array of GIDs registered from the Metalink file."
+    },
+    "errors": [
+      1,
+      20,
+      28
+    ],
+    "authentication_required": true
+  },
+  {
+    "name": "aria2.remove",
+    "category": "control",
+    "description": "Removes the download denoted by GID. If download is active, stops download first.",
+    "parameters": [
+      {
+        "name": "gid",
+        "type": "str",
+        "required": true,
+        "description": "GID of the download."
+      }
+    ],
+    "returns": {
+      "type": "str",
+      "description": "GID of the removed download."
+    },
+    "errors": [
+      1
+    ],
+    "authentication_required": true
+  },
+  {
+    "name": "aria2.forceRemove",
+    "category": "control",
+    "description": "Forcefully removes the download denoted by GID without contacting trackers.",
+    "parameters": [
+      {
+        "name": "gid",
+        "type": "str",
+        "required": true,
+        "description": "GID of the download."
+      }
+    ],
+    "returns": {
+      "type": "str",
+      "description": "GID of the removed download."
+    },
+    "errors": [
+      1
+    ],
+    "authentication_required": true
+  },
+  {
+    "name": "aria2.pause",
+    "category": "control",
+    "description": "Pauses the download denoted by GID.",
+    "parameters": [
+      {
+        "name": "gid",
+        "type": "str",
+        "required": true,
+        "description": "GID of the download."
+      }
+    ],
+    "returns": {
+      "type": "str",
+      "description": "GID of the paused download."
+    },
+    "errors": [
+      1
+    ],
+    "authentication_required": true
+  },
+  {
+    "name": "aria2.pauseAll",
+    "category": "control",
+    "description": "Pauses all active and waiting downloads.",
+    "parameters": [],
+    "returns": {
+      "type": "str",
+      "description": "'OK' on success."
+    },
+    "errors": [
+      1
+    ],
+    "authentication_required": true
+  },
+  {
+    "name": "aria2.forcePause",
+    "category": "control",
+    "description": "Forcefully pauses the download denoted by GID without waiting for piece actions.",
+    "parameters": [
+      {
+        "name": "gid",
+        "type": "str",
+        "required": true,
+        "description": "GID of the download."
+      }
+    ],
+    "returns": {
+      "type": "str",
+      "description": "GID of the paused download."
+    },
+    "errors": [
+      1
+    ],
+    "authentication_required": true
+  },
+  {
+    "name": "aria2.forcePauseAll",
+    "category": "control",
+    "description": "Forcefully pauses all active and waiting downloads.",
+    "parameters": [],
+    "returns": {
+      "type": "str",
+      "description": "'OK' on success."
+    },
+    "errors": [
+      1
+    ],
+    "authentication_required": true
+  },
+  {
+    "name": "aria2.unpause",
+    "category": "control",
+    "description": "Changes download status from paused to waiting.",
+    "parameters": [
+      {
+        "name": "gid",
+        "type": "str",
+        "required": true,
+        "description": "GID of the download."
+      }
+    ],
+    "returns": {
+      "type": "str",
+      "description": "GID of the unpaused download."
+    },
+    "errors": [
+      1
+    ],
+    "authentication_required": true
+  },
+  {
+    "name": "aria2.unpauseAll",
+    "category": "control",
+    "description": "Unpauses all paused downloads.",
+    "parameters": [],
+    "returns": {
+      "type": "str",
+      "description": "'OK' on success."
+    },
+    "errors": [
+      1
+    ],
+    "authentication_required": true
+  },
+  {
+    "name": "aria2.tellStatus",
+    "category": "inspection",
+    "description": "Returns download progress and status for the download denoted by GID.",
+    "parameters": [
+      {
+        "name": "gid",
+        "type": "str",
+        "required": true,
+        "description": "GID of the download."
+      },
+      {
+        "name": "keys",
+        "type": "list[str]",
+        "required": false,
+        "description": "Subset of keys to return (e.g. ['gid', 'status', 'completedLength'])."
+      }
+    ],
+    "returns": {
+      "type": "dict",
+      "description": "Download status dictionary."
+    },
+    "errors": [
+      1
+    ],
+    "authentication_required": true
+  },
+  {
+    "name": "aria2.getUris",
+    "category": "inspection",
+    "description": "Returns URIs used in the download denoted by GID.",
+    "parameters": [
+      {
+        "name": "gid",
+        "type": "str",
+        "required": true,
+        "description": "GID of the download."
+      }
+    ],
+    "returns": {
+      "type": "list[dict]",
+      "description": "List of URI objects containing 'uri' and 'status'."
+    },
+    "errors": [
+      1
+    ],
+    "authentication_required": true
+  },
+  {
+    "name": "aria2.getFiles",
+    "category": "inspection",
+    "description": "Returns the file list of the download denoted by GID.",
+    "parameters": [
+      {
+        "name": "gid",
+        "type": "str",
+        "required": true,
+        "description": "GID of the download."
+      }
+    ],
+    "returns": {
+      "type": "list[dict]",
+      "description": "List of file structures with index, path, length, completedLength, selected, uris."
+    },
+    "errors": [
+      1
+    ],
+    "authentication_required": true
+  },
+  {
+    "name": "aria2.getPeers",
+    "category": "inspection",
+    "description": "Returns peer list of the BitTorrent download denoted by GID.",
+    "parameters": [
+      {
+        "name": "gid",
+        "type": "str",
+        "required": true,
+        "description": "GID of the download."
+      }
+    ],
+    "returns": {
+      "type": "list[dict]",
+      "description": "List of peer objects (peerId, ip, port, bitfield, amChoking, peerChoking, downloadSpeed, uploadSpeed, seeder)."
+    },
+    "errors": [
+      1
+    ],
+    "authentication_required": true
+  },
+  {
+    "name": "aria2.getServers",
+    "category": "inspection",
+    "description": "Returns connected HTTP/FTP/SFTP servers for the download denoted by GID.",
+    "parameters": [
+      {
+        "name": "gid",
+        "type": "str",
+        "required": true,
+        "description": "GID of the download."
+      }
+    ],
+    "returns": {
+      "type": "list[dict]",
+      "description": "List of server structures containing index, servers (uri, currentUri, downloadSpeed)."
+    },
+    "errors": [
+      1
+    ],
+    "authentication_required": true
+  },
+  {
+    "name": "aria2.tellActive",
+    "category": "inspection",
+    "description": "Returns a list of active downloads.",
+    "parameters": [
+      {
+        "name": "keys",
+        "type": "list[str]",
+        "required": false,
+        "description": "Keys to fetch."
+      }
+    ],
+    "returns": {
+      "type": "list[dict]",
+      "description": "Array of active download status dictionaries."
+    },
+    "errors": [
+      1
+    ],
+    "authentication_required": true
+  },
+  {
+    "name": "aria2.tellWaiting",
+    "category": "inspection",
+    "description": "Returns a paginated list of waiting downloads, including paused.",
+    "parameters": [
+      {
+        "name": "offset",
+        "type": "int",
+        "required": true,
+        "description": "Offset from 0."
+      },
+      {
+        "name": "num",
+        "type": "int",
+        "required": true,
+        "description": "Maximum number of items to return."
+      },
+      {
+        "name": "keys",
+        "type": "list[str]",
+        "required": false,
+        "description": "Keys to fetch."
+      }
+    ],
+    "returns": {
+      "type": "list[dict]",
+      "description": "Array of waiting download status dictionaries."
+    },
+    "errors": [
+      1
+    ],
+    "authentication_required": true
+  },
+  {
+    "name": "aria2.tellStopped",
+    "category": "inspection",
+    "description": "Returns a paginated list of stopped/completed/error downloads.",
+    "parameters": [
+      {
+        "name": "offset",
+        "type": "int",
+        "required": true,
+        "description": "Offset from 0."
+      },
+      {
+        "name": "num",
+        "type": "int",
+        "required": true,
+        "description": "Maximum number of items to return."
+      },
+      {
+        "name": "keys",
+        "type": "list[str]",
+        "required": false,
+        "description": "Keys to fetch."
+      }
+    ],
+    "returns": {
+      "type": "list[dict]",
+      "description": "Array of stopped download status dictionaries."
+    },
+    "errors": [
+      1
+    ],
+    "authentication_required": true
+  },
+  {
+    "name": "aria2.changePosition",
+    "category": "queue",
+    "description": "Moves the download in the queue.",
+    "parameters": [
+      {
+        "name": "gid",
+        "type": "str",
+        "required": true,
+        "description": "GID of the download."
+      },
+      {
+        "name": "pos",
+        "type": "int",
+        "required": true,
+        "description": "Target position."
+      },
+      {
+        "name": "how",
+        "type": "str",
+        "required": true,
+        "description": "'POS_SET', 'POS_CUR', or 'POS_END'."
+      }
+    ],
+    "returns": {
+      "type": "int",
+      "description": "Resulting queue position."
+    },
+    "errors": [
+      1
+    ],
+    "authentication_required": true
+  },
+  {
+    "name": "aria2.changeUri",
+    "category": "downloads",
+    "description": "Removes the URIs in delUris and adds the URIs in addUris for the download denoted by GID.",
+    "parameters": [
+      {
+        "name": "gid",
+        "type": "str",
+        "required": true,
+        "description": "GID of the download."
+      },
+      {
+        "name": "fileIndex",
+        "type": "int",
+        "required": true,
+        "description": "1-based file index."
+      },
+      {
+        "name": "delUris",
+        "type": "list[str]",
+        "required": true,
+        "description": "URIs to delete."
+      },
+      {
+        "name": "addUris",
+        "type": "list[str]",
+        "required": true,
+        "description": "URIs to add."
+      },
+      {
+        "name": "position",
+        "type": "int",
+        "required": false,
+        "description": "Insertion index."
+      }
+    ],
+    "returns": {
+      "type": "list[int]",
+      "description": "Array containing number of deleted and added URIs."
+    },
+    "errors": [
+      1
+    ],
+    "authentication_required": true
+  },
+  {
+    "name": "aria2.getOption",
+    "category": "options",
+    "description": "Returns download-scoped options for the download denoted by GID.",
+    "parameters": [
+      {
+        "name": "gid",
+        "type": "str",
+        "required": true,
+        "description": "GID of the download."
+      }
+    ],
+    "returns": {
+      "type": "dict[str, str]",
+      "description": "Key-value map of options."
+    },
+    "errors": [
+      1
+    ],
+    "authentication_required": true
+  },
+  {
+    "name": "aria2.changeOption",
+    "category": "options",
+    "description": "Changes download-scoped options dynamically for the download denoted by GID.",
+    "parameters": [
+      {
+        "name": "gid",
+        "type": "str",
+        "required": true,
+        "description": "GID of the download."
+      },
+      {
+        "name": "options",
+        "type": "dict[str, str]",
+        "required": true,
+        "description": "Options dictionary."
+      }
+    ],
+    "returns": {
+      "type": "str",
+      "description": "'OK' on success."
+    },
+    "errors": [
+      1,
+      28
+    ],
+    "authentication_required": true
+  },
+  {
+    "name": "aria2.getGlobalOption",
+    "category": "options",
+    "description": "Returns all global options currently applied to the aria2 daemon session.",
+    "parameters": [],
+    "returns": {
+      "type": "dict[str, str]",
+      "description": "Global options dictionary."
+    },
+    "errors": [
+      1
+    ],
+    "authentication_required": true
+  },
+  {
+    "name": "aria2.changeGlobalOption",
+    "category": "options",
+    "description": "Changes global options dynamically on the active aria2 daemon session.",
+    "parameters": [
+      {
+        "name": "options",
+        "type": "dict[str, str]",
+        "required": true,
+        "description": "Global options to change."
+      }
+    ],
+    "returns": {
+      "type": "str",
+      "description": "'OK' on success."
+    },
+    "errors": [
+      1,
+      28
+    ],
+    "authentication_required": true
+  },
+  {
+    "name": "aria2.getGlobalStat",
+    "category": "statistics",
+    "description": "Returns global download/upload speed and total counts.",
+    "parameters": [],
+    "returns": {
+      "type": "dict",
+      "description": "Global stats: downloadSpeed, uploadSpeed, numActive, numWaiting, numStopped, numStoppedTotal."
+    },
+    "errors": [
+      1
+    ],
+    "authentication_required": true
+  },
+  {
+    "name": "aria2.purgeDownloadResult",
+    "category": "maintenance",
+    "description": "Purges completed/error/removed download results to free memory.",
+    "parameters": [],
+    "returns": {
+      "type": "str",
+      "description": "'OK' on success."
+    },
+    "errors": [
+      1
+    ],
+    "authentication_required": true
+  },
+  {
+    "name": "aria2.removeDownloadResult",
+    "category": "maintenance",
+    "description": "Removes a specific completed/error/removed download result from memory denoted by GID.",
+    "parameters": [
+      {
+        "name": "gid",
+        "type": "str",
+        "required": true,
+        "description": "GID to remove."
+      }
+    ],
+    "returns": {
+      "type": "str",
+      "description": "'OK' on success."
+    },
+    "errors": [
+      1
+    ],
+    "authentication_required": true
+  },
+  {
+    "name": "aria2.getVersion",
+    "category": "system",
+    "description": "Returns version information and list of enabled compile-time features.",
+    "parameters": [],
+    "returns": {
+      "type": "dict",
+      "description": "Dictionary with 'version' (str) and 'enabledFeatures' (list[str])."
+    },
+    "errors": [],
+    "authentication_required": true
+  },
+  {
+    "name": "aria2.getSessionInfo",
+    "category": "system",
+    "description": "Returns session ID used for WebSocket notifications.",
+    "parameters": [],
+    "returns": {
+      "type": "dict",
+      "description": "Dictionary with 'sessionId' (str)."
+    },
+    "errors": [],
+    "authentication_required": true
+  },
+  {
+    "name": "aria2.shutdown",
+    "category": "system",
+    "description": "Gracefully shuts down the aria2 daemon.",
+    "parameters": [],
+    "returns": {
+      "type": "str",
+      "description": "'OK' on success."
+    },
+    "errors": [
+      1
+    ],
+    "authentication_required": true
+  },
+  {
+    "name": "aria2.forceShutdown",
+    "category": "system",
+    "description": "Immediately shuts down the aria2 daemon without waiting for active actions.",
+    "parameters": [],
+    "returns": {
+      "type": "str",
+      "description": "'OK' on success."
+    },
+    "errors": [
+      1
+    ],
+    "authentication_required": true
+  },
+  {
+    "name": "aria2.saveSession",
+    "category": "system",
+    "description": "Saves the current session to the file specified by --save-session.",
+    "parameters": [],
+    "returns": {
+      "type": "str",
+      "description": "'OK' on success."
+    },
+    "errors": [
+      1
+    ],
+    "authentication_required": true
+  },
+  {
+    "name": "system.multicall",
+    "category": "system",
+    "description": "Executes multiple RPC methods in a single request transaction.",
+    "parameters": [
+      {
+        "name": "methods",
+        "type": "list[dict]",
+        "required": true,
+        "description": "Array of method call objects ({'methodName': '...', 'params': [...]})."
+      }
+    ],
+    "returns": {
+      "type": "list",
+      "description": "Array of return values corresponding to each method call."
+    },
+    "errors": [],
+    "authentication_required": true
+  },
+  {
+    "name": "system.listMethods",
+    "category": "system",
+    "description": "Returns all supported RPC methods on the server.",
+    "parameters": [],
+    "returns": {
+      "type": "list[str]",
+      "description": "Array of method name strings."
+    },
+    "errors": [],
+    "authentication_required": false
+  },
+  {
+    "name": "system.listNotifications",
+    "category": "system",
+    "description": "Returns all supported notification event names on the server.",
+    "parameters": [],
+    "returns": {
+      "type": "list[str]",
+      "description": "Array of notification event name strings."
+    },
+    "errors": [],
+    "authentication_required": false
+  }
+]

@@ -1,0 +1,200 @@
+[
+  {
+    "code": 0,
+    "symbol": "SUCCESS",
+    "message": "Successful",
+    "recoverable": true
+  },
+  {
+    "code": 1,
+    "symbol": "UNKNOWN_ERROR",
+    "message": "Unknown error occurred",
+    "recoverable": false
+  },
+  {
+    "code": 2,
+    "symbol": "TIMEOUT",
+    "message": "Time out occurred",
+    "recoverable": true
+  },
+  {
+    "code": 3,
+    "symbol": "RESOURCE_NOT_FOUND",
+    "message": "Resource was not found (HTTP 404 / FTP 550)",
+    "recoverable": false
+  },
+  {
+    "code": 4,
+    "symbol": "MAX_FILE_NOT_FOUND",
+    "message": "aria2 saw the specified number of 'resource not found' errors",
+    "recoverable": false
+  },
+  {
+    "code": 5,
+    "symbol": "SPEED_TOO_SLOW",
+    "message": "Download speed was too slow",
+    "recoverable": true
+  },
+  {
+    "code": 6,
+    "symbol": "NETWORK_PROBLEM",
+    "message": "Network problem occurred",
+    "recoverable": true
+  },
+  {
+    "code": 7,
+    "symbol": "UNFINISHED_DOWNLOADS",
+    "message": "There were unfinished downloads",
+    "recoverable": true
+  },
+  {
+    "code": 8,
+    "symbol": "RESUME_NOT_SUPPORTED",
+    "message": "Remote server did not support resume when resume was required",
+    "recoverable": false
+  },
+  {
+    "code": 9,
+    "symbol": "NOT_ENOUGH_DISK_SPACE",
+    "message": "There was not enough disk space available",
+    "recoverable": false
+  },
+  {
+    "code": 10,
+    "symbol": "PIECE_LENGTH_DIFFERENT",
+    "message": "Piece length was different from one in .aria2 control file",
+    "recoverable": false
+  },
+  {
+    "code": 11,
+    "symbol": "DUPLICATE_INFO_HASH",
+    "message": "aria2 was downloading the same info hash",
+    "recoverable": false
+  },
+  {
+    "code": 12,
+    "symbol": "DUPLICATE_TORRENT",
+    "message": "aria2 was downloading the same torrent",
+    "recoverable": false
+  },
+  {
+    "code": 13,
+    "symbol": "FILE_ALREADY_EXISTS",
+    "message": "File already existed",
+    "recoverable": false
+  },
+  {
+    "code": 14,
+    "symbol": "RENAMING_FAILED",
+    "message": "Renaming file failed",
+    "recoverable": false
+  },
+  {
+    "code": 15,
+    "symbol": "CANNOT_OPEN_FILE",
+    "message": "aria2 could not open an existing file",
+    "recoverable": false
+  },
+  {
+    "code": 16,
+    "symbol": "CANNOT_CREATE_TRUNCATE",
+    "message": "aria2 could not create new file or truncate existing file",
+    "recoverable": false
+  },
+  {
+    "code": 17,
+    "symbol": "FILE_IO_ERROR",
+    "message": "File I/O error occurred",
+    "recoverable": false
+  },
+  {
+    "code": 18,
+    "symbol": "CANNOT_CREATE_DIR",
+    "message": "aria2 could not create directory",
+    "recoverable": false
+  },
+  {
+    "code": 19,
+    "symbol": "NAME_RESOLUTION_FAILED",
+    "message": "Name resolution failed (DNS failure)",
+    "recoverable": true
+  },
+  {
+    "code": 20,
+    "symbol": "CANNOT_PARSE_METALINK",
+    "message": "aria2 could not parse Metalink document",
+    "recoverable": false
+  },
+  {
+    "code": 21,
+    "symbol": "FTP_COMMAND_FAILED",
+    "message": "FTP command failed",
+    "recoverable": true
+  },
+  {
+    "code": 22,
+    "symbol": "BAD_HTTP_HEADER",
+    "message": "HTTP response header was bad or unexpected",
+    "recoverable": true
+  },
+  {
+    "code": 23,
+    "symbol": "TOO_MANY_REDIRECTS",
+    "message": "Too many redirects occurred",
+    "recoverable": false
+  },
+  {
+    "code": 24,
+    "symbol": "HTTP_AUTH_FAILED",
+    "message": "HTTP authorization failed (HTTP 401 / 403)",
+    "recoverable": false
+  },
+  {
+    "code": 25,
+    "symbol": "CANNOT_PARSE_BENCODE",
+    "message": "aria2 could not parse bencoded file (.torrent)",
+    "recoverable": false
+  },
+  {
+    "code": 26,
+    "symbol": "CORRUPTED_TORRENT",
+    "message": ".torrent file was corrupted or missing information",
+    "recoverable": false
+  },
+  {
+    "code": 27,
+    "symbol": "BAD_MAGNET_URI",
+    "message": "Magnet URI was bad",
+    "recoverable": false
+  },
+  {
+    "code": 28,
+    "symbol": "BAD_OPTION",
+    "message": "Bad/unrecognized option was given or unexpected option value",
+    "recoverable": false
+  },
+  {
+    "code": 29,
+    "symbol": "SERVER_OVERLOAD",
+    "message": "Remote server was unable to handle request (HTTP 503)",
+    "recoverable": true
+  },
+  {
+    "code": 30,
+    "symbol": "CANNOT_PARSE_JSONRPC",
+    "message": "aria2 could not parse JSON-RPC request",
+    "recoverable": false
+  },
+  {
+    "code": 31,
+    "symbol": "RESERVED",
+    "message": "Reserved",
+    "recoverable": false
+  },
+  {
+    "code": 32,
+    "symbol": "CHECKSUM_FAILED",
+    "message": "Checksum validation failed",
+    "recoverable": false
+  }
+]
