@@ -1,9 +1,32 @@
-"""
-Application layer for Shusha 2: Coordinates use cases and background services.
-"""
+"""Application layer for Shusha: Coordinates use cases, services, commands, and queries."""
 
+from shusha.application.command_bus import CommandBus
+from shusha.application.commands import (
+    CancelJobCommand,
+    Command,
+    CreateJobCommand,
+    CreateJobGroupCommand,
+    PauseJobCommand,
+    RemoveJobCommand,
+    ResumeJobCommand,
+    RetryJobCommand,
+    StartJobCommand,
+)
+from shusha.application.event_bus import EventBus, EventHandler
+from shusha.application.queries import (
+    GetCapabilitiesQuery,
+    GetDiagnosticsQuery,
+    GetGlobalStatisticsQuery,
+    GetJobGroupQuery,
+    GetJobQuery,
+    ListJobsQuery,
+    Query,
+    ResolveAcquisitionQuery,
+)
+from shusha.application.query_bus import QueryBus
 from shusha.application.services import (
     ClipboardWatcherService,
+    JobLifecycleService,
     PostActionService,
     SchedulerService,
     SyncCoordinator,
@@ -31,21 +54,43 @@ __all__ = [
     "AddDownloadRequest",
     "AddDownloadUseCase",
     "AssignCategoryUseCase",
+    "CancelJobCommand",
     "CategoryDTO",
     "ChangeDownloadOptionsUseCase",
     "ClipboardWatcherService",
+    "Command",
+    "CommandBus",
     "CreateCategoryUseCase",
+    "CreateJobCommand",
+    "CreateJobGroupCommand",
     "DeleteCategoryUseCase",
     "DownloadInspection",
+    "EventBus",
+    "EventHandler",
+    "GetCapabilitiesQuery",
+    "GetDiagnosticsQuery",
+    "GetGlobalStatisticsQuery",
+    "GetJobGroupQuery",
+    "GetJobQuery",
     "InspectDownloadUseCase",
+    "JobLifecycleService",
+    "ListJobsQuery",
     "PauseDownloadUseCase",
+    "PauseJobCommand",
     "PostActionService",
+    "Query",
+    "QueryBus",
     "QueueAction",
     "RemoveDownloadUseCase",
+    "RemoveJobCommand",
     "ReorderQueueUseCase",
+    "ResolveAcquisitionQuery",
     "ResumeDownloadUseCase",
+    "ResumeJobCommand",
+    "RetryJobCommand",
     "SchedulerService",
     "SetQueueLimitsUseCase",
+    "StartJobCommand",
     "SyncCoordinator",
     "UpdateCategoryUseCase",
 ]

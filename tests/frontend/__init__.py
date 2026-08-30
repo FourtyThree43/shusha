@@ -1,0 +1,1 @@
+"""Frontend presentation tests package."""

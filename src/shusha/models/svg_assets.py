@@ -305,6 +305,11 @@ def render_vector_icon(
     return img
 
 
+def clear_tk_image_cache() -> None:
+    """Clear cached Tk PhotoImage references."""
+    _TK_IMAGE_CACHE.clear()
+
+
 def get_svg_tk_image(
     icon_name: str,
     size: int = 20,
@@ -324,7 +329,16 @@ def get_svg_tk_image(
     """
     cache_key = f"{icon_name}_{size}_{color}_{bg_color}"
     if cache_key in _TK_IMAGE_CACHE:
-        return _TK_IMAGE_CACHE[cache_key]
+        cached = _TK_IMAGE_CACHE[cache_key]
+        try:
+            import tkinter as tk
+
+            root = getattr(tk, "_default_root", None)
+            if root and root.tk.call("info", "commands", str(cached)):
+                return cached
+        except Exception:
+            pass
+        _TK_IMAGE_CACHE.pop(cache_key, None)
 
     try:
         pil_img = render_vector_icon(

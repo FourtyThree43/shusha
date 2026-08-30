@@ -1,6 +1,6 @@
-"""
-Versioned SQLite Schema Migrations for Shusha 2.
-"""
+"""Versioned SQLite Schema Migrations for Shusha."""
+
+from __future__ import annotations
 
 import sqlite3
 from collections.abc import Callable
@@ -90,14 +90,95 @@ def migration_v1_initial_schema(conn: sqlite3.Connection) -> None:
     """)
 
 
+def migration_v2_multi_backend_schema(conn: sqlite3.Connection) -> None:
+    """Schema version 2: Multi-backend jobs, job_groups, artifacts, credential_references."""
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS job_groups (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        kind TEXT NOT NULL DEFAULT 'batch',
+        total_jobs INTEGER NOT NULL DEFAULT 0,
+        completed_jobs INTEGER NOT NULL DEFAULT 0,
+        failed_jobs INTEGER NOT NULL DEFAULT 0,
+        total_length INTEGER,
+        completed_length INTEGER NOT NULL DEFAULT 0,
+        metadata_json TEXT NOT NULL DEFAULT '{}',
+        created_at TEXT NOT NULL DEFAULT (datetime('now', 'utc'))
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS jobs (
+        id TEXT PRIMARY KEY,
+        backend_id TEXT NOT NULL,
+        name TEXT NOT NULL,
+        state TEXT NOT NULL DEFAULT 'QUEUED',
+        group_id TEXT REFERENCES job_groups(id) ON DELETE SET NULL,
+        source_uri TEXT NOT NULL DEFAULT '',
+        category_id TEXT REFERENCES categories(id) ON DELETE SET NULL,
+        total_length INTEGER,
+        completed_length INTEGER NOT NULL DEFAULT 0,
+        download_speed INTEGER NOT NULL DEFAULT 0,
+        upload_speed INTEGER NOT NULL DEFAULT 0,
+        error_message TEXT,
+        metadata_json TEXT NOT NULL DEFAULT '{}',
+        backend_data_json TEXT NOT NULL DEFAULT '{}',
+        created_at TEXT NOT NULL DEFAULT (datetime('now', 'utc')),
+        started_at TEXT,
+        finished_at TEXT
+    );
+    """)
+
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_jobs_state ON jobs(state);")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_jobs_backend ON jobs(backend_id);")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_jobs_group ON jobs(group_id);")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_jobs_category ON jobs(category_id);")
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS artifacts (
+        id TEXT PRIMARY KEY,
+        job_id TEXT NOT NULL REFERENCES jobs(id) ON DELETE CASCADE,
+        kind TEXT NOT NULL DEFAULT 'file',
+        name TEXT NOT NULL,
+        path TEXT NOT NULL,
+        size INTEGER,
+        checksum TEXT,
+        status TEXT NOT NULL DEFAULT 'pending',
+        mime_type TEXT,
+        metadata_json TEXT NOT NULL DEFAULT '{}',
+        created_at TEXT NOT NULL DEFAULT (datetime('now', 'utc'))
+    );
+    """)
+
+    cursor.execute(
+        "CREATE INDEX IF NOT EXISTS idx_artifacts_job_id ON artifacts(job_id);"
+    )
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS credential_references (
+        id TEXT PRIMARY KEY,
+        kind TEXT NOT NULL,
+        store_key TEXT NOT NULL,
+        scope TEXT NOT NULL DEFAULT 'domain',
+        label TEXT NOT NULL DEFAULT '',
+        domain_pattern TEXT,
+        description TEXT NOT NULL DEFAULT '',
+        created_at TEXT NOT NULL DEFAULT (datetime('now', 'utc'))
+    );
+    """)
+
+
 MIGRATIONS: dict[int, MigrationFn] = {
     1: migration_v1_initial_schema,
+    2: migration_v2_multi_backend_schema,
 }
 
 
 def apply_migrations(conn: sqlite3.Connection) -> int:
-    """
-    Apply all pending database migrations in a transaction.
+    """Apply all pending database migrations in a transaction.
+
     Returns the final schema version number.
     """
     cursor = conn.cursor()

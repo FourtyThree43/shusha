@@ -105,11 +105,11 @@ class ClipboardWatcher:
         try:
             import tkinter as tk
 
-            root = tk.Tk()
-            root.withdraw()
-            content = root.clipboard_get()
-            root.destroy()
-            return str(content or "").strip()
+            root = getattr(tk, "_default_root", None)
+            if root is not None:
+                content = root.clipboard_get()
+                return str(content or "").strip()
+            return ""
         except Exception:
             return ""
 

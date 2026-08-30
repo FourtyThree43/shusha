@@ -1,8 +1,10 @@
-"""
-Strongly typed aria2 RPC client adapters, options registry, and WebSocket transport for Shusha 2.
-"""
+"""Strongly typed aria2 RPC client adapters, options registry, and WebSocket transport for Shusha."""
 
-from shusha.infrastructure.aria2.client import Aria2Client, RpcTransport
+from shusha.infrastructure.aria2.client import (
+    Aria2Client,
+    RpcTransport,
+    VersionInfo,
+)
 from shusha.infrastructure.aria2.errors import (
     Aria2AuthenticationError,
     Aria2ConnectionError,
@@ -38,6 +40,7 @@ __all__ = [
     "OptionDefinition",
     "OptionRegistry",
     "RpcTransport",
+    "VersionInfo",
     "XmlRpcTransport",
     "map_aria2_status_to_state",
     "parse_download_file",

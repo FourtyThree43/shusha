@@ -33,3 +33,7 @@ class Aria2EngineError(Aria2RpcError):
 
     def __init__(self, code: int, message: str) -> None:
         super().__init__(f"aria2 engine error [{code}]: {message}", code=code)
+
+
+class Aria2DownloadNotFoundError(Aria2RpcError):
+    """Raised when a download with specified GID is not found in aria2."""

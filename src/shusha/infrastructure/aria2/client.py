@@ -6,6 +6,7 @@ untyped responses directly into domain entities.
 
 import base64
 from collections.abc import Sequence
+from dataclasses import dataclass
 from typing import Protocol, cast
 
 from shusha.domain.download import Download
@@ -26,6 +27,14 @@ from shusha.infrastructure.aria2.parsers import (
     parse_peer,
     parse_server,
 )
+
+
+@dataclass(frozen=True, slots=True)
+class VersionInfo:
+    """aria2 version and compile-time enabled features."""
+
+    version: str
+    enabled_features: list[str]
 
 
 class RpcTransport(Protocol):
@@ -301,14 +310,14 @@ class Aria2Client:
         res = self.transport.call("aria2.removeDownloadResult", [str(gid)])
         return str(res) == "OK"
 
-    def get_version(self) -> tuple[str, list[str]]:
+    def get_version(self) -> VersionInfo:
         """Fetch daemon version and compile-time enabled features."""
         res = self.transport.call("aria2.getVersion")
         if isinstance(res, dict):
             ver = str(res.get("version", ""))
             features = cast(list[str], res.get("enabledFeatures", []))
-            return ver, features
-        return "unknown", []
+            return VersionInfo(version=ver, enabled_features=features)
+        return VersionInfo(version="unknown", enabled_features=[])
 
     def get_session_info(self) -> str:
         """Get daemon session ID."""

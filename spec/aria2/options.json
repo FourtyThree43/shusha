@@ -357,11 +357,16 @@
     "name": "file-allocation",
     "short_name": null,
     "category": "basic",
-    "type": "path",
+    "type": "choice",
     "default": "prealloc",
     "minimum": null,
     "maximum": null,
-    "enum_values": null,
+    "enum_values": [
+      "none",
+      "prealloc",
+      "falloc",
+      "trunc"
+    ],
     "scope": [
       "GLOBAL"
     ],

@@ -57,6 +57,11 @@ class TestGuiSmoke(unittest.TestCase):
         root.destroy()
 
     def test_aria2_gui_components(self):
+        import os
+
+        if not os.environ.get("DISPLAY"):
+            self.skipTest("No X11 display available for Aria2Gui test")
+
         try:
             # Use modern ttkbootstrap 2.x theme
             root = ttk.Window(themename="bootstrap-dark")
@@ -66,44 +71,51 @@ class TestGuiSmoke(unittest.TestCase):
 
         mock_api = MagicMock()
         mock_api.client = MagicMock()
-        app = Aria2Gui(root, api=mock_api)
-        self.assertIsNotNone(app.dt)
-        self.assertIsNotNone(app.category_combo)
-        self.assertIn("Download Speed", app.stats_vars)
+        try:
+            app = Aria2Gui(root, api=mock_api)
+            self.assertIsNotNone(app.dt)
+            self.assertIsNotNone(app.category_combo)
+            self.assertIn("Download Speed", app.stats_vars)
 
-        # Test category change
-        app.category_combo.set("Active")
-        app.on_category_changed()
-        self.assertEqual(app.active_category, "Active")
+            # Test category change
+            app.category_combo.set("Active")
+            app.on_category_changed()
+            self.assertEqual(app.active_category, "Active")
 
-        # Test context menu exists
-        self.assertIsNotNone(app.context_menu)
+            # Test context menu exists
+            self.assertIsNotNone(app.context_menu)
 
-        # Test queue actions
-        app.start_queue()
-        app.pause_queue()
-        app.clear_queue()
+            # Test queue actions
+            app.start_queue()
+            app.pause_queue()
+            app.clear_queue()
 
-        # Test tray actions
-        app.minimize_to_tray()
-        app.restore_from_tray()
+            # Test tray actions
+            app.minimize_to_tray()
+            app.restore_from_tray()
 
-        # Test logs directory opening
-        app.open_logs_directory()
+            # Test logs directory opening
+            app.open_logs_directory()
 
-        # Test selection methods
-        dls = app.get_selected_downloads()
-        self.assertEqual(dls, [])
-        dl = app.get_selected_download()
-        self.assertIsNone(dl)
+            # Test selection methods
+            dls = app.get_selected_downloads()
+            self.assertEqual(dls, [])
+            dl = app.get_selected_download()
+            self.assertIsNone(dl)
 
-        # Test selection actions when nothing selected
-        app.start_selected_download()
-        app.pause_selected_download()
-        app.remove_selected_download()
-        app.open_uri_manager()
-
-        root.destroy()
+            # Test selection actions when nothing selected
+            app.start_selected_download()
+            app.pause_selected_download()
+            app.remove_selected_download()
+            app.open_uri_manager()
+        finally:
+            if (
+                "app" in locals()
+                and hasattr(app, "clipboard_watcher")
+                and app.clipboard_watcher
+            ):
+                app.clipboard_watcher.stop()
+            root.destroy()
 
 
 if __name__ == "__main__":

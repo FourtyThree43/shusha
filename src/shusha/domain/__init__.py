@@ -1,9 +1,24 @@
-"""
-Shusha 2 Domain Layer.
+"""Shusha Domain Layer.
+
 Pure, decoupled business abstractions with zero external dependencies.
 """
 
+from shusha.domain.acquisition import (
+    AcquisitionRequest,
+    AcquisitionStatus,
+    DetectedKind,
+    Provenance,
+    SelectionPolicy,
+    SourceKind,
+)
+from shusha.domain.artifact import Artifact, ArtifactKind, ArtifactStatus
+from shusha.domain.capability import Capability, CapabilitySet
 from shusha.domain.category import Category, CategoryRule
+from shusha.domain.credentials import (
+    CredentialKind,
+    CredentialReference,
+    CredentialScope,
+)
 from shusha.domain.download import Download
 from shusha.domain.download_file import DownloadFile
 from shusha.domain.download_source import DownloadSource, SourceStatus
@@ -26,19 +41,33 @@ from shusha.domain.events import (
     DownloadStateChangedEvent,
 )
 from shusha.domain.identifiers import (
+    AcquisitionId,
+    ArtifactId,
+    BackendId,
     CategoryId,
     ConnectionId,
+    CredentialId,
     DownloadId,
     Gid,
     HistoryId,
+    JobGroupId,
+    JobId,
     PeerId,
     ProfileId,
     SessionId,
     TaskId,
+    make_acquisition_id,
+    make_artifact_id,
+    make_backend_id,
     make_category_id,
+    make_credential_id,
     make_download_id,
     make_gid,
+    make_job_group_id,
+    make_job_id,
 )
+from shusha.domain.job import Job, JobProgress, JobTimestamps
+from shusha.domain.job_group import JobGroup, JobGroupKind
 from shusha.domain.metalink import MetalinkFile, MetalinkResource
 from shusha.domain.peer import Peer
 from shusha.domain.queue import DownloadQueue
@@ -59,9 +88,19 @@ from shusha.domain.values import (
 )
 
 __all__ = [
+    "AcquisitionId",
+    "AcquisitionRequest",
+    "AcquisitionStatus",
+    "Artifact",
+    "ArtifactId",
+    "ArtifactKind",
+    "ArtifactStatus",
+    "BackendId",
     "BitRate",
     "Bitfield",
     "ByteSize",
+    "Capability",
+    "CapabilitySet",
     "Category",
     "CategoryChangedEvent",
     "CategoryId",
@@ -69,6 +108,11 @@ __all__ = [
     "CategoryRuleConflictError",
     "Checksum",
     "ConnectionId",
+    "CredentialId",
+    "CredentialKind",
+    "CredentialReference",
+    "CredentialScope",
+    "DetectedKind",
     "DomainError",
     "DomainEvent",
     "Download",
@@ -90,6 +134,13 @@ __all__ = [
     "HistoryId",
     "InvalidIdentifierError",
     "InvalidStateTransitionError",
+    "Job",
+    "JobGroup",
+    "JobGroupId",
+    "JobGroupKind",
+    "JobId",
+    "JobProgress",
+    "JobTimestamps",
     "MetalinkFile",
     "MetalinkResource",
     "Peer",
@@ -97,9 +148,12 @@ __all__ = [
     "Percentage",
     "Port",
     "ProfileId",
+    "Provenance",
     "ScheduleWindow",
+    "SelectionPolicy",
     "Server",
     "SessionId",
+    "SourceKind",
     "SourceStatus",
     "TaskId",
     "TorrentMeta",
@@ -107,8 +161,14 @@ __all__ = [
     "Uri",
     "ValueObjectValidationError",
     "can_transition",
+    "make_acquisition_id",
+    "make_artifact_id",
+    "make_backend_id",
     "make_category_id",
+    "make_credential_id",
     "make_download_id",
     "make_gid",
+    "make_job_group_id",
+    "make_job_id",
     "validate_transition",
 ]

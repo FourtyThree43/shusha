@@ -1,0 +1,1 @@
+"""Backend adapters tests package."""

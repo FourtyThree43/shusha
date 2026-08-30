@@ -1,133 +1,1454 @@
-# PLAN.md
+# Shusha Rewrite — Master Architecture & AI Execution Plan
 
-# Shusha Rewrite — Python 3.14 / ttkbootstrap / aria2c Full-Coverage Plan
-
-> **Status:** Rewrite master plan  
-> **Target:** Python 3.14+  
-> **GUI:** `ttkbootstrap` / Tkinter / ttk  
-> **Toolchain:** Astral `uv`, Ruff, ty, pytest  
-> **Backend:** aria2c  
-> **Architecture:** typed domain + application services + infrastructure adapters + presentation layer  
-> **Primary objective:** modernize Shusha while achieving comprehensive aria2c feature/specification coverage without coupling the UI to aria2's transport protocol.
+**Status:** LOCKED ARCHITECTURE CONTRACT  
+**Target:** Python 3.14+  
+**Package/toolchain:** Astral `uv`, Ruff, ty, pytest  
+**Desktop:** ttkbootstrap  
+**TUI/diagnostics:** Textual  
+**CLI:** Python CLI sharing the application layer  
+**Reference backend:** aria2c  
+**Secondary backend:** yt-dlp  
+**Architecture:** multi-backend + multi-frontend + acquisition platform + plugin ecosystem
 
 ---
 
-## 1. Mission
+# 1. Mission
 
-Shusha is to be rewritten as a modern, strongly typed Python 3.14 desktop download manager built around aria2c.
+Rewrite Shusha into a modern, strongly typed, extensible download acquisition and orchestration platform.
 
-The rewrite must provide:
+Shusha MUST NOT become an aria2 GUI with additional integrations bolted on.
 
-1. A polished `ttkbootstrap` desktop UI.
-2. Full practical coverage of the aria2c command-line/RPC capability surface.
-3. Strong type safety.
-4. Clean separation between domain, application, infrastructure, and presentation.
-5. Reliable local and remote aria2 daemon management.
-6. HTTP/HTTPS/FTP/SFTP support.
-7. BitTorrent and Magnet support.
-8. Metalink support.
-9. Checksums and integrity verification.
-10. Queue management.
-11. Scheduling.
-12. Session persistence.
-13. Proxy/authentication configuration.
-14. Server/peer/tracker inspection.
-15. Statistics and diagnostics.
-16. Secure credential handling.
-17. Cross-platform behavior.
-18. Comprehensive automated tests.
-19. Complete developer/user documentation.
-20. Machine-checkable correspondence between aria2 documentation, option registry, implementation, UI, and tests.
+The target product is:
 
-The rewrite is **not** a mechanical port.
+> **A multi-backend download acquisition and orchestration platform with a shared typed application core, ttkbootstrap desktop UI, Textual operator/diagnostics UI, CLI automation interface, browser integration, clipboard capture, media acquisition, and a versioned plugin architecture.**
 
-The intended strategy is:
+aria2c is the first reference execution backend.
+
+yt-dlp is the first major secondary backend.
+
+The existing 132-screen desktop catalogue is the **initial aria2 feature-completeness baseline**, not a permanent restriction on the application's information architecture.
+
+---
+
+# 2. Current Repository Baseline
+
+The current repository already contains:
+
+- `src/shusha`
+- ttkbootstrap/Tkinter GUI
+- MVC-oriented organization
+- aria2 client integration
+- daemon/process supervision
+- settings persistence
+- download models
+- statistics
+- tests
+- documentation
+- `uv.lock`
+- Astral `uv`
+- Ruff
+- ty
+
+The repository currently describes Shusha as an aria2 wrapper with ttkbootstrap and local daemon orchestration. The rewrite changes the architectural center from "aria2 GUI" to "multi-backend orchestration platform." [SOURCE: current repository dev branch]
+
+The existing aria2 functionality MUST be preserved or intentionally superseded only where the new architecture provides an explicit replacement.
+
+---
+
+# 3. Locked Architectural Principles
+
+## AP-001 — Multi-backend is fundamental
+
+Backend implementations are replaceable execution engines.
+
+Initial:
 
 ```text
-Existing Shusha
-      │
-      ▼
-Phase 0 audit
-      │
-      ▼
-Compatibility map
-      │
-      ▼
-New typed domain
-      │
-      ▼
-New application services
-      │
-      ▼
-New aria2 infrastructure
-      │
-      ▼
-New ttkbootstrap UI
-      │
-      ▼
-Feature parity
-      │
-      ▼
-Validation
-      │
-      ▼
-Legacy removal
+aria2
+yt-dlp
+```
+
+Future:
+
+```text
+third-party plugins
+additional media engines
+future download engines
+```
+
+No application service may depend directly on a concrete backend.
+
+---
+
+## AP-002 — aria2 is not the domain model
+
+Core MUST NOT contain aria2-specific concepts as fundamental domain primitives.
+
+Forbidden core coupling:
+
+```text
+Aria2Download
+Aria2Peer
+Aria2RpcClient
+Aria2Option
+```
+
+as domain-level concepts.
+
+Instead:
+
+```text
+Job
+Artifact
+Source
+File
+Peer
+Tracker
+Server
+Capability
+BackendOption
+```
+
+aria2 adapters map those concepts into the backend.
+
+---
+
+## AP-003 — Acquisition is independent of execution
+
+All inputs converge through the acquisition pipeline.
+
+Supported acquisition sources:
+
+```text
+manual URL
+clipboard
+browser extension
+drag/drop
+torrent file
+magnet URI
+Metalink file
+local file
+CLI
+future integrations
+```
+
+All produce:
+
+```text
+AcquisitionRequest
 ```
 
 ---
 
-# 2. Non-Negotiable Decisions
+## AP-004 — Detection, inspection, resolution and execution are separate
 
-## 2.1 Python
-
-Target:
+The pipeline is:
 
 ```text
-Python 3.14+
+Acquisition
+    ↓
+Detection
+    ↓
+Inspection
+    ↓
+Resolution
+    ↓
+Policy
+    ↓
+Backend Selection
+    ↓
+Job Creation
+    ↓
+Execution
+    ↓
+Artifact
 ```
 
-The rewrite does not maintain compatibility with Python 3.10–3.13.
-
-Use modern Python typing and language features where they improve correctness.
+These stages MUST NOT be collapsed into one giant `download_url()` operation.
 
 ---
 
-## 2.2 GUI
+## AP-005 — User intent overrides automation
 
-The official GUI framework is:
+Backend selection precedence:
 
 ```text
+1. Explicit user backend choice
+2. Explicit user workflow
+3. Saved acquisition rule
+4. Backend recommendation
+5. Capability-based automatic routing
+6. Application default
+```
+
+---
+
+## AP-006 — Capability-driven UI
+
+Frontends MUST query backend capabilities.
+
+Forbidden:
+
+```python
+if backend == "aria2":
+    show_peers()
+```
+
+Preferred:
+
+```python
+if capabilities.peers:
+    show_peers()
+```
+
+---
+
+## AP-007 — Frontends are independent
+
+Three first-class interfaces:
+
+```text
+ttkbootstrap Desktop
+Textual TUI / Diagnostics
+CLI
+```
+
+No frontend may call a backend implementation directly.
+
+Correct:
+
+```text
+Frontend
+  ↓
+Application
+  ↓
+Backend Contract
+  ↓
+Backend Adapter
+```
+
+Forbidden:
+
+```text
+ttkbootstrap → aria2 RPC
+Textual → aria2 RPC
+CLI → yt-dlp subprocess
+```
+
+---
+
+## AP-008 — Events are first-class
+
+Core operations MUST emit typed events.
+
+Examples:
+
+```text
+AcquisitionDetected
+ResolutionStarted
+ResolutionCompleted
+JobCreated
+JobStarted
+JobProgressChanged
+JobPaused
+JobResumed
+JobFailed
+JobCompleted
+JobCancelled
+BackendConnected
+BackendDisconnected
+PluginLoaded
+PluginFailed
+SchedulerTriggered
+```
+
+Frontends consume application state/events rather than polling concrete backends unnecessarily.
+
+---
+
+## AP-009 — Artifact is the execution output
+
+A job may produce:
+
+```text
+file
+directory
+playlist
+media collection
+torrent payload
+generated/post-processed output
+```
+
+The generic result is:
+
+```text
+Artifact
+```
+
+---
+
+## AP-010 — Job groups are first-class
+
+Support:
+
+```text
+Job
+JobGroup
+Batch
+Playlist
+Collection
+```
+
+A playlist resolved by yt-dlp MUST NOT be forced into the semantic model of a single file download.
+
+---
+
+## AP-011 — Secrets never belong in ordinary domain objects
+
+Credentials are represented by references:
+
+```text
+CredentialReference
+```
+
+and resolved through a credential store.
+
+Plugins MUST receive only the secrets required for their operation.
+
+---
+
+## AP-012 — Plugins are versioned contracts
+
+The plugin platform MUST define:
+
+```text
+identity
+version
+compatibility
+capabilities
+configuration
+lifecycle
+execution
+events
+diagnostics
+security/trust
+```
+
+---
+
+## AP-013 — Fake implementations validate the architecture
+
+Before completing aria2 integration, the system MUST have:
+
+```text
+FakeBackend
+FakeAcquisitionProvider
+FakeResolver
+```
+
+These are mandatory architecture tests.
+
+---
+
+## AP-014 — 132 screens are feature coverage
+
+The 132-screen catalogue represents the initial aria2 desktop feature-completeness baseline.
+
+It MUST NOT dictate permanent navigation.
+
+A catalogue item may become:
+
+```text
+screen
+tab
+panel
+drawer
+dialog
+wizard
+inspector
+overlay
+contextual view
+```
+
+provided the underlying feature and states remain covered.
+
+---
+
+# 4. Target Architecture
+
+```text
+                              SHUSHA
+                                 │
+              ┌──────────────────┼──────────────────┐
+              │                  │                  │
+         ACQUISITION        ORCHESTRATION        OUTPUT
+              │                  │                  │
+     ┌────────┼─────────┐        │              Artifact
+     │        │         │        │
+ Clipboard Browser   Drag/Drop   Jobs
+ Capture   Bridge                │
+     │        │                  │
+     └────────┴───────┐          │
+                      ▼          ▼
+                Acquisition   Policy
+                   Request    Engine
+                      │          │
+                      └────┬─────┘
+                           ▼
+                       Resolver
+                           │
+                           ▼
+                    Backend Selection
+                           │
+              ┌────────────┼────────────┐
+              │            │            │
+            aria2        yt-dlp      Plugins
+              │            │            │
+              └────────────┼────────────┘
+                           │
+                           ▼
+                          Job
+                           │
+                           ▼
+                      Event System
+                           │
+             ┌─────────────┼─────────────┐
+             │             │             │
+          Desktop        Textual        CLI
+        ttkbootstrap    TUI/Diag
+```
+
+---
+
+# 5. Dependency Architecture
+
+```text
+                     ┌─────────────────┐
+                     │      CORE       │
+                     │ Domain + Events │
+                     └────────┬────────┘
+                              │
+                     ┌────────▼────────┐
+                     │   APPLICATION   │
+                     │ Commands/Query  │
+                     │ Services/Rules  │
+                     └────────┬────────┘
+                              │
+             ┌────────────────┼────────────────┐
+             │                │                │
+       ┌─────▼─────┐    ┌─────▼─────┐    ┌────▼────┐
+       │ Acquisition│    │ Backend   │    │ Persist │
+       │ Platform   │    │ Contracts │    │ence     │
+       └─────┬──────┘    └─────┬─────┘    └─────────┘
+             │                 │
+       ┌─────┼──────┐    ┌─────┼─────────┐
+       │     │      │    │     │         │
+    Clip  Browser  Drop aria2 yt-dlp  Plugins
+       │     │      │
+       └─────┴──────┘
+             │
+             ▼
+       Application Layer
+             │
+       ┌─────┼─────────┐
+       │     │         │
+   Desktop Textual    CLI
+```
+
+### Dependency rules
+
+```text
+core → depends on nothing application-specific
+
+application → core
+
+infrastructure → core/application contracts
+
+backend adapters → core/application/backend contracts
+
+acquisition adapters → core/application
+
+desktop → application contracts
+
+textual → application contracts
+
+cli → application contracts
+
+browser extension → acquisition gateway only
+
+plugins → plugin SDK/contracts
+
+core NEVER → frontend
+core NEVER → concrete backend
+frontend NEVER → concrete backend
+backend NEVER → frontend
+```
+
+---
+
+# 6. Target Directory Tree
+
+```text
+.
+├── .github/
+│   ├── workflows/
+│   ├── ISSUE_TEMPLATE/
+│   └── pull_request_template.md
+│
+├── docs/
+│   ├── architecture/
+│   ├── api/
+│   ├── aria2/
+│   ├── backends/
+│   ├── plugins/
+│   ├── acquisition/
+│   ├── browser/
+│   ├── desktop/
+│   ├── textual/
+│   ├── cli/
+│   ├── security/
+│   ├── operations/
+│   └── adr/
+│
+├── extensions/
+│   ├── browser/
+│   │   ├── chromium/
+│   │   └── firefox/
+│   └── native-host/
+│
+├── src/
+│   └── shusha/
+│       ├── __main__.py
+│       ├── version.py
+│       │
+│       ├── core/
+│       │   ├── domain/
+│       │   │   ├── jobs/
+│       │   │   ├── artifacts/
+│       │   │   ├── sources/
+│       │   │   ├── files/
+│       │   │   ├── queues/
+│       │   │   ├── schedules/
+│       │   │   ├── capabilities/
+│       │   │   ├── credentials/
+│       │   │   └── errors/
+│       │   │
+│       │   ├── application/
+│       │   │   ├── commands/
+│       │   │   ├── queries/
+│       │   │   ├── services/
+│       │   │   ├── policies/
+│       │   │   └── workflows/
+│       │   │
+│       │   ├── events/
+│       │   └── contracts/
+│       │
+│       ├── acquisition/
+│       │   ├── detection/
+│       │   ├── inspection/
+│       │   ├── resolution/
+│       │   ├── policies/
+│       │   ├── clipboard/
+│       │   ├── browser/
+│       │   ├── dragdrop/
+│       │   └── inbox/
+│       │
+│       ├── backends/
+│       │   ├── contracts/
+│       │   ├── registry/
+│       │   ├── discovery/
+│       │   ├── aria2/
+│       │   └── yt_dlp/
+│       │
+│       ├── plugins/
+│       │   ├── api/
+│       │   ├── manifest/
+│       │   ├── discovery/
+│       │   ├── registry/
+│       │   └── security/
+│       │
+│       ├── infrastructure/
+│       │   ├── persistence/
+│       │   ├── filesystem/
+│       │   ├── process/
+│       │   ├── networking/
+│       │   ├── credentials/
+│       │   ├── logging/
+│       │   └── platform/
+│       │
+│       └── frontends/
+│           ├── desktop/
+│           │   └── ttkbootstrap/
+│           │       ├── app.py
+│           │       ├── router.py
+│           │       ├── state/
+│           │       ├── theme/
+│           │       ├── design/
+│           │       ├── widgets/
+│           │       ├── components/
+│           │       ├── layouts/
+│           │       ├── dialogs/
+│           │       └── screens/
+│           │
+│           ├── textual/
+│           │   ├── app.py
+│           │   ├── screens/
+│           │   ├── widgets/
+│           │   ├── diagnostics/
+│           │   └── styles/
+│           │
+│           └── cli/
+│               ├── app.py
+│               ├── commands/
+│               ├── formatters/
+│               └── output/
+│
+├── tests/
+│   ├── unit/
+│   ├── integration/
+│   ├── contract/
+│   ├── architecture/
+│   ├── frontend/
+│   ├── acquisition/
+│   ├── backends/
+│   ├── plugins/
+│   ├── e2e/
+│   └── fixtures/
+│
+├── PLAN.md
+├── AGENTS.md
+├── README.md
+├── CONTRIBUTING.md
+├── SECURITY.md
+├── CHANGELOG.md
+├── pyproject.toml
+└── uv.lock
+```
+
+---
+
+# 7. Core Domain Contract
+
+## Job
+
+```text
+Job
+├── id
+├── group_id
+├── backend_id
+├── source
+├── request
+├── state
+├── progress
+├── timestamps
+├── outputs
+├── capabilities
+├── metadata
+└── backend_data
+```
+
+Backend-specific state MUST remain namespaced.
+
+---
+
+## AcquisitionRequest
+
+```text
+AcquisitionRequest
+├── id
+├── source_kind
+├── raw_input
+├── detected_kind
+├── metadata
+├── preferred_backend
+├── selection_policy
+├── created_at
+└── provenance
+```
+
+---
+
+## Capability
+
+Capabilities MUST be typed and machine-readable.
+
+Minimum capability vocabulary:
+
+```text
+basic_download
+pause_resume
+cancel
+retry
+queue
+scheduling
+multiple_sources
+segmentation
+http
+https
+ftp
+sftp
+torrent
+magnet
+metalink
+torrent_files
+torrent_peers
+torrent_trackers
+server_status
+piece_status
+checksum
+cookies
+authentication
+proxy
+rate_limit
+file_selection
+input_file
+session_save
+remote_rpc
+media_extraction
+format_selection
+playlist
+subtitles
+metadata
+post_processing
+```
+
+---
+
+# 8. Acquisition Architecture
+
+## Sources
+
+```text
+manual
+clipboard
+browser
+drag_drop
+cli
+torrent_file
+magnet
+metalink
+local_file
+api
+```
+
+## Pipeline
+
+```text
+Acquisition Source
+       ↓
+AcquisitionDetected
+       ↓
+Detector
+       ↓
+Inspector
+       ↓
+Resolver
+       ↓
+Policy Engine
+       ↓
+Backend Recommendation
+       ↓
+User/Rule Selection
+       ↓
+JobRequest
+```
+
+## Acquisition Inbox
+
+The desktop MUST expose a persistent/ephemeral acquisition inbox.
+
+States:
+
+```text
+detected
+inspecting
+resolved
+awaiting_user
+accepted
+ignored
+expired
+failed
+```
+
+---
+
+# 9. Clipboard Contract
+
+Clipboard capture MUST support:
+
+```text
+single URL
+multiple URLs
+text containing URLs
+magnet URI
+torrent URL
+media URL
+```
+
+Features:
+
+```text
+enable/disable
+source filtering
+duplicate suppression
+notification policy
+automatic enqueue
+automatic start
+ignore rules
+privacy mode
+```
+
+Clipboard monitoring MUST never silently upload clipboard contents.
+
+---
+
+# 10. Browser Integration Contract
+
+Browser extension is an acquisition client.
+
+Supported operations:
+
+```text
+send URL
+send page
+send selected link
+send media candidate
+send multiple links
+context menu
+download interception
+```
+
+The extension MUST communicate through an authenticated local acquisition gateway/native host.
+
+The extension MUST NOT contain:
+
+```text
+aria2 RPC logic
+yt-dlp execution logic
+download database
+scheduler
+business rules
+```
+
+---
+
+# 11. Media Grabber Contract
+
+Media Grabber is backend-neutral.
+
+```text
+MediaGrabber
+      ↓
+MediaResolver
+      ↓
+yt-dlp adapter
+```
+
+Capabilities:
+
+```text
+site detection
+title
+duration
+thumbnail
+formats
+video streams
+audio streams
+subtitles
+chapters
+playlist
+metadata
+post-processing
+```
+
+Required workflow:
+
+```text
+Inspect
+ ↓
+Show metadata
+ ↓
+Show formats
+ ↓
+User selection
+ ↓
+Create Job
+```
+
+---
+
+# 12. aria2 Reference Backend Contract
+
+aria2 support MUST cover the official aria2c command/RPC surface rather than only the existing application's current feature subset.
+
+The official manual defines HTTP(S), FTP, SFTP, BitTorrent and Metalink support and multi-source downloading, with integrity validation and extensive options. [SOURCE: aria2c manual]
+
+## Protocol coverage
+
+```text
+HTTP
+HTTPS
+FTP
+SFTP
+BitTorrent
+BitTorrent Magnet
+Metalink
+```
+
+## Transfer features
+
+```text
+segmentation
+multiple connections
+multiple mirrors
+URI selection
+resume
+retry
+timeouts
+speed limits
+connection limits
+server statistics
+piece selection
+file allocation
+integrity checking
+checksum validation
+remote timestamp
+```
+
+## BitTorrent
+
+```text
+torrent files
+magnet links
+DHT
+DHT IPv4
+DHT IPv6
+PEX
+peer limits
+peer exchange
+seed ratio
+seed time
+tracker configuration
+tracker discovery
+listen ports
+local peer discovery
+piece selection
+torrent metadata
+torrent file selection
+```
+
+## Metalink
+
+```text
+Metalink v3/v4
+mirrors
+preferred protocol
+language
+location
+OS
+version
+checksums
+piece checksums
+file selection
+URI selection
+```
+
+## HTTP/HTTPS
+
+```text
+headers
+cookies
+referer
+user agent
+authentication
+proxy
+HTTPS certificate configuration
+server authentication
+redirects
+compression
+keep-alive
+pipelining where supported
+conditional/request behavior
+```
+
+## FTP
+
+```text
+FTP authentication
+anonymous FTP
+active/passive configuration
+proxy
+directory behavior
+resume
+timestamp
+```
+
+## SFTP
+
+```text
+SSH host verification
+known-host style validation
+public-key authentication
+password authentication
+key files
+host key checksums
+```
+
+## File/output
+
+```text
+output directory
+output filename
+file allocation
+preallocation
+falloc
+truncation
+existing-file behavior
+overwrite
+auto-renaming
+control files
+resume
+disk allocation limits
+```
+
+## Queue/session
+
+```text
+input file
+deferred input
+save session
+load session
+queue ordering
+concurrency
+pause
+resume
+remove
+force save
+```
+
+## RPC
+
+Support both aria2 JSON-RPC and XML-RPC semantics exposed by the backend.
+
+Required operation families:
+
+```text
+addUri
+addTorrent
+addMetalink
+remove
+forceRemove
+pause
+pauseAll
+forcePause
+forcePauseAll
+unpause
+unpauseAll
+tellStatus
+getUris
+getFiles
+getPeers
+getServers
+tellActive
+tellWaiting
+tellStopped
+changePosition
+changeUri
+changeOption
+changeGlobalOption
+getOption
+getGlobalOption
+getVersion
+getSessionInfo
+shutdown
+forceShutdown
+getGlobalStat
+purgeDownloadResult
+saveSession
+```
+
+The RPC implementation MUST be tested against the official method/parameter semantics.
+
+## Dynamic options
+
+Every supported aria2 option MUST have metadata:
+
+```text
+name
+short_name
+type
+default
+allowed_values
+scope
+mutable
+protocols
+description
+security_class
+```
+
+Options MUST be categorized in the UI.
+
+The system MUST NOT hard-code a partial handwritten option list and claim complete coverage.
+
+The option catalogue MUST be generated/validated against the reference manual and/or aria2 runtime capabilities.
+
+---
+
+# 13. aria2 Option Coverage Matrix
+
+The rewrite MUST maintain:
+
+```text
+docs/aria2/option-matrix.md
+```
+
+Each option:
+
+```text
+aria2 option
+short form
+domain category
+typed representation
+default
+frontend exposure
+runtime mutability
+RPC support
+backend adapter mapping
+tests
+documentation
+```
+
+Coverage states:
+
+```text
+SUPPORTED
+SUPPORTED_WITH_LIMITATION
+READ_ONLY
+BACKEND_ONLY
+UNSUPPORTED_WITH_REASON
+DEPRECATED
+```
+
+No option may silently disappear.
+
+---
+
+# 14. Frontend Contract
+
+## Desktop
+
+Technology:
+
+```text
+ttkbootstrap
 Tkinter
-  └── ttk
-       └── ttkbootstrap
 ```
 
-Do **not** introduce CustomTkinter.
+Desktop owns:
 
-Do not mix CustomTkinter and ttkbootstrap.
-
-Do not introduce a second widget toolkit.
+```text
+complete aria2 baseline
+full configuration
+visual job management
+advanced inspectors
+acquisition workflows
+media workflows
+settings
+diagnostics
+```
 
 ---
 
-## 2.3 Toolchain
+## Textual
 
-Use Astral tooling:
+Textual owns:
 
-```bash
+```text
+operator workflows
+SSH/headless workflows
+diagnostics
+live monitoring
+backend inspection
+logs/events
+doctor
+advanced administration
+```
+
+Textual does not need 132-screen parity.
+
+---
+
+## CLI
+
+The CLI owns:
+
+```text
+automation
+scripting
+CI
+cron
+shell integration
+administration
+machine output
+```
+
+Required output modes:
+
+```text
+table
+json
+jsonl
+```
+
+---
+
+# 15. Desktop Design System
+
+Required system:
+
+```text
+Application shell
+navigation
+toolbar
+status bar
+command palette
+dialogs
+drawers
+inspectors
+tables
+trees
+cards
+charts
+forms
+property grids
+notifications
+empty states
+loading states
+error states
+offline states
+confirmation states
+```
+
+Responsive classes:
+
+```text
+Compact
+Standard
+Wide
+UltraWide
+```
+
+The layout system MUST define deterministic behavior for each class.
+
+---
+
+# 16. 132-Screen Baseline
+
+The desktop implementation MUST map the existing 132-screen catalogue to:
+
+```text
+screen ID
+feature
+route
+component
+state model
+required capabilities
+backend dependencies
+acceptance test
+responsive behavior
+accessibility behavior
+```
+
+Each catalogue entry MUST have:
+
+```text
+default state
+loading
+empty
+error
+offline
+disabled
+permission/security
+busy
+success
+```
+
+where applicable.
+
+---
+
+# 17. Plugin Contract
+
+Plugin manifest:
+
+```text
+id
+name
+version
+api_version
+description
+author
+license
+backend_type
+capabilities
+entrypoint
+configuration_schema
+permissions
+```
+
+Plugin lifecycle:
+
+```text
+discover
+validate
+load
+initialize
+start
+stop
+unload
+```
+
+Plugins MUST declare permissions.
+
+Examples:
+
+```text
+network
+filesystem
+process
+credentials
+browser
+clipboard
+```
+
+Third-party plugins MUST NOT receive unrestricted application privileges.
+
+---
+
+# 18. Persistence
+
+Persistence MUST support:
+
+```text
+jobs
+job groups
+artifacts
+history
+queue state
+schedules
+settings
+backend configuration
+acquisition rules
+plugin configuration
+diagnostic records where appropriate
+```
+
+The persistence abstraction MUST allow migration between storage implementations.
+
+Do not expose SQLite/shelve/etc. directly to domain objects.
+
+---
+
+# 19. Daemon/Service Mode
+
+Target commands:
+
+```text
+shusha
+shusha desktop
+shusha tui
+shusha daemon
+shusha add
+shusha list
+shusha status
+shusha pause
+shusha resume
+shusha remove
+shusha resolve
+shusha doctor
+shusha diagnostics
+```
+
+The first implementation may run application services in-process.
+
+The architecture MUST leave a clean boundary for a long-running service.
+
+---
+
+# 20. Security
+
+Security architecture MUST cover:
+
+```text
+plugin trust
+credential storage
+browser bridge authentication
+local service authentication
+filesystem boundaries
+command execution
+URL validation
+SSRF-sensitive workflows
+cookie handling
+proxy credentials
+TLS certificate validation
+aria2 RPC secret handling
+logs containing secrets
+temporary files
+```
+
+Never log:
+
+```text
+passwords
+API tokens
+cookies
+authorization headers
+private keys
+credential material
+```
+
+---
+
+# 21. Observability
+
+Standardize:
+
+```text
+structured logs
+correlation IDs
+job IDs
+backend IDs
+plugin IDs
+event IDs
+health checks
+diagnostics
+timing
+error categories
+```
+
+Required diagnostic commands:
+
+```text
+shusha doctor
+shusha diagnostics
+```
+
+---
+
+# 22. Python 3.14 / Astral Toolchain
+
+Required baseline:
+
+```text
+Python >= 3.14
 uv
 ruff
 ty
-```
-
-Testing:
-
-```bash
 pytest
-pytest-cov
+coverage
 ```
 
-Canonical commands:
+Quality commands:
 
 ```bash
 uv sync
@@ -135,1930 +1456,1275 @@ uv run ruff check .
 uv run ruff format --check .
 uv run ty check
 uv run pytest
-uv run pytest --cov
+uv run pytest --cov=shusha
 uv build
 ```
 
----
-
-## 2.4 Architecture
-
-Required dependency direction:
+Typing policy:
 
 ```text
-presentation
-     │
-     ▼
-application
-     │
-     ▼
-domain
-
-infrastructure ───────► domain/application contracts
-```
-
-The domain must never import:
-
-```text
-tkinter
-ttkbootstrap
-aria2 RPC implementation
-subprocess
-sqlite implementation
-platform-specific APIs
-```
-
-The presentation layer must not directly invoke aria2 RPC.
-
----
-
-## 2.5 aria2 as an external system
-
-aria2 is an external dependency.
-
-Treat it as:
-
-```text
-external process
-external protocol
-external version
-external state machine
-external failure domain
-```
-
-Never make aria2 implementation details leak throughout the application.
-
----
-
-# 3. Target Repository
-
-```text
-shusha/
-├── .github/
-│   ├── workflows/
-│   │   ├── ci.yml
-│   │   ├── tests.yml
-│   │   ├── typecheck.yml
-│   │   ├── docs.yml
-│   │   └── release.yml
-│   ├── ISSUE_TEMPLATE/
-│   │   ├── bug.yml
-│   │   ├── feature.yml
-│   │   ├── aria2-compatibility.yml
-│   │   └── ui-ux.yml
-│   └── pull_request_template.md
-│
-├── docs/
-│   ├── architecture/
-│   │   ├── OVERVIEW.md
-│   │   ├── DOMAIN.md
-│   │   ├── APPLICATION.md
-│   │   ├── INFRASTRUCTURE.md
-│   │   ├── UI.md
-│   │   └── DATA_FLOW.md
-│   ├── aria2/
-│   │   ├── ARIA2_COMPATIBILITY.md
-│   │   ├── ARIA2_OPTION_MATRIX.md
-│   │   ├── ARIA2_RPC_MATRIX.md
-│   │   ├── ARIA2_EVENT_MATRIX.md
-│   │   ├── ARIA2_STATUS_MODEL.md
-│   │   ├── ARIA2_ERROR_MODEL.md
-│   │   └── ARIA2_VERSION_POLICY.md
-│   ├── api/
-│   │   ├── DOMAIN_API.md
-│   │   ├── APPLICATION_API.md
-│   │   └── RPC_API.md
-│   ├── ui/
-│   │   ├── DESIGN_SYSTEM.md
-│   │   ├── INFORMATION_ARCHITECTURE.md
-│   │   ├── SCREEN_CATALOGUE.md
-│   │   ├── INTERACTION_MODEL.md
-│   │   └── ACCESSIBILITY.md
-│   ├── development/
-│   │   ├── DEVELOPMENT.md
-│   │   ├── TESTING.md
-│   │   ├── TYPE_CHECKING.md
-│   │   ├── RELEASES.md
-│   │   └── AI_AGENT_GUIDE.md
-│   └── audit/
-│       ├── REPOSITORY_AUDIT.md
-│       ├── CURRENT_ARCHITECTURE.md
-│       ├── CURRENT_FEATURE_MATRIX.md
-│       ├── CURRENT_ARIA2_COVERAGE.md
-│       ├── CURRENT_UI_AUDIT.md
-│       ├── CURRENT_TEST_AUDIT.md
-│       ├── CURRENT_DOCUMENTATION_AUDIT.md
-│       ├── DEPENDENCY_AUDIT.md
-│       ├── TYPE_AUDIT.md
-│       ├── SECURITY_AUDIT.md
-│       ├── DEAD_CODE_AUDIT.md
-│       ├── MIGRATION_MAP.md
-│       └── PHASE_0_FINDINGS.md
-│
-├── src/
-│   └── shusha/
-│       ├── __init__.py
-│       ├── __main__.py
-│       ├── cli.py
-│       │
-│       ├── domain/
-│       │   ├── download.py
-│       │   ├── download_file.py
-│       │   ├── download_source.py
-│       │   ├── download_status.py
-│       │   ├── torrent.py
-│       │   ├── metalink.py
-│       │   ├── peer.py
-│       │   ├── server.py
-│       │   ├── checksum.py
-│       │   ├── speed.py
-│       │   ├── statistics.py
-│       │   ├── category.py
-│       │   ├── scheduler.py
-│       │   ├── settings.py
-│       │   ├── session.py
-│       │   ├── errors.py
-│       │   └── events.py
-│       │
-│       ├── application/
-│       │   ├── app.py
-│       │   ├── commands/
-│       │   ├── queries/
-│       │   └── services/
-│       │
-│       ├── infrastructure/
-│       │   ├── aria2/
-│       │   ├── daemon/
-│       │   ├── persistence/
-│       │   ├── configuration/
-│       │   ├── filesystem/
-│       │   ├── os/
-│       │   └── networking/
-│       │
-│       ├── presentation/
-│       │   ├── app.py
-│       │   ├── state.py
-│       │   ├── commands.py
-│       │   ├── bindings.py
-│       │   ├── components/
-│       │   ├── windows/
-│       │   ├── dialogs/
-│       │   └── theme/
-│       │
-│       ├── platform/
-│       └── shared/
-│
-├── tests/
-│   ├── unit/
-│   ├── integration/
-│   ├── presentation/
-│   ├── e2e/
-│   └── fixtures/
-│
-├── scripts/
-│   ├── audit_repository.py
-│   ├── generate_aria2_matrix.py
-│   ├── check_docs.py
-│   └── check_options.py
-│
-├── AGENTS.md
-├── PLAN.md
-├── README.md
-├── CHANGELOG.md
-├── CONTRIBUTING.md
-├── SECURITY.md
-├── LICENSE.txt
-├── pyproject.toml
-└── uv.lock
-```
-
-The tree is a **target state**, not a requirement to move every file immediately.
-
----
-
-# 4. Work State Model
-
-Every issue must be maintained in one of:
-
-```text
-PLANNED
-READY
-IN_PROGRESS
-BLOCKED
-IN_REVIEW
-DONE
-REJECTED
-SUPERSEDED
-```
-
-An issue may only become `DONE` when its acceptance criteria are satisfied.
-
----
-
-# 5. Dependency Graph
-
-High-level dependency graph:
-
-```text
-EPIC 0  Audit
-  │
-  ├───────────────┐
-  ▼               ▼
-EPIC 1          EPIC 5
-aria2 spec      persistence design
-  │
-  ▼
-EPIC 2
-domain
-  │
-  ├──────────────┐
-  ▼              ▼
-EPIC 3          EPIC 4
-RPC             daemon
-  │              │
-  └──────┬───────┘
-         ▼
-      EPIC 6
-    application
-         │
-         ▼
-      EPIC 7
-        UI
-         │
-   ┌─────┼──────────────┐
-   ▼     ▼              ▼
-EPIC 8 EPIC 9         EPIC 10
-Options Scheduler     Queue
-   │     │              │
-   └─────┼──────────────┘
-         ▼
-   EPIC 11 / 12
- BitTorrent / Metalink
-         │
-         ▼
-      EPIC 13
-      Security
-         │
-         ▼
-      EPIC 14
-   Observability
-         │
-         ▼
-      EPIC 15
- OS integration
-         │
-         ▼
-      EPIC 16
-      Testing
-         │
-         ▼
-      EPIC 17
- Documentation
-         │
-         ▼
-      EPIC 18
- Consistency gates
-         │
-         ▼
-      EPIC 19
- Packaging
-         │
-         ▼
-      EPIC 20
- CI/CD
-         │
-         ▼
-      EPIC 21
- Migration/removal
+strict
+no Any unless justified
+no untyped public APIs
+Protocols for contracts
+Typed models for domain data
 ```
 
 ---
 
-# 6. EPIC 0 — Repository Audit
-
-## P0-001 — Establish reproducible baseline
-
-**Dependencies:** none.
-
-### Agent task
-
-Inspect the repository without modifying application architecture.
-
-Record:
-
-- git branch
-- commit
-- Python version
-- uv version
-- aria2 version if installed
-- operating system
-- dependency lock state
-- Ruff status
-- ty status
-- pytest status
-- coverage
-- build status
-
-### Acceptance criteria
-
-- `docs/audit/PHASE_0_FINDINGS.md` exists.
-- Baseline commands are documented.
-- Every failing command has its failure captured.
-- No failures are hidden or silently ignored.
-
----
-
-## P0-002 — Source inventory
-
-**Dependencies:** P0-001.
-
-### Agent task
-
-Inventory every Python module and classify:
-
-- purpose
-- public API
-- imports
-- side effects
-- UI coupling
-- aria2 coupling
-- persistence coupling
-- subprocess usage
-- network usage
-- test coverage
-- rewrite disposition
-
-### Acceptance criteria
-
-Every source file appears exactly once in the inventory.
-
-Each is marked:
+# 23. Epic Dependency Graph
 
 ```text
-KEEP
-REWRITE
-ADAPT
-REMOVE
-UNKNOWN
+E00 Repository Audit
+ │
+ ├── E01 Toolchain/Foundation
+ │
+ ├── E02 Domain/Core
+ │      │
+ │      ├── E03 Events/Application
+ │      │
+ │      ├── E04 Persistence
+ │      │
+ │      └── E05 Backend SDK
+ │             │
+ │             ├── E06 Fake Backend
+ │             │
+ │             ├── E07 aria2
+ │             │
+ │             └── E08 yt-dlp
+ │
+ ├── E09 Acquisition
+ │      ├── Clipboard
+ │      ├── Drag/Drop
+ │      ├── Resolution
+ │      └── Policy
+ │
+ │      └── E10 Browser
+ │
+ ├── E11 Desktop
+ │      └── 132-screen baseline
+ │
+ ├── E12 Textual
+ │
+ ├── E13 CLI
+ │
+ ├── E14 Plugins
+ │
+ ├── E15 Security
+ │
+ ├── E16 Testing/QA
+ │
+ ├── E17 Documentation
+ │
+ └── E18 Release/Packaging
+```
+
+Critical path:
+
+```text
+E00
+ ↓
+E01
+ ↓
+E02
+ ↓
+E03
+ ↓
+E05
+ ↓
+E06
+ ↓
+E07
+ ↓
+E11
+```
+
+Parallel paths after core contracts:
+
+```text
+E07 aria2
+E08 yt-dlp
+E09 acquisition
+E12 Textual
+E13 CLI
+E14 plugins
+E15 security
 ```
 
 ---
 
-## P0-003 — Feature inventory
+# 24. AI-Agent Ticket Contract
 
-**Dependencies:** P0-002.
+Every ticket below is executable.
 
-### Agent task
+An agent MUST:
 
-Inventory all current functionality.
+1. inspect existing code before editing;
+2. identify impacted modules;
+3. implement the smallest coherent change;
+4. add/update tests;
+5. run relevant checks;
+6. update documentation;
+7. report files changed;
+8. report tests run;
+9. report unresolved issues;
+10. never silently weaken typing or acceptance criteria.
 
-Minimum categories:
+A ticket is complete only when all acceptance criteria pass.
 
-- downloads
-- HTTP
-- HTTPS
-- FTP
-- SFTP
-- BitTorrent
-- Magnet
-- Metalink
-- RPC
-- daemon
-- scheduler
-- authentication
-- proxy
-- checksums
-- file selection
-- sessions
-- notifications
-- tray
-- clipboard
-- trackers
-- peers
-- mirrors
-- media extraction
-- WebSocket
-- webhook
-- statistics
-- categories
-- search
-- filtering
-- settings
+---
 
-### Acceptance criteria
+# 25. Epic E00 — Repository Audit
 
-`CURRENT_FEATURE_MATRIX.md` exists with:
+## E00-I01 — Inventory Repository
+
+**Depends:** none
+
+**Task**
+
+Inventory source, tests, docs, resources, workflows, packaging and archive material.
+
+**Acceptance**
+
+- complete tree recorded;
+- existing modules mapped;
+- legacy/archive code identified;
+- entry points identified;
+- dependencies identified;
+- test suite identified;
+- migration risks documented.
+
+---
+
+## E00-I02 — Map Existing Features
+
+**Depends:** E00-I01
+
+**Task**
+
+Map existing functionality to the new architecture.
+
+**Acceptance**
+
+Every existing feature is marked:
 
 ```text
-feature
-current implementation
-tests
-documentation
-new implementation
+retain
+rewrite
+replace
+deprecate
+remove
+```
+
+No existing user-visible capability is unclassified.
+
+---
+
+## E00-I03 — aria2 Gap Matrix
+
+**Depends:** E00-I01
+
+**Task**
+
+Compare current implementation against official aria2c documentation.
+
+**Acceptance**
+
+- all option families catalogued;
+- RPC methods catalogued;
+- protocol coverage catalogued;
+- gaps classified;
+- tests required for each gap;
+- `docs/aria2/option-matrix.md` created.
+
+---
+
+# 26. Epic E01 — Foundation
+
+## E01-I01 — Python 3.14 Baseline
+
+**Depends:** E00
+
+**Acceptance**
+
+- pyproject requires Python 3.14+;
+- obsolete compatibility code removed;
+- CI tests Python 3.14;
+- package builds.
+
+## E01-I02 — uv Toolchain
+
+**Depends:** E01-I01
+
+**Acceptance**
+
+- uv lockfile valid;
+- reproducible `uv sync`;
+- development commands documented.
+
+## E01-I03 — Ruff and ty
+
+**Depends:** E01-I01
+
+**Acceptance**
+
+- Ruff configured;
+- ty configured;
+- CI fails on violations;
+- public APIs typed.
+
+## E01-I04 — Test Infrastructure
+
+**Depends:** E01-I01
+
+**Acceptance**
+
+- unit/integration/contract/e2e layout;
+- fixtures;
+- coverage;
+- deterministic test commands.
+
+---
+
+# 27. Epic E02 — Domain Core
+
+## E02-I01 — Job Model
+
+**Depends:** E01
+
+**Acceptance**
+
+Typed Job model supports lifecycle, backend, source, progress and outputs.
+
+## E02-I02 — Artifact Model
+
+**Depends:** E02-I01
+
+**Acceptance**
+
+Files, directories and collections can be represented without backend-specific types.
+
+## E02-I03 — JobGroup Model
+
+**Depends:** E02-I01
+
+**Acceptance**
+
+Batch/playlist/group jobs supported.
+
+## E02-I04 — AcquisitionRequest
+
+**Depends:** E01
+
+**Acceptance**
+
+All acquisition sources map to a typed request.
+
+## E02-I05 — Capability Model
+
+**Depends:** E01
+
+**Acceptance**
+
+Capabilities are typed, serializable and queryable.
+
+## E02-I06 — CredentialReference
+
+**Depends:** E01
+
+**Acceptance**
+
+Domain objects contain references rather than secrets.
+
+---
+
+# 28. Epic E03 — Application and Events
+
+## E03-I01 — Command Bus
+
+**Depends:** E02
+
+**Acceptance**
+
+Frontend-independent commands execute application operations.
+
+## E03-I02 — Query Layer
+
+**Depends:** E02
+
+**Acceptance**
+
+Frontends can retrieve jobs, status, capabilities and diagnostics without backend coupling.
+
+## E03-I03 — Event Bus
+
+**Depends:** E02
+
+**Acceptance**
+
+Typed events can be emitted/subscribed to and tested.
+
+## E03-I04 — Job Lifecycle Service
+
+**Depends:** E03-I01, E03-I03
+
+**Acceptance**
+
+Create/start/pause/resume/cancel/remove/retry workflows are backend-neutral.
+
+---
+
+# 29. Epic E04 — Persistence
+
+## E04-I01 — Persistence Contracts
+
+**Depends:** E02
+
+**Acceptance**
+
+Repositories/interfaces exist for jobs, artifacts, history, settings and schedules.
+
+## E04-I02 — Initial Storage
+
+**Depends:** E04-I01
+
+**Acceptance**
+
+Initial storage implementation supports restart recovery.
+
+## E04-I03 — Migrations
+
+**Depends:** E04-I02
+
+**Acceptance**
+
+Schema versioning and migration tests exist.
+
+---
+
+# 30. Epic E05 — Backend SDK
+
+## E05-I01 — Backend Protocol
+
+**Depends:** E02
+
+**Acceptance**
+
+Backend contract supports discovery, lifecycle, capabilities, job execution and events.
+
+## E05-I02 — Backend Registry
+
+**Depends:** E05-I01
+
+**Acceptance**
+
+Backends can be registered, discovered and selected.
+
+## E05-I03 — Backend Error Model
+
+**Depends:** E05-I01
+
+**Acceptance**
+
+Backend errors map into stable application errors.
+
+## E05-I04 — Backend Option Model
+
+**Depends:** E05-I01
+
+**Acceptance**
+
+Backend-specific options have typed metadata.
+
+---
+
+# 31. Epic E06 — Fake Backend
+
+## E06-I01 — FakeBackend
+
+**Depends:** E05
+
+**Acceptance**
+
+Fake backend simulates:
+
+```text
+queued
+active
+paused
+failed
+completed
+cancelled
+progress
+speed
+ETA
+files
+events
+capabilities
+```
+
+## E06-I02 — Contract Test Suite
+
+**Depends:** E06-I01
+
+**Acceptance**
+
+Every backend implementation must pass the common contract suite.
+
+---
+
+# 32. Epic E07 — aria2 Backend
+
+## E07-I01 — RPC Transport
+
+**Depends:** E05, E06
+
+**Acceptance**
+
+JSON-RPC transport implemented with typed request/response handling, timeouts, retries and structured errors.
+
+## E07-I02 — XML-RPC Compatibility
+
+**Depends:** E07-I01
+
+**Acceptance**
+
+Required XML-RPC operations supported/tested.
+
+## E07-I03 — Session/Daemon Lifecycle
+
+**Depends:** E07-I01
+
+**Acceptance**
+
+Local aria2 process can be discovered, started, monitored and stopped safely.
+
+## E07-I04 — Download Lifecycle
+
+**Depends:** E07-I01
+
+**Acceptance**
+
+Add/pause/resume/cancel/remove/retry operations work.
+
+## E07-I05 — Status/Files/Peers/Servers
+
+**Depends:** E07-I04
+
+**Acceptance**
+
+Status, files, peers and servers are represented through backend-neutral models.
+
+## E07-I06 — Global Statistics
+
+**Depends:** E07-I04
+
+**Acceptance**
+
+Global statistics are exposed through application queries.
+
+## E07-I07 — Option Catalogue
+
+**Depends:** E07-I04
+
+**Acceptance**
+
+Full documented option catalogue generated/validated and exposed through typed metadata.
+
+## E07-I08 — Protocol Features
+
+**Depends:** E07-I04
+
+**Acceptance**
+
+HTTP(S), FTP, SFTP, BitTorrent, Magnet and Metalink are covered.
+
+## E07-I09 — Integrity/Checksums
+
+**Depends:** E07-I08
+
+**Acceptance**
+
+Checksum/integrity features are represented and tested.
+
+## E07-I10 — Input/Session Files
+
+**Depends:** E07-I04
+
+**Acceptance**
+
+Input-file and session semantics are documented and implemented where supported.
+
+## E07-I11 — RPC Complete Surface
+
+**Depends:** E07-I01
+
+**Acceptance**
+
+RPC method matrix covers all required aria2 RPC methods and identifies intentionally unsupported methods with reasons.
+
+---
+
+# 33. Epic E08 — yt-dlp Backend
+
+## E08-I01 — Process Adapter
+
+**Depends:** E05, E06
+
+**Acceptance**
+
+yt-dlp is executed through a safe typed adapter.
+
+## E08-I02 — Media Inspection
+
+**Depends:** E08-I01
+
+**Acceptance**
+
+Metadata and format information can be queried without starting a download.
+
+## E08-I03 — Format Selection
+
+**Depends:** E08-I02
+
+**Acceptance**
+
+Video/audio format selection maps into a typed job request.
+
+## E08-I04 — Playlist/Collection
+
+**Depends:** E08-I02, E02-I03
+
+**Acceptance**
+
+Playlists produce job groups.
+
+## E08-I05 — Subtitles/Metadata/Post-processing
+
+**Depends:** E08-I03
+
+**Acceptance**
+
+Supported yt-dlp workflows are represented without contaminating core domain models.
+
+---
+
+# 34. Epic E09 — Acquisition Platform
+
+## E09-I01 — Detector
+
+**Depends:** E02
+
+**Acceptance**
+
+Detects URL, magnet, torrent, Metalink and media candidates.
+
+## E09-I02 — Inspector
+
+**Depends:** E09-I01
+
+**Acceptance**
+
+Inspects source without executing an irreversible download.
+
+## E09-I03 — Resolver
+
+**Depends:** E09-I02, E05
+
+**Acceptance**
+
+Selects compatible backend candidates.
+
+## E09-I04 — Policy Engine
+
+**Depends:** E09-I03
+
+**Acceptance**
+
+Supports source/type/domain/backend rules and precedence.
+
+## E09-I05 — Acquisition Inbox
+
+**Depends:** E09-I04, E03
+
+**Acceptance**
+
+Detected items can be accepted, ignored, retried or expired.
+
+## E09-I06 — Clipboard Capture
+
+**Depends:** E09-I01, E09-I05
+
+**Acceptance**
+
+Clipboard capture supports URLs, magnets, multi-URL text, deduplication and configurable action policy.
+
+## E09-I07 — Drag and Drop
+
+**Depends:** E09-I01
+
+**Acceptance**
+
+Desktop can accept URLs, text, torrent files, Metalinks and supported local inputs.
+
+---
+
+# 35. Epic E10 — Browser Integration
+
+## E10-I01 — Acquisition Gateway
+
+**Depends:** E09, E15
+
+**Acceptance**
+
+Authenticated local browser acquisition endpoint exists.
+
+## E10-I02 — Chromium Extension
+
+**Depends:** E10-I01
+
+**Acceptance**
+
+Context menu and send-to-Shusha workflows work.
+
+## E10-I03 — Firefox Extension
+
+**Depends:** E10-I01
+
+**Acceptance**
+
+Equivalent acquisition workflows work.
+
+## E10-I04 — Media Candidate Transfer
+
+**Depends:** E08, E10-I01
+
+**Acceptance**
+
+Browser can send detected media/page candidates for inspection.
+
+## E10-I05 — Browser Security
+
+**Depends:** E10-I01
+
+**Acceptance**
+
+Unauthorized origins/requests are rejected and security behavior is documented.
+
+---
+
+# 36. Epic E11 — ttkbootstrap Desktop
+
+## E11-I01 — Application Shell
+
+**Depends:** E03
+
+**Acceptance**
+
+Shell includes navigation, toolbar, content region, status region and notifications.
+
+## E11-I02 — Design System
+
+**Depends:** E11-I01
+
+**Acceptance**
+
+Typography, spacing, states, controls, tables, dialogs and theme tokens are standardized.
+
+## E11-I03 — Responsive Layout Engine
+
+**Depends:** E11-I01
+
+**Acceptance**
+
+Compact/Standard/Wide/UltraWide behavior is deterministic.
+
+## E11-I04 — Dashboard
+
+**Depends:** E03, E07
+
+**Acceptance**
+
+Dashboard displays backend-neutral jobs/statistics/events.
+
+## E11-I05 — Download Workspace
+
+**Depends:** E11-I04
+
+**Acceptance**
+
+Queue, filtering, sorting, bulk actions, context actions and inspectors work.
+
+## E11-I06 — Add Download Workflow
+
+**Depends:** E09, E07
+
+**Acceptance**
+
+URL/torrent/magnet/Metalink workflows are available.
+
+## E11-I07 — Acquisition Inbox UI
+
+**Depends:** E09-I05
+
+**Acceptance**
+
+Users can inspect and accept acquisition candidates.
+
+## E11-I08 — Media Grabber UI
+
+**Depends:** E08-I02, E08-I03
+
+**Acceptance**
+
+Media metadata and format selection workflow works.
+
+## E11-I09 — aria2 Advanced Inspectors
+
+**Depends:** E07-I05
+
+**Acceptance**
+
+Files, peers, trackers, servers, pieces, options and statistics are covered.
+
+## E11-I10 — Settings
+
+**Depends:** E07-I07, E04
+
+**Acceptance**
+
+Backend, application, acquisition, browser, appearance, storage and security settings are represented.
+
+## E11-I11 — 132-Screen Baseline
+
+**Depends:** E11-I01 through E11-I10
+
+**Acceptance**
+
+Every catalogue feature is implemented or explicitly mapped to a replacement UI with equivalent functionality.
+
+---
+
+# 37. Epic E12 — Textual
+
+## E12-I01 — TUI Shell
+
+**Depends:** E03
+
+**Acceptance**
+
+Textual application starts and displays backend-neutral state.
+
+## E12-I02 — Live Job Monitor
+
+**Depends:** E03
+
+**Acceptance**
+
+Jobs update without full-screen refresh artifacts.
+
+## E12-I03 — Acquisition Monitor
+
+**Depends:** E09
+
+**Acceptance**
+
+Acquisition events and inbox are visible.
+
+## E12-I04 — Diagnostics
+
+**Depends:** E03
+
+**Acceptance**
+
+Backend/plugin/system diagnostics are inspectable.
+
+## E12-I05 — Doctor
+
+**Depends:** E15
+
+**Acceptance**
+
+`shusha doctor`/TUI doctor identifies actionable environment problems.
+
+## E12-I06 — Headless Administration
+
+**Depends:** E12-I02
+
+**Acceptance**
+
+Pause/resume/remove/retry and configuration inspection work over terminal workflows.
+
+---
+
+# 38. Epic E13 — CLI
+
+## E13-I01 — CLI Framework
+
+**Depends:** E03
+
+**Acceptance**
+
+CLI dispatches application commands, not backend calls.
+
+## E13-I02 — Job Commands
+
+**Depends:** E13-I01
+
+**Acceptance**
+
+Implement:
+
+```text
+add
+list
 status
-```
-
----
-
-## P0-004 — Test audit
-
-**Dependencies:** P0-002.
-
-### Agent task
-
-Classify all tests and identify coverage gaps.
-
-### Acceptance criteria
-
-Every existing test has a mapped feature/module.
-
-No test is deleted during Phase 0.
-
----
-
-## P0-005 — Dependency audit
-
-**Dependencies:** P0-001.
-
-### Agent task
-
-Classify dependencies:
-
-```text
-runtime
-development
-optional
-platform
-unused
-duplicate
-legacy
-```
-
-### Acceptance criteria
-
-`DEPENDENCY_AUDIT.md` identifies every direct dependency and its rewrite disposition.
-
----
-
-## P0-006 — Architecture audit
-
-**Dependencies:** P0-002, P0-003.
-
-### Agent task
-
-Document actual architecture rather than README architecture.
-
-Identify:
-
-- circular dependencies
-- UI/business coupling
-- RPC leakage
-- global state
-- mutable singleton state
-- subprocess coupling
-- persistence coupling
-- threading/event-loop assumptions
-
-### Acceptance criteria
-
-`CURRENT_ARCHITECTURE.md` contains an actual dependency diagram.
-
----
-
-## P0-007 — Security audit
-
-**Dependencies:** P0-002.
-
-### Agent task
-
-Search for:
-
-- credentials
-- tokens
-- secrets
-- unsafe subprocess calls
-- shell invocation
-- path traversal
-- unsafe URL handling
-- insecure temporary files
-- logging of secrets
-- permissive config files
-
-### Acceptance criteria
-
-Every finding receives:
-
-```text
-severity
-location
-risk
-recommendation
-rewrite disposition
-```
-
----
-
-## P0-008 — Dead-code audit
-
-**Dependencies:** P0-002.
-
-### Agent task
-
-Identify:
-
-- unused modules
-- obsolete views
-- abandoned experiments
-- archive code
-- duplicate implementations
-- unreachable branches
-
-### Acceptance criteria
-
-No code is deleted solely based on static analysis.
-
-Each candidate is explicitly classified.
-
----
-
-## P0-009 — Migration map
-
-**Dependencies:** P0-002 through P0-008.
-
-### Acceptance criteria
-
-Every existing feature maps to:
-
-```text
-old location
-new location
-migration strategy
-tests
-documentation
-```
-
----
-
-# 7. EPIC 1 — aria2 Specification Baseline
-
-## P1-001 — Build aria2 option registry
-
-**Dependencies:** P0-003.
-
-### Agent task
-
-Create a machine-readable catalogue of all relevant aria2 options.
-
-Each record must include:
-
-```text
-name
-short_name
-category
-type
-default
-minimum
-maximum
-enum_values
-scope
-rpc_supported
-cli_supported
-sensitive
-deprecated
-experimental
-description
-documentation_reference
-```
-
-### Acceptance criteria
-
-Every option in the supported aria2 manual surface is accounted for.
-
-Unknown options are explicitly recorded as unknown rather than omitted.
-
----
-
-## P1-002 — Categorize options
-
-**Dependencies:** P1-001.
-
-### Acceptance criteria
-
-Every option belongs to a defined category.
-
-No option belongs to two categories unless explicitly marked multi-category.
-
----
-
-## P1-003 — Build RPC method registry
-
-**Dependencies:** P1-001.
-
-### Agent task
-
-Catalogue all supported aria2 RPC methods.
-
-### Acceptance criteria
-
-Each method has:
-
-```text
-name
-parameters
-return type
-errors
-authentication requirements
-feature area
-tests
-```
-
----
-
-## P1-004 — Build event registry
-
-**Dependencies:** P1-003.
-
-### Acceptance criteria
-
-All relevant aria2 event notifications have typed mappings.
-
----
-
-## P1-005 — aria2 version policy
-
-**Dependencies:** P1-001, P1-003.
-
-### Acceptance criteria
-
-Document:
-
-- minimum supported aria2 version
-- tested versions
-- unsupported versions
-- capability detection
-- version-dependent behavior
-
----
-
-# 8. EPIC 2 — Domain Model
-
-## P2-001 — Download aggregate
-
-**Dependencies:** P1-001.
-
-Implement:
-
-```text
-Download
-DownloadId
-DownloadStatus
-DownloadProgress
-DownloadSource
-DownloadFile
-DownloadError
-```
-
-### Acceptance criteria
-
-- no raw aria2 dictionaries
-- immutable/value semantics where appropriate
-- complete typing
-- unit tests
-- serialization tests
-
----
-
-## P2-002 — Torrent domain
-
-**Dependencies:** P2-001.
-
-Implement:
-
-```text
-Torrent
-TorrentFile
-Peer
-Tracker
-Piece
-```
-
-### Acceptance criteria
-
-All fields needed by the application are represented without transport-specific names leaking into the domain.
-
----
-
-## P2-003 — Metalink domain
-
-**Dependencies:** P2-001.
-
-Implement:
-
-```text
-Metalink
-MetalinkFile
-Mirror
-Checksum
-```
-
----
-
-## P2-004 — Statistics domain
-
-**Dependencies:** P2-001.
-
-Implement:
-
-```text
-DownloadStatistics
-GlobalStatistics
-ServerStatistics
-SpeedSample
-```
-
----
-
-## P2-005 — Event domain
-
-**Dependencies:** P2-001 through P2-004.
-
-Implement typed application events.
-
-### Acceptance criteria
-
-Events are transport-independent.
-
----
-
-## P2-006 — Error model
-
-**Dependencies:** P2-001.
-
-Create structured errors for:
-
-```text
-connection
-authentication
-RPC
-aria2
-filesystem
-validation
-configuration
-persistence
-network
-daemon
-```
-
-### Acceptance criteria
-
-User-facing errors never require parsing arbitrary strings in UI code.
-
----
-
-# 9. EPIC 3 — aria2 Infrastructure
-
-## P3-001 — RPC transport
-
-**Dependencies:** P1-003, P2-006.
-
-Implement typed JSON-RPC transport.
-
-Required:
-
-- request IDs
-- timeouts
-- retries where safe
-- authentication
-- RPC errors
-- malformed response handling
-- cancellation strategy
-
-### Acceptance criteria
-
-No raw transport response escapes the infrastructure boundary.
-
----
-
-## P3-002 — RPC models
-
-**Dependencies:** P2-001 through P2-004.
-
-Implement serializers/deserializers.
-
-### Acceptance criteria
-
-Malformed external data produces typed validation errors.
-
----
-
-## P3-003 — RPC client
-
-**Dependencies:** P3-001, P3-002.
-
-Implement typed client methods.
-
-Example:
-
-```python
-await client.tell_status(download_id)
-```
-
-not:
-
-```python
-await client.call("aria2.tellStatus", ...)
-```
-
-outside infrastructure.
-
----
-
-## P3-004 — Capability detection
-
-**Dependencies:** P3-003.
-
-Detect:
-
-- aria2 version
-- methods
-- supported options
-- optional features
-
-### Acceptance criteria
-
-Unsupported capabilities produce explicit capability errors.
-
----
-
-## P3-005 — Event transport
-
-**Dependencies:** P3-003, P1-004.
-
-Implement event subscription/translation.
-
----
-
-# 10. EPIC 4 — Daemon Lifecycle
-
-## P4-001 — Discovery
-
-**Dependencies:** P0-006.
-
-Detect configured/local aria2 executables.
-
----
-
-## P4-002 — Command builder
-
-**Dependencies:** P1-001.
-
-Build daemon arguments from typed configuration.
-
-Never concatenate shell commands.
-
----
-
-## P4-003 — Process supervisor
-
-**Dependencies:** P4-002.
-
-States:
-
-```text
-UNKNOWN
-SEARCHING
-FOUND
-STARTING
-RUNNING
-UNHEALTHY
-STOPPING
-STOPPED
-FAILED
-```
-
----
-
-## P4-004 — Health monitor
-
-**Dependencies:** P3-003, P4-003.
-
-### Acceptance criteria
-
-Daemon failures generate typed events.
-
----
-
-## P4-005 — Remote daemon support
-
-**Dependencies:** P3-003.
-
-Support connecting to a remote aria2 RPC endpoint.
-
----
-
-# 11. EPIC 5 — Persistence
-
-## P5-001 — Persistence contracts
-
-**Dependencies:** P2 domain.
-
-Create protocols:
-
-```text
-DownloadRepository
-SettingsRepository
-SessionRepository
-CategoryRepository
-```
-
----
-
-## P5-002 — Database implementation
-
-**Dependencies:** P5-001.
-
-Use an implementation appropriate to the application requirements.
-
-Requirements:
-
-- schema version
-- migrations
-- transactions
-- atomic updates
-- corruption handling
-
----
-
-## P5-003 — Configuration persistence
-
-**Dependencies:** P5-001.
-
-Persist:
-
-- application settings
-- UI state
-- daemon profiles
-- categories
-- schedules
-- preferences
-
----
-
-## P5-004 — Import/export
-
-**Dependencies:** P5-002, P5-003.
-
-Support safe configuration export/import.
-
----
-
-# 12. EPIC 6 — Application Layer
-
-## P6-001 — Application composition root
-
-**Dependencies:** P2, P3, P4, P5.
-
-Construct all dependencies explicitly.
-
-No hidden global service locator.
-
----
-
-## P6-002 — Add download use case
-
-**Dependencies:** P6-001.
-
----
-
-## P6-003 — Pause/resume use cases
-
-**Dependencies:** P6-001.
-
----
-
-## P6-004 — Remove/retry use cases
-
-**Dependencies:** P6-001.
-
----
-
-## P6-005 — Queue operations
-
-**Dependencies:** P6-001.
-
----
-
-## P6-006 — Change options
-
-**Dependencies:** P1-001, P6-001.
-
----
-
-## P6-007 — Download inspection
-
-**Dependencies:** P3-003, P2 models.
-
----
-
-## P6-008 — Statistics queries
-
-**Dependencies:** P2-004, P3-003.
-
----
-
-## P6-009 — Scheduling service
-
-**Dependencies:** P5-003, P6-005.
-
----
-
-## P6-010 — Notification service
-
-**Dependencies:** P6 events.
-
----
-
-# 13. EPIC 7 — ttkbootstrap UI
-
-## P7-001 — Design system
-
-**Dependencies:** P0-006.
-
-Define:
-
-- typography
-- spacing
-- colors
-- icons
-- status states
-- controls
-- tables
-- dialogs
-- menus
-- accessibility conventions
-
----
-
-## P7-002 — Application shell
-
-**Dependencies:** P7-001, P6-001.
-
-Implement:
-
-```text
-menu
-toolbar
-sidebar
-content
-status bar
-notifications
-```
-
----
-
-## P7-003 — Download table
-
-**Dependencies:** P7-002, P6 queries.
-
-Features:
-
-- sorting
-- filtering
-- search
-- multi-select
-- keyboard navigation
-- context menu
-- status indicators
-- progress
-- speed
-- ETA
-
----
-
-## P7-004 — Add Download wizard
-
-**Dependencies:** P7-002, P6-002.
-
-Stages:
-
-```text
-Source
-Destination
-Files
-Options
-Review
-Start
-```
-
----
-
-## P7-005 — Download inspector
-
-**Dependencies:** P7-003.
-
-Tabs:
-
-```text
-Overview
-Files
-Connections
-Peers
-Servers
-Options
-Logs
-Hashes
-```
-
----
-
-## P7-006 — Settings
-
-**Dependencies:** P1 option registry, P7-001.
-
-Support:
-
-```text
-Basic
-Advanced
-Expert
-```
-
-All settings must map to aria2 options.
-
----
-
-## P7-007 — Error and empty states
-
-**Dependencies:** P7-002.
-
-Every major screen must define:
-
-```text
-loading
-empty
-error
-offline
-disabled
-permission denied
-```
-
----
-
-# 14. EPIC 8 — Full aria2 Option UX
-
-## P8-001 — Option editor engine
-
-**Dependencies:** P1-001, P7-006.
-
-Generate UI controls from `OptionDefinition`.
-
----
-
-## P8-002 — Validation engine
-
-**Dependencies:** P8-001.
-
-Support:
-
-- numeric ranges
-- enums
-- paths
-- URLs
-- durations
-- sizes
-- booleans
-- lists
-- structured values
-
----
-
-## P8-003 — Option documentation links
-
-**Dependencies:** P8-001.
-
-Every advanced option exposes its aria2 documentation reference.
-
----
-
-## P8-004 — Scope handling
-
-**Dependencies:** P8-001.
-
-Distinguish:
-
-```text
-global option
-download option
-daemon option
-read-only status
-```
-
----
-
-## P8-005 — Sensitive options
-
-**Dependencies:** P8-001, EPIC 13.
-
-Mask credentials and secrets.
-
----
-
-# 15. EPIC 9 — Scheduler
-
-## P9-001 — Schedule domain
-
-**Dependencies:** P2-005.
-
----
-
-## P9-002 — Schedule persistence
-
-**Dependencies:** P5-003, P9-001.
-
----
-
-## P9-003 — Scheduler engine
-
-**Dependencies:** P9-001, P9-002.
-
----
-
-## P9-004 — Scheduler UI
-
-**Dependencies:** P7-006, P9-003.
-
-Support:
-
-```text
-days
-times
-start
 pause
-bandwidth
-concurrency
-recurrence
+resume
+cancel
+remove
+retry
 ```
 
+## E13-I03 — Resolution
+
+**Depends:** E09
+
+**Acceptance**
+
+`shusha resolve URL` performs inspection without execution.
+
+## E13-I04 — JSON/JSONL Output
+
+**Depends:** E13-I02
+
+**Acceptance**
+
+Machine-readable output is stable and documented.
+
+## E13-I05 — Diagnostics
+
+**Depends:** E12-I05
+
+**Acceptance**
+
+`doctor` and diagnostics work without Desktop.
+
 ---
 
-# 16. EPIC 10 — Queue
+# 39. Epic E14 — Plugin Platform
 
-## P10-001 — Queue model
+## E14-I01 — Manifest
 
-**Dependencies:** P2-001.
+**Depends:** E05
+
+**Acceptance**
+
+Manifest schema versioned and validated.
+
+## E14-I02 — Discovery
+
+**Depends:** E14-I01
+
+**Acceptance**
+
+Installed plugins are discovered deterministically.
+
+## E14-I03 — Lifecycle
+
+**Depends:** E14-I02
+
+**Acceptance**
+
+Plugin lifecycle and failures are isolated.
+
+## E14-I04 — Permissions
+
+**Depends:** E15
+
+**Acceptance**
+
+Plugins declare and receive only required permissions.
+
+## E14-I05 — SDK
+
+**Depends:** E14-I01 through E14-I04
+
+**Acceptance**
+
+Plugin development kit includes contracts, fixtures, fake backend and documentation.
 
 ---
 
-## P10-002 — Queue operations
+# 40. Epic E15 — Security
 
-**Dependencies:** P10-001, P6-005.
+## E15-I01 — Credential Store
 
-Support:
+**Depends:** E02
+
+**Acceptance**
+
+Secrets are stored through a dedicated abstraction.
+
+## E15-I02 — Plugin Trust
+
+**Depends:** E14-I01
+
+**Acceptance**
+
+Trust levels and permission enforcement exist.
+
+## E15-I03 — Browser Authentication
+
+**Depends:** E10-I01
+
+**Acceptance**
+
+Browser gateway rejects unauthorized requests.
+
+## E15-I04 — Process Execution
+
+**Depends:** E05
+
+**Acceptance**
+
+Backend subprocess execution avoids unsafe shell interpolation.
+
+## E15-I05 — Secret Redaction
+
+**Depends:** E15-I01
+
+**Acceptance**
+
+Credentials cannot appear in logs/errors/diagnostic dumps.
+
+## E15-I06 — Security Documentation
+
+**Depends:** E15-I01 through E15-I05
+
+**Acceptance**
+
+Threat model and security guidance are published.
+
+---
+
+# 41. Epic E16 — QA
+
+## E16-I01 — Architecture Tests
+
+**Depends:** E02-E05
+
+**Acceptance**
+
+Automated tests fail if forbidden dependency directions appear.
+
+## E16-I02 — Backend Contract Tests
+
+**Depends:** E06
+
+**Acceptance**
+
+Fake backend, aria2 and yt-dlp satisfy shared contracts where applicable.
+
+## E16-I03 — Acquisition Tests
+
+**Depends:** E09
+
+**Acceptance**
+
+Detection, resolution, policy and deduplication have deterministic tests.
+
+## E16-I04 — Frontend Tests
+
+**Depends:** E11-E13
+
+**Acceptance**
+
+Critical workflows have UI/TUI/CLI tests.
+
+## E16-I05 — End-to-End Tests
+
+**Depends:** E07, E08, E09, E11
+
+**Acceptance**
+
+Representative real backend workflows succeed.
+
+## E16-I06 — Compatibility Matrix
+
+**Depends:** E16-I05
+
+**Acceptance**
+
+Supported OS/runtime/backend combinations are documented and tested.
+
+---
+
+# 42. Epic E17 — Documentation
+
+## E17-I01 — README Rewrite
+
+**Depends:** architecture stabilization
+
+**Acceptance**
+
+README explains Shusha as a multi-backend platform.
+
+## E17-I02 — Architecture Documentation
+
+**Depends:** E02-E05
+
+**Acceptance**
+
+Architecture diagrams, dependency rules and ADRs published.
+
+## E17-I03 — aria2 Documentation
+
+**Depends:** E07
+
+**Acceptance**
+
+Complete option/RPC/protocol coverage documented.
+
+## E17-I04 — Plugin Documentation
+
+**Depends:** E14
+
+**Acceptance**
+
+Plugin SDK documentation includes examples and compatibility rules.
+
+## E17-I05 — Acquisition Documentation
+
+**Depends:** E09-E10
+
+**Acceptance**
+
+Clipboard/browser/media workflows documented.
+
+## E17-I06 — Frontend Documentation
+
+**Depends:** E11-E13
+
+**Acceptance**
+
+Desktop, Textual and CLI architecture documented.
+
+## E17-I07 — Operations Guide
+
+**Depends:** E12-E15
+
+**Acceptance**
+
+Daemon, diagnostics, logs, recovery and security operations documented.
+
+## E17-I08 — Migration Guide
+
+**Depends:** E17-I01
+
+**Acceptance**
+
+Existing Shusha users/developers can understand migration from the old architecture.
+
+---
+
+# 43. Epic E18 — Packaging and Release
+
+## E18-I01 — Package Metadata
+
+**Depends:** E01
+
+**Acceptance**
+
+Correct Python package metadata and entry points.
+
+## E18-I02 — Desktop Packaging
+
+**Depends:** E11
+
+**Acceptance**
+
+Desktop distribution strategy documented/tested.
+
+## E18-I03 — CLI/TUI Packaging
+
+**Depends:** E12, E13
+
+**Acceptance**
+
+CLI/TUI install and invocation documented.
+
+## E18-I04 — CI/CD
+
+**Depends:** E16
+
+**Acceptance**
+
+CI runs lint, format, typing, tests, build and package checks.
+
+## E18-I05 — Release Checklist
+
+**Depends:** E17, E18-I04
+
+**Acceptance**
+
+Release checklist is reproducible and documented.
+
+---
+
+# 44. Definition of Done
+
+A ticket is DONE only if:
+
+- implementation exists;
+- types pass;
+- tests exist;
+- relevant tests pass;
+- architecture rules pass;
+- docs are updated;
+- no unexplained TODO remains;
+- no unrelated refactor is introduced;
+- error handling is explicit;
+- logging is safe;
+- public behavior is documented;
+- acceptance criteria are satisfied.
+
+---
+
+# 45. Definition of Release Readiness
+
+The rewrite is not release-ready until:
 
 ```text
-move up
-move down
-move top
-move bottom
-priority
-bulk operations
-```
-
----
-
-## P10-003 — Queue UI
-
-**Dependencies:** P7-003, P10-002.
-
----
-
-# 17. EPIC 11 — BitTorrent
-
-## P11-001 — Torrent ingestion
-
-**Dependencies:** P6-002, P2-002.
-
-Support:
-
-```text
-.torrent
-magnet
-```
-
----
-
-## P11-002 — Torrent file selection
-
-**Dependencies:** P11-001, P7-004.
-
----
-
-## P11-003 — Peer view
-
-**Dependencies:** P2-002, P3-003, P7-005.
-
----
-
-## P11-004 — Tracker view
-
-**Dependencies:** P2-002, P7-005.
-
----
-
-## P11-005 — BitTorrent options
-
-**Dependencies:** P8 option engine.
-
----
-
-# 18. EPIC 12 — Metalink
-
-## P12-001 — Metalink ingestion
-
-**Dependencies:** P6-002, P2-003.
-
----
-
-## P12-002 — Mirror management
-
-**Dependencies:** P12-001.
-
----
-
-## P12-003 — Checksum/piece verification
-
-**Dependencies:** P2-003, P2-004.
-
----
-
-# 19. EPIC 13 — Security
-
-## P13-001 — Secret storage abstraction
-
-**Dependencies:** P5-003.
-
----
-
-## P13-002 — Credential redaction
-
-**Dependencies:** P13-001, P14-001.
-
----
-
-## P13-003 — Secure subprocess execution
-
-**Dependencies:** P4-002.
-
-Rules:
-
-- no shell interpolation
-- argument arrays
-- explicit executable paths
-- validated environment
-- controlled working directories
-
----
-
-## P13-004 — Filesystem security
-
-**Dependencies:** P2, P5.
-
-Protect against:
-
-- path traversal
-- invalid destinations
-- symlink surprises
-- unsafe filenames
-
----
-
-## P13-005 — URI security
-
-**Dependencies:** P6-002.
-
-Validate external URLs and avoid leaking credentials.
-
----
-
-# 20. EPIC 14 — Observability
-
-## P14-001 — Structured logging
-
-**Dependencies:** P2-006.
-
-Include:
-
-```text
-timestamp
-level
-component
-event
-download_id
-request_id
-error
-```
-
----
-
-## P14-002 — Diagnostics bundle
-
-**Dependencies:** P14-001.
-
-Provide a user-exportable diagnostic report without secrets.
-
----
-
-## P14-003 — aria2 log integration
-
-**Dependencies:** P4, P14-001.
-
----
-
-# 21. EPIC 15 — OS Integration
-
-## P15-001 — Notifications
-
-**Dependencies:** P6-010.
-
----
-
-## P15-002 — Clipboard integration
-
-**Dependencies:** P7-002.
-
-Clipboard monitoring must be explicitly opt-in/configurable where appropriate.
-
----
-
-## P15-003 — File opening
-
-**Dependencies:** P7-005.
-
----
-
-## P15-004 — System tray
-
-**Dependencies:** P7-002.
-
----
-
-## P15-005 — Platform abstraction
-
-**Dependencies:** P15-001 through P15-004.
-
-Supported targets:
-
-```text
-Windows
-Linux
-macOS
-```
-
----
-
-# 22. EPIC 16 — Testing
-
-## P16-001 — Test architecture
-
-**Dependencies:** EPIC 2.
-
-Establish:
-
-```text
-tests/unit
-tests/integration
-tests/presentation
-tests/e2e
-tests/fixtures
-```
-
----
-
-## P16-002 — Domain tests
-
-**Dependencies:** P2.
-
-Target:
-
-```text
->=95%
-```
-
-for meaningful domain behavior.
-
----
-
-## P16-003 — RPC tests
-
-**Dependencies:** P3.
-
-Use deterministic fixtures/mocks.
-
----
-
-## P16-004 — Daemon tests
-
-**Dependencies:** P4.
-
-Test lifecycle transitions and failures.
-
----
-
-## P16-005 — Persistence tests
-
-**Dependencies:** P5.
-
-Test migrations, corruption, rollback and recovery.
-
----
-
-## P16-006 — Application tests
-
-**Dependencies:** P6.
-
----
-
-## P16-007 — Presentation tests
-
-**Dependencies:** P7.
-
-Focus on behavior rather than meaningless line coverage.
-
----
-
-## P16-008 — End-to-end tests
-
-**Dependencies:** P3, P4, P6, P7.
-
-Where practical, test against a real aria2 daemon.
-
----
-
-## P16-009 — Compatibility tests
-
-**Dependencies:** P1, P3, P8.
-
-Every supported aria2 option/method should have either:
-
-```text
-automated test
-```
-
-or an explicit documented reason why it cannot be automatically tested.
-
----
-
-# 23. EPIC 17 — Documentation
-
-## P17-001 — README rewrite
-
-**Dependencies:** P7, P19.
-
-README must explain:
-
-- purpose
-- screenshots
-- installation
-- aria2 requirements
-- quick start
-- supported platforms
-- features
-- troubleshooting
-- development
-
----
-
-## P17-002 — Architecture documentation
-
-**Dependencies:** EPIC 2–7.
-
----
-
-## P17-003 — aria2 compatibility documentation
-
-**Dependencies:** EPIC 1, 8, 11, 12.
-
----
-
-## P17-004 — User guide
-
-**Dependencies:** P7.
-
----
-
-## P17-005 — Developer guide
-
-**Dependencies:** EPIC 16.
-
----
-
-## P17-006 — AI agent guide
-
-**Dependencies:** architecture stabilized.
-
-Document repository conventions and safe modification procedures.
-
----
-
-# 24. EPIC 18 — Consistency Automation
-
-## P18-001 — Option consistency checker
-
-**Dependencies:** P1, P8.
-
-Verify:
-
-```text
-registry
-implementation
-UI
-documentation
-tests
-```
-
----
-
-## P18-002 — RPC consistency checker
-
-**Dependencies:** P1, P3.
-
----
-
-## P18-003 — Documentation link checker
-
-**Dependencies:** P17.
-
----
-
-## P18-004 — Architecture import checker
-
-**Dependencies:** P2–P7.
-
-Fail CI if forbidden dependency directions are introduced.
-
----
-
-# 25. EPIC 19 — Packaging
-
-## P19-001 — Python package
-
-**Dependencies:** P7.
-
----
-
-## P19-002 — Build validation
-
-**Dependencies:** P19-001.
-
-Validate:
-
-```bash
-uv build
-```
-
-and installation from generated artifacts.
-
----
-
-## P19-003 — Platform packaging
-
-**Dependencies:** P19-002, P15.
-
-Produce/document:
-
-```text
-Windows
-Linux
-macOS
-```
-
-release strategy.
-
----
-
-# 26. EPIC 20 — CI/CD
-
-## P20-001 — Static CI
-
-**Dependencies:** P19.
-
-Required:
-
-```bash
-uv run ruff check .
-uv run ruff format --check .
-uv run ty check
-```
-
----
-
-## P20-002 — Test CI
-
-**Dependencies:** P16.
-
-Required:
-
-```bash
-uv run pytest
-```
-
----
-
-## P20-003 — Build CI
-
-**Dependencies:** P19.
-
----
-
-## P20-004 — Multi-platform CI
-
-**Dependencies:** P20-001, P20-002.
-
----
-
-## P20-005 — Documentation CI
-
-**Dependencies:** P18.
-
----
-
-# 27. EPIC 21 — Legacy Migration and Removal
-
-## P21-001 — Feature parity audit
-
-**Dependencies:** P8–P18.
-
-Create a matrix comparing old and new implementations.
-
----
-
-## P21-002 — Migration validation
-
-**Dependencies:** P21-001.
-
-Every feature must be:
-
-```text
-MIGRATED
-REPLACED
-INTENTIONALLY REMOVED
-```
-
-No `UNKNOWN`.
-
----
-
-## P21-003 — Remove legacy UI
-
-**Dependencies:** P21-002.
-
----
-
-## P21-004 — Remove legacy controllers
-
-**Dependencies:** P21-002.
-
----
-
-## P21-005 — Remove obsolete infrastructure
-
-**Dependencies:** P21-002.
-
----
-
-## P21-006 — Final dead-code audit
-
-**Dependencies:** P21-003 through P21-005.
-
----
-
-# 28. Global Definition of Done
-
-No issue is complete unless applicable requirements are satisfied.
-
-```text
-[ ] Implementation complete
-[ ] Public API typed
-[ ] External boundaries typed
-[ ] Tests added
-[ ] Existing tests preserved or migrated
-[ ] Error handling implemented
-[ ] Security considered
-[ ] Logging considered
-[ ] Documentation updated
-[ ] aria2 mapping updated
-[ ] UI updated if applicable
-[ ] No architecture violation
+[ ] Python 3.14+
+[ ] uv lock reproducible
 [ ] Ruff clean
-[ ] Ruff format clean
 [ ] ty clean
-[ ] pytest clean
-[ ] Build succeeds
+[ ] tests green
+[ ] architecture tests green
+[ ] fake backend green
+[ ] aria2 backend contract green
+[ ] aria2 protocol coverage validated
+[ ] aria2 RPC matrix complete
+[ ] aria2 option matrix complete
+[ ] yt-dlp backend functional
+[ ] acquisition pipeline functional
+[ ] clipboard capture functional
+[ ] browser bridge secured
+[ ] media grabber functional
+[ ] Desktop baseline complete
+[ ] Textual diagnostics functional
+[ ] CLI functional
+[ ] plugin SDK documented
+[ ] persistence/recovery tested
+[ ] security review complete
+[ ] documentation complete
+[ ] packaging tested
 ```
 
 ---
 
-# 29. Global AI Agent Stop Conditions
+# 46. Architectural Non-Goals
 
-The agent MUST stop and report rather than guess when:
+Do NOT:
 
-1. aria2 behavior is ambiguous.
-2. The upstream specification contradicts an existing implementation.
-3. A destructive migration is required without an approved strategy.
-4. A credential/security decision is unclear.
-5. An existing feature cannot be mapped.
-6. A dependency cannot be removed safely.
-7. A test expectation contradicts documented behavior.
-8. A platform-specific behavior cannot be verified.
-9. The agent would need to invent an aria2 option or RPC method.
-10. The agent would need to introduce `Any` to make type checking pass.
-11. The agent would need to bypass a failing test without understanding it.
-12. A UI behavior cannot be inferred safely from the specification.
+- create separate business logic for each frontend;
+- turn core into an aria2 abstraction dump;
+- make every backend expose every feature;
+- force yt-dlp into an aria2-shaped model;
+- reproduce the Desktop UI in Textual;
+- make browser extensions execute downloads;
+- expose secrets to plugins unnecessarily;
+- silently discard unsupported aria2 options;
+- treat the 132-screen catalogue as a rigid navigation tree;
+- introduce a network service before an actual requirement exists;
+- add speculative abstractions without a consumer.
 
-When blocked, produce:
+---
+
+# 47. Implementation Order
+
+Recommended order:
 
 ```text
-BLOCKED:
-Question:
-Evidence:
-Current behavior:
-Expected behavior:
-Options:
-Recommended resolution:
+Phase 0  Repository audit
+Phase 1  Toolchain + architectural skeleton
+Phase 2  Core domain
+Phase 3  Application commands/queries/events
+Phase 4  Persistence
+Phase 5  Backend contracts + fake backend
+Phase 6  aria2 backend
+Phase 7  Acquisition platform
+Phase 8  yt-dlp backend
+Phase 9  Plugin SDK
+Phase 10 Security/browser integration
+Phase 11 ttkbootstrap desktop
+Phase 12 Textual
+Phase 13 CLI
+Phase 14 QA/compatibility
+Phase 15 Documentation
+Phase 16 Packaging/release
+```
+
+Parallel work is permitted only when dependency contracts already exist.
+
+---
+
+# 48. Architectural Gate Reviews
+
+The AI agent MUST stop and request review before crossing these gates:
+
+```text
+GATE-01 Core contract freeze
+GATE-02 Backend contract freeze
+GATE-03 Acquisition contract freeze
+GATE-04 aria2 compatibility freeze
+GATE-05 Plugin security freeze
+GATE-06 Desktop navigation freeze
+GATE-07 Release candidate freeze
+```
+
+No frontend implementation should force changes to core contracts without an ADR.
+
+---
+
+# 49. Required ADRs
+
+Create:
+
+```text
+ADR-001 Multi-backend architecture
+ADR-002 Acquisition pipeline
+ADR-003 Capability model
+ADR-004 Job and Artifact model
+ADR-005 Event architecture
+ADR-006 Persistence strategy
+ADR-007 aria2 integration strategy
+ADR-008 yt-dlp integration strategy
+ADR-009 Plugin security model
+ADR-010 Browser bridge architecture
+ADR-011 Desktop architecture
+ADR-012 Textual architecture
+ADR-013 CLI architecture
+ADR-014 Daemon/service boundary
+ADR-015 Credential storage
+ADR-016 132-screen baseline interpretation
 ```
 
 ---
 
-# 30. Commit Strategy
+# 50. Final Architectural Contract
 
-Prefer small commits.
+The rewrite is successful only if the following statement remains true:
 
-Examples:
+> **Shusha receives work through multiple acquisition mechanisms, resolves that work through typed detection/inspection/policy pipelines, executes it through replaceable backend plugins, persists it through backend-neutral application services, emits typed events, and exposes the same underlying capabilities through ttkbootstrap Desktop, Textual TUI/Diagnostics, and CLI.**
 
-```text
-audit: establish phase 0 repository baseline
-audit: inventory current features
-audit: map aria2 compatibility surface
-build: configure Python 3.14 astral toolchain
-feat(domain): introduce typed download model
-feat(aria2): add typed rpc transport
-feat(daemon): implement lifecycle supervisor
-feat(app): add download use cases
-feat(ui): introduce ttkbootstrap application shell
-feat(ui): add download table
-feat(options): add aria2 option registry
-feat(torrent): add torrent inspection
-feat(metalink): add metalink support
-test(aria2): add rpc compatibility fixtures
-docs: rewrite architecture documentation
-ci: add cross-platform validation
-refactor: remove legacy controller layer
-```
+aria2 is the first complete reference backend.
 
-Do not create giant commits containing unrelated architectural changes.
+yt-dlp is the first secondary backend.
 
----
+Clipboard, browser integration, drag/drop, media grabber and future integrations are acquisition mechanisms.
 
-# 31. Final Release Gate
+The 132-screen catalogue is the initial aria2 desktop completeness contract.
 
-The rewrite is not considered complete until:
-
-```text
-Phase 0 audit complete
-        +
-aria2 compatibility matrix complete
-        +
-typed domain complete
-        +
-RPC complete
-        +
-daemon lifecycle complete
-        +
-persistence complete
-        +
-application services complete
-        +
-ttkbootstrap UI complete
-        +
-full option editor complete
-        +
-BitTorrent complete
-        +
-Metalink complete
-        +
-security review complete
-        +
-tests passing
-        +
-documentation complete
-        +
-CI green
-        +
-packaging validated
-        +
-legacy code removed
-```
-
-The final criterion is:
-
-> **A new contributor or AI coding agent can understand, build, test, modify and extend Shusha without needing to reverse-engineer undocumented behavior from the old implementation.**
+The architecture MUST remain open for additional backends, acquisition providers, frontends and future remote/service interfaces without rewriting the domain core.

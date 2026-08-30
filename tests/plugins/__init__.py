@@ -1,0 +1,1 @@
+"""Plugin platform tests package."""

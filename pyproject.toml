@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "shusha"
 dynamic = ["version"]
-description = "Shusha download manager is a GUI for aria2."
+description = "Shusha — Multi-backend download acquisition and orchestration platform"
 readme = "README.md"
 requires-python = ">=3.14"
 license = "MIT"
@@ -27,6 +27,7 @@ dependencies = [
   "ttkbootstrap>=1.10.1",
   "platformdirs>=4.1.0",
   "pillow>=10.0.0",
+  "textual>=8.2.8",
 ]
 
 [project.urls]
@@ -35,10 +36,12 @@ Issues = "https://github.com/FourtyThree43/shusha/issues"
 Source = "https://github.com/FourtyThree43/shusha"
 
 [project.scripts]
-shusha = "shusha.cli:main"
+shusha = "shusha.interfaces.cli.main:main"
+shusha-tui = "shusha.interfaces.tui.app:run_tui"
+shusha-host = "shusha.acquisition.browser.bridge:main"
 
 [project.gui-scripts]
-shusha-gui = "shusha.ShushaDM:main"
+shusha-gui = "shusha.main:run_gui"
 
 [tool.hatch.version]
 path = "src/shusha/__about__.py"
